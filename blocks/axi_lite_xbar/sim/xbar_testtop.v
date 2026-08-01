@@ -92,6 +92,11 @@ module xbar_testtop (
   wire [3:0]  aes_wstrb;
   wire [1:0]  aes_bresp, aes_rresp;
 
+  wire        dma_awvalid, dma_awready, dma_wvalid, dma_wready, dma_bvalid, dma_bready, dma_arvalid, dma_arready, dma_rvalid, dma_rready;
+  wire [31:0] dma_awaddr, dma_wdata, dma_araddr, dma_rdata;
+  wire [3:0]  dma_wstrb;
+  wire [1:0]  dma_bresp, dma_rresp;
+
   axi_lite_xbar u_xbar (
       .clk(clk), .rst(rst),
       .s0_awvalid(s0_awvalid), .s0_awready(s0_awready), .s0_awaddr(s0_awaddr),
@@ -152,7 +157,13 @@ module xbar_testtop (
       .aes_wvalid(aes_wvalid),   .aes_wready(aes_wready),   .aes_wdata(aes_wdata), .aes_wstrb(aes_wstrb),
       .aes_bvalid(aes_bvalid),   .aes_bready(aes_bready),   .aes_bresp(aes_bresp),
       .aes_arvalid(aes_arvalid), .aes_arready(aes_arready), .aes_araddr(aes_araddr),
-      .aes_rvalid(aes_rvalid),   .aes_rready(aes_rready),   .aes_rdata(aes_rdata), .aes_rresp(aes_rresp)
+      .aes_rvalid(aes_rvalid),   .aes_rready(aes_rready),   .aes_rdata(aes_rdata), .aes_rresp(aes_rresp),
+
+      .dma_awvalid(dma_awvalid), .dma_awready(dma_awready), .dma_awaddr(dma_awaddr),
+      .dma_wvalid(dma_wvalid),   .dma_wready(dma_wready),   .dma_wdata(dma_wdata), .dma_wstrb(dma_wstrb),
+      .dma_bvalid(dma_bvalid),   .dma_bready(dma_bready),   .dma_bresp(dma_bresp),
+      .dma_arvalid(dma_arvalid), .dma_arready(dma_arready), .dma_araddr(dma_araddr),
+      .dma_rvalid(dma_rvalid),   .dma_rready(dma_rready),   .dma_rdata(dma_rdata), .dma_rresp(dma_rresp)
   );
 
   fake_axi_lite_slave u_rom (
@@ -225,6 +236,15 @@ module xbar_testtop (
       .s_bvalid(aes_bvalid),   .s_bready(aes_bready),   .s_bresp(aes_bresp),
       .s_arvalid(aes_arvalid), .s_arready(aes_arready), .s_araddr(aes_araddr),
       .s_rvalid(aes_rvalid),   .s_rready(aes_rready),   .s_rdata(aes_rdata), .s_rresp(aes_rresp)
+  );
+
+  fake_axi_lite_slave u_dma (
+      .clk(clk), .rst(rst),
+      .s_awvalid(dma_awvalid), .s_awready(dma_awready), .s_awaddr(dma_awaddr),
+      .s_wvalid(dma_wvalid),   .s_wready(dma_wready),   .s_wdata(dma_wdata), .s_wstrb(dma_wstrb),
+      .s_bvalid(dma_bvalid),   .s_bready(dma_bready),   .s_bresp(dma_bresp),
+      .s_arvalid(dma_arvalid), .s_arready(dma_arready), .s_araddr(dma_araddr),
+      .s_rvalid(dma_rvalid),   .s_rready(dma_rready),   .s_rdata(dma_rdata), .s_rresp(dma_rresp)
   );
 
 endmodule

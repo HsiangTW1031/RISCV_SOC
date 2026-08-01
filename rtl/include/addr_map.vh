@@ -15,6 +15,11 @@
 `define ADDR_PERIPH_I2C   4'h3   // 0x4000_3000
 `define ADDR_PERIPH_SPI   4'h4   // 0x4000_4000
 `define ADDR_PERIPH_AES   4'h5   // 0x4000_5000
+`define ADDR_PERIPH_DMA   4'h6   // 0x4000_6000 -- dma_engine's AXI4-Lite
+                                 // control port only; the DMA's own AXI4
+                                 // burst master talks directly to
+                                 // dma_ram.v, entirely separate from this
+                                 // Lite-only crossbar (see docs/specs/dma.md)
 
 // ---- slave index numbering, used by axi_lite_xbar's internal mux ----
 `define SLAVE_ROM   0
@@ -25,5 +30,6 @@
 `define SLAVE_I2C   5
 `define SLAVE_SPI   6
 `define SLAVE_AES   7
-`define SLAVE_ERR   8   // default/error slave: unmapped addresses -> SLVERR
-`define NUM_SLAVES  9
+`define SLAVE_DMA   8
+`define SLAVE_ERR   9   // default/error slave: unmapped addresses -> SLVERR
+`define NUM_SLAVES  10

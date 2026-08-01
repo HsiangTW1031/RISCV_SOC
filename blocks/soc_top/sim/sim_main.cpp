@@ -149,6 +149,38 @@ int main(int argc, char** argv) {
   jtag_check("JTAG read-back matches JTAG-written value (through the real crossbar+SRAM)",
              rd_val == SCRATCH_VAL);
 
+  // ---- Phase 6: confirm the DMA engine's AXI4-Lite control port is
+  // correctly address-decoded and routed as the crossbar's 9th slave
+  // (0x4000_6000). This only proves the *wiring* (address decode +
+  // crossbar routing) is correct -- the DMA engine's actual multi-block
+  // AES streaming logic is already exhaustively verified against NIST
+  // SP 800-38A vectors at the block level (blocks/dma/sim/
+  // dma_engine_sim_main.cpp, 15/15 checks), and re-proving that here
+  // would be redundant; dma_ram is deliberately not reachable from the
+  // crossbar at all (see dma_ram.v's header), so a real end-to-end DMA
+  // operation can only be driven/observed at the block level anyway.
+  const uint32_t DMA_SRC_ADDR_REG = 0x40006008;
+  const uint32_t DMA_TEST_VAL     = 0xCAFEF00D;
+
+  ir_scan(IR_AXI_ADDR); dr_scan32(DMA_SRC_ADDR_REG);
+  ir_scan(IR_AXI_DATA); dr_scan32(DMA_TEST_VAL);
+  ir_scan(IR_AXI_CTRL); dr_scan32(0x1); // rw=0 (write), start=1
+  spins = 0;
+  do { status = dr_scan32(0); spins++; } while ((status & 0x1) && spins < 100);
+  jtag_check("JTAG write to DMA SRC_ADDR reg: bridge completed", spins < 100);
+  jtag_check("JTAG write to DMA SRC_ADDR reg: OKAY response", (status & 0x2) != 0);
+
+  ir_scan(IR_AXI_ADDR); dr_scan32(DMA_SRC_ADDR_REG);
+  ir_scan(IR_AXI_CTRL); dr_scan32(0x3); // rw=1 (read), start=1
+  spins = 0;
+  do { status = dr_scan32(0); spins++; } while ((status & 0x1) && spins < 100);
+  jtag_check("JTAG read from DMA SRC_ADDR reg: bridge completed", spins < 100);
+  ir_scan(IR_AXI_DATA);
+  rd_val = dr_scan32(0);
+  jtag_check("JTAG read-back matches JTAG-written DMA SRC_ADDR value "
+             "(crossbar's 9th slave correctly address-decoded)",
+             rd_val == DMA_TEST_VAL);
+
   tfp->close();
   delete dut;
   delete ctx;
@@ -163,6 +195,7 @@ int main(int argc, char** argv) {
          "(kicking the Watchdog each time), and reported the count over "
          "UART — all through real AXI4-Lite transactions; the JTAG debug "
          "bridge also wrote and read back a RAM word through the real "
-         "2-master crossbar\n");
+         "2-master crossbar, and reached the DMA engine's control port as "
+         "the crossbar's 9th slave (Phase 6)\n");
   return 0;
 }

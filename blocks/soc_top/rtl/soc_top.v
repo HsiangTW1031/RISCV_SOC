@@ -57,8 +57,9 @@ module soc_top #(
   wire        cpu_rvalid, cpu_rready;
   wire [31:0] cpu_rdata;
 
-  wire        timer_irq, wdt_irq, i2c_irq, spi_irq, aes_irq;
-  wire [31:0] irq_bus = {24'b0, aes_irq, spi_irq, i2c_irq, wdt_irq, timer_irq, 3'b0};
+  wire        timer_irq, wdt_irq, i2c_irq, spi_irq, aes_irq, dma_irq;
+  wire [31:0] irq_bus = {23'b0, dma_irq, aes_irq, spi_irq, i2c_irq, wdt_irq, timer_irq, 3'b0};
+  // bit8=dma_irq (Phase 6, whole multi-block DMA+AES operation done),
   // bit7=aes_irq, bit6=spi_irq, bit5=i2c_irq, bit4=wdt_irq, bit3=timer_irq,
   // bits[2:0] reserved for PicoRV32's own bus-error/illegal-instruction/
   // (unused) traps.
@@ -141,6 +142,24 @@ module soc_top #(
   wire        aesx_arvalid, aesx_arready; wire [31:0] aesx_araddr;
   wire        aesx_rvalid,  aesx_rready;  wire [31:0] aesx_rdata; wire [1:0] aesx_rresp;
 
+  // ---- crossbar <-> dma_engine's AXI4-Lite control port (Phase 6) ----
+  wire        dmax_awvalid, dmax_awready; wire [31:0] dmax_awaddr;
+  wire        dmax_wvalid,  dmax_wready;  wire [31:0] dmax_wdata; wire [3:0] dmax_wstrb;
+  wire        dmax_bvalid,  dmax_bready;  wire [1:0]  dmax_bresp;
+  wire        dmax_arvalid, dmax_arready; wire [31:0] dmax_araddr;
+  wire        dmax_rvalid,  dmax_rready;  wire [31:0] dmax_rdata; wire [1:0] dmax_rresp;
+
+  // ---- dma_engine's own AXI4 burst master <-> its private dma_ram.v
+  // (NOT routed through the AXI4-Lite crossbar -- see dma_ram.v/
+  // dma_engine.v headers for the architectural rationale) ----
+  wire        dma_m_awvalid, dma_m_awready; wire [31:0] dma_m_awaddr;
+  wire [7:0]  dma_m_awlen; wire [2:0] dma_m_awsize; wire [1:0] dma_m_awburst;
+  wire        dma_m_wvalid, dma_m_wready; wire [31:0] dma_m_wdata; wire [3:0] dma_m_wstrb; wire dma_m_wlast;
+  wire        dma_m_bvalid, dma_m_bready; wire [1:0] dma_m_bresp;
+  wire        dma_m_arvalid, dma_m_arready; wire [31:0] dma_m_araddr;
+  wire [7:0]  dma_m_arlen; wire [2:0] dma_m_arsize; wire [1:0] dma_m_arburst;
+  wire        dma_m_rvalid, dma_m_rready; wire [31:0] dma_m_rdata; wire [1:0] dma_m_rresp; wire dma_m_rlast;
+
   // ---- JTAG debug bridge's AXI4-Lite master port (crossbar's s1) ----
   wire        jtag_awvalid, jtag_awready; wire [31:0] jtag_awaddr;
   wire        jtag_wvalid,  jtag_wready;  wire [31:0] jtag_wdata; wire [3:0] jtag_wstrb;
@@ -209,7 +228,13 @@ module soc_top #(
       .aes_wvalid(aesx_wvalid),   .aes_wready(aesx_wready),   .aes_wdata(aesx_wdata), .aes_wstrb(aesx_wstrb),
       .aes_bvalid(aesx_bvalid),   .aes_bready(aesx_bready),   .aes_bresp(aesx_bresp),
       .aes_arvalid(aesx_arvalid), .aes_arready(aesx_arready), .aes_araddr(aesx_araddr),
-      .aes_rvalid(aesx_rvalid),   .aes_rready(aesx_rready),   .aes_rdata(aesx_rdata), .aes_rresp(aesx_rresp)
+      .aes_rvalid(aesx_rvalid),   .aes_rready(aesx_rready),   .aes_rdata(aesx_rdata), .aes_rresp(aesx_rresp),
+
+      .dma_awvalid(dmax_awvalid), .dma_awready(dmax_awready), .dma_awaddr(dmax_awaddr),
+      .dma_wvalid(dmax_wvalid),   .dma_wready(dmax_wready),   .dma_wdata(dmax_wdata), .dma_wstrb(dmax_wstrb),
+      .dma_bvalid(dmax_bvalid),   .dma_bready(dmax_bready),   .dma_bresp(dmax_bresp),
+      .dma_arvalid(dmax_arvalid), .dma_arready(dmax_arready), .dma_araddr(dmax_araddr),
+      .dma_rvalid(dmax_rvalid),   .dma_rready(dmax_rready),   .dma_rdata(dmax_rdata), .dma_rresp(dmax_rresp)
   );
 
   boot_rom #(.HEXFILE(FIRMWARE_HEX)) u_rom (
@@ -291,6 +316,33 @@ module soc_top #(
       .s_arvalid(aesx_arvalid), .s_arready(aesx_arready), .s_araddr(aesx_araddr),
       .s_rvalid(aesx_rvalid),   .s_rready(aesx_rready),   .s_rdata(aesx_rdata), .s_rresp(aesx_rresp),
       .irq(aes_irq)
+  );
+
+  // ---- Phase 6: DMA engine + its private burst-capable memory ----
+  dma_engine u_dma (
+      .clk(clk), .rst(rst),
+      .s_awvalid(dmax_awvalid), .s_awready(dmax_awready), .s_awaddr(dmax_awaddr),
+      .s_wvalid(dmax_wvalid),   .s_wready(dmax_wready),   .s_wdata(dmax_wdata), .s_wstrb(dmax_wstrb),
+      .s_bvalid(dmax_bvalid),   .s_bready(dmax_bready),   .s_bresp(dmax_bresp),
+      .s_arvalid(dmax_arvalid), .s_arready(dmax_arready), .s_araddr(dmax_araddr),
+      .s_rvalid(dmax_rvalid),   .s_rready(dmax_rready),   .s_rdata(dmax_rdata), .s_rresp(dmax_rresp),
+
+      .m_awvalid(dma_m_awvalid), .m_awready(dma_m_awready), .m_awaddr(dma_m_awaddr), .m_awlen(dma_m_awlen), .m_awsize(dma_m_awsize), .m_awburst(dma_m_awburst),
+      .m_wvalid(dma_m_wvalid),   .m_wready(dma_m_wready),   .m_wdata(dma_m_wdata), .m_wstrb(dma_m_wstrb), .m_wlast(dma_m_wlast),
+      .m_bvalid(dma_m_bvalid),   .m_bready(dma_m_bready),   .m_bresp(dma_m_bresp),
+      .m_arvalid(dma_m_arvalid), .m_arready(dma_m_arready), .m_araddr(dma_m_araddr), .m_arlen(dma_m_arlen), .m_arsize(dma_m_arsize), .m_arburst(dma_m_arburst),
+      .m_rvalid(dma_m_rvalid),   .m_rready(dma_m_rready),   .m_rdata(dma_m_rdata), .m_rresp(dma_m_rresp), .m_rlast(dma_m_rlast),
+
+      .irq(dma_irq)
+  );
+
+  dma_ram u_dma_ram (
+      .clk(clk), .rst(rst),
+      .s_awvalid(dma_m_awvalid), .s_awready(dma_m_awready), .s_awaddr(dma_m_awaddr), .s_awlen(dma_m_awlen), .s_awsize(dma_m_awsize), .s_awburst(dma_m_awburst),
+      .s_wvalid(dma_m_wvalid),   .s_wready(dma_m_wready),   .s_wdata(dma_m_wdata), .s_wstrb(dma_m_wstrb), .s_wlast(dma_m_wlast),
+      .s_bvalid(dma_m_bvalid),   .s_bready(dma_m_bready),   .s_bresp(dma_m_bresp),
+      .s_arvalid(dma_m_arvalid), .s_arready(dma_m_arready), .s_araddr(dma_m_araddr), .s_arlen(dma_m_arlen), .s_arsize(dma_m_arsize), .s_arburst(dma_m_arburst),
+      .s_rvalid(dma_m_rvalid),   .s_rready(dma_m_rready),   .s_rdata(dma_m_rdata), .s_rresp(dma_m_rresp), .s_rlast(dma_m_rlast)
   );
 
   // ---- JTAG debug bridge: the crossbar's second master ----
