@@ -1,9 +1,27 @@
 `include "axi_lite.vh"
 `include "addr_map.vh"
 
-// AXI4-Lite crossbar — Phase 4 scope: 1 master x 8 slaves (ROM, RAM, Timer,
-// Watchdog, UART, I2C, SPI, AES). Hand-written (the project's core
-// differentiator); Verilog-2001 only.
+// AXI4-Lite crossbar — Phase 5 scope: 2 masters (s0 = CPU, s1 = the JTAG
+// debug bridge) x 8 slaves (ROM, RAM, Timer, Watchdog, UART, I2C, SPI,
+// AES). Hand-written (the project's core differentiator); Verilog-2001
+// only.
+//
+// Arbitration: fixed priority, s0 (CPU) wins on simultaneous contention.
+// This is a deliberate choice, not an oversight -- s1 is a debug/JTAG
+// path, used occasionally and not latency-sensitive the way real-time
+// CPU execution is, so favoring the CPU on a tie is the safer default
+// (round-robin fairness isn't needed for "occasional debug access", and
+// would only add complexity this project doesn't need). The grant is
+// decided independently for the write and read channel groups (a master
+// can, for instance, win the write arbitration while the other wins read,
+// simultaneously) and is LOCKED for the full duration of whichever
+// transaction won it -- decided once, while the pipeline is genuinely
+// idle (`w_open`/`r_open` below), and held constant through issue/
+// response so a transaction can never have its upstream identity change
+// mid-flight. The internal decode/routing logic below (downstream side)
+// is completely unchanged from the single-master version -- arbitration
+// is purely a mux layer in front of it that presents whichever master
+// won as "the" upstream request.
 //
 // Single-outstanding per channel group (write / read independently), which
 // matches picorv32_axi_adapter's own behavior (it asserts AWVALID and
@@ -20,28 +38,51 @@ module axi_lite_xbar (
     input  wire        clk,
     input  wire        rst,
 
-    // ---- upstream: the single AXI4-Lite master (CPU) ----
-    input  wire        s_awvalid,
-    output wire        s_awready,
-    input  wire [31:0] s_awaddr,
+    // ---- upstream master 0: the CPU ----
+    input  wire        s0_awvalid,
+    output wire        s0_awready,
+    input  wire [31:0] s0_awaddr,
 
-    input  wire        s_wvalid,
-    output wire        s_wready,
-    input  wire [31:0] s_wdata,
-    input  wire [3:0]  s_wstrb,
+    input  wire        s0_wvalid,
+    output wire        s0_wready,
+    input  wire [31:0] s0_wdata,
+    input  wire [3:0]  s0_wstrb,
 
-    output reg         s_bvalid,
-    input  wire        s_bready,
-    output reg  [1:0]  s_bresp,
+    output wire        s0_bvalid,
+    input  wire        s0_bready,
+    output wire [1:0]  s0_bresp,
 
-    input  wire        s_arvalid,
-    output wire        s_arready,
-    input  wire [31:0] s_araddr,
+    input  wire        s0_arvalid,
+    output wire        s0_arready,
+    input  wire [31:0] s0_araddr,
 
-    output reg         s_rvalid,
-    input  wire        s_rready,
-    output reg  [31:0] s_rdata,
-    output reg  [1:0]  s_rresp,
+    output wire        s0_rvalid,
+    input  wire        s0_rready,
+    output wire [31:0] s0_rdata,
+    output wire [1:0]  s0_rresp,
+
+    // ---- upstream master 1: the JTAG-AXI debug bridge ----
+    input  wire        s1_awvalid,
+    output wire        s1_awready,
+    input  wire [31:0] s1_awaddr,
+
+    input  wire        s1_wvalid,
+    output wire        s1_wready,
+    input  wire [31:0] s1_wdata,
+    input  wire [3:0]  s1_wstrb,
+
+    output wire        s1_bvalid,
+    input  wire        s1_bready,
+    output wire [1:0]  s1_bresp,
+
+    input  wire        s1_arvalid,
+    output wire        s1_arready,
+    input  wire [31:0] s1_araddr,
+
+    output wire        s1_rvalid,
+    input  wire        s1_rready,
+    output wire [31:0] s1_rdata,
+    output wire [1:0]  s1_rresp,
 
     // ---- downstream slave: ROM ----
     output reg          rom_awvalid, input wire rom_awready, output reg [31:0] rom_awaddr,
@@ -101,9 +142,7 @@ module axi_lite_xbar (
 );
 
   // slave-select width sized for the full addr_map.vh SLAVE_* numbering
-  // (up to SLAVE_ERR=8), even though only 5 of those are wired up so far —
-  // any address decoding to a not-yet-implemented slave (I2C/SPI/AES) falls
-  // through to SLAVE_ERR, same as a genuinely unmapped address.
+  // (up to SLAVE_ERR=8).
   localparam SEL_W = 4;
 
   function [SEL_W-1:0] decode_addr;
@@ -144,14 +183,53 @@ module axi_lite_xbar (
   reg [3:0]  w_strb_lat;
   reg        w_have_aw, w_have_w;
   reg        w_issued_aw, w_issued_w;
+  reg        s_bvalid;
+  reg [1:0]  s_bresp;
 
-  wire aw_fire = s_awvalid && s_awready;
-  wire w_fire  = s_wvalid  && s_wready;
+  // ---- write-side arbitration: fixed priority, s0 wins ties ----
+  reg  w_grant; // 1 = s0 (CPU) owns the in-flight/most-recent write txn, 0 = s1 (JTAG)
+  // Must also check w_state==W_IDLE, not just "!w_have_aw && !w_have_w" --
+  // when AW and W both fire on the SAME cycle (the common case for a
+  // single-outstanding master that asserts them together, like the JTAG
+  // bridge), the W_IDLE->W_ISSUE transition below resets w_have_aw/
+  // w_have_w back to 0 as part of that SAME move, which would make this
+  // read spuriously true again for one cycle while already sitting in
+  // W_ISSUE -- letting a second master steal the grant out from under an
+  // in-flight transaction whose address was already latched under the
+  // ORIGINAL grant, so the eventual B response gets routed back to the
+  // wrong master, which then waits forever for a BVALID that was actually
+  // delivered to someone else. Caught by the soc_top-level JTAG test
+  // (CPU kept issuing writes right as the JTAG write's grant should have
+  // been locked in), not by the crossbar's own unit test, which never
+  // has a competing master requesting on that exact transitional cycle.
+  wire w_open = (w_state == W_IDLE) && !w_have_aw && !w_have_w;
+  wire w_arb_s0 = (s0_awvalid || s0_wvalid) || !(s1_awvalid || s1_wvalid);
+  wire w_grant_eff = w_open ? w_arb_s0 : w_grant;
+
+  wire        cur_awvalid = w_grant_eff ? s0_awvalid : s1_awvalid;
+  wire [31:0] cur_awaddr  = w_grant_eff ? s0_awaddr  : s1_awaddr;
+  wire        cur_wvalid  = w_grant_eff ? s0_wvalid  : s1_wvalid;
+  wire [31:0] cur_wdata   = w_grant_eff ? s0_wdata   : s1_wdata;
+  wire [3:0]  cur_wstrb   = w_grant_eff ? s0_wstrb   : s1_wstrb;
+  wire        cur_bready  = w_grant     ? s0_bready  : s1_bready;
+
+  wire cur_awready = (w_state == W_IDLE) && !w_have_aw;
+  wire cur_wready  = (w_state == W_IDLE) && !w_have_w;
+
+  assign s0_awready = w_grant_eff ? cur_awready : 1'b0;
+  assign s1_awready = w_grant_eff ? 1'b0 : cur_awready;
+  assign s0_wready  = w_grant_eff ? cur_wready : 1'b0;
+  assign s1_wready  = w_grant_eff ? 1'b0 : cur_wready;
+
+  assign s0_bvalid = w_grant  ? s_bvalid : 1'b0;
+  assign s1_bvalid = !w_grant ? s_bvalid : 1'b0;
+  assign s0_bresp  = s_bresp;
+  assign s1_bresp  = s_bresp;
+
+  wire aw_fire = cur_awvalid && cur_awready;
+  wire w_fire  = cur_wvalid  && cur_wready;
   wire aw_ready_c = w_have_aw || aw_fire;
   wire w_ready_c  = w_have_w  || w_fire;
-
-  assign s_awready = (w_state == W_IDLE) && !w_have_aw;
-  assign s_wready  = (w_state == W_IDLE) && !w_have_w;
 
   // Combinational routing of the downstream AW/W channels to whichever
   // slave is currently selected (only meaningful while w_state==W_ISSUE).
@@ -215,16 +293,19 @@ module axi_lite_xbar (
       w_have_aw  <= 1'b0;
       w_have_w   <= 1'b0;
       s_bvalid   <= 1'b0;
+      w_grant    <= 1'b1;
     end else begin
+      if (w_open) w_grant <= w_arb_s0;
+
       case (w_state)
         W_IDLE: begin
           if (aw_fire) begin
-            w_addr_lat <= s_awaddr;
-            w_sel      <= decode_addr(s_awaddr);
+            w_addr_lat <= cur_awaddr;
+            w_sel      <= decode_addr(cur_awaddr);
           end
           if (w_fire) begin
-            w_data_lat <= s_wdata;
-            w_strb_lat <= s_wstrb;
+            w_data_lat <= cur_wdata;
+            w_strb_lat <= cur_wstrb;
           end
           w_have_aw <= aw_ready_c;
           w_have_w  <= w_ready_c;
@@ -258,7 +339,7 @@ module axi_lite_xbar (
         W_RESP: begin
           if (w_sel == `SLAVE_ERR && !s_bvalid) s_bresp <= `AXI_RESP_SLVERR;
           s_bvalid <= 1'b1;
-          if (s_bvalid && s_bready) begin
+          if (s_bvalid && cur_bready) begin
             s_bvalid <= 1'b0;
             w_state  <= W_IDLE;
           end
@@ -281,8 +362,30 @@ module axi_lite_xbar (
   reg [SEL_W-1:0] r_sel;
   reg [31:0] r_addr_lat;
   reg        r_issued_ar;
+  reg        s_rvalid;
+  reg [31:0] s_rdata;
+  reg [1:0]  s_rresp;
 
-  assign s_arready = (r_state == R_IDLE);
+  // ---- read-side arbitration: independent of the write side, same
+  // fixed-priority (s0/CPU wins ties) scheme ----
+  reg  r_grant;
+  wire r_open = (r_state == R_IDLE);
+  wire r_arb_s0 = s0_arvalid || !s1_arvalid;
+  wire r_grant_eff = r_open ? r_arb_s0 : r_grant;
+
+  wire        cur_arvalid = r_grant_eff ? s0_arvalid : s1_arvalid;
+  wire [31:0] cur_araddr  = r_grant_eff ? s0_araddr  : s1_araddr;
+  wire        cur_rready  = r_grant     ? s0_rready  : s1_rready;
+
+  assign s0_arready = r_grant_eff ? (r_state == R_IDLE) : 1'b0;
+  assign s1_arready = r_grant_eff ? 1'b0 : (r_state == R_IDLE);
+
+  assign s0_rvalid = r_grant  ? s_rvalid : 1'b0;
+  assign s1_rvalid = !r_grant ? s_rvalid : 1'b0;
+  assign s0_rdata  = s_rdata;
+  assign s1_rdata  = s_rdata;
+  assign s0_rresp  = s_rresp;
+  assign s1_rresp  = s_rresp;
 
   always @* begin
     rom_arvalid   = 1'b0; rom_araddr   = r_addr_lat; rom_rready   = 1'b0;
@@ -342,12 +445,15 @@ module axi_lite_xbar (
     if (rst) begin
       r_state  <= R_IDLE;
       s_rvalid <= 1'b0;
+      r_grant  <= 1'b1;
     end else begin
+      if (r_open) r_grant <= r_arb_s0;
+
       case (r_state)
         R_IDLE: begin
-          if (s_arvalid) begin
-            r_addr_lat  <= s_araddr;
-            r_sel       <= decode_addr(s_araddr);
+          if (cur_arvalid) begin
+            r_addr_lat  <= cur_araddr;
+            r_sel       <= decode_addr(cur_araddr);
             r_issued_ar <= 1'b0;
             r_state     <= R_ISSUE;
           end
@@ -377,7 +483,7 @@ module axi_lite_xbar (
             s_rresp <= `AXI_RESP_SLVERR;
           end
           s_rvalid <= 1'b1;
-          if (s_rvalid && s_rready) begin
+          if (s_rvalid && cur_rready) begin
             s_rvalid <= 1'b0;
             r_state  <= R_IDLE;
           end

@@ -38,6 +38,8 @@ int main(int argc, char** argv) {
     sim_time += 5;
   };
 
+  dut->tck = 0; dut->tms = 1; dut->tdi = 0; // hold the JTAG TAP in Test-Logic-Reset while idle
+
   dut->rst = 1;
   for (int i = 0; i < 4; i++) clock();
   dut->rst = 0;
@@ -71,10 +73,6 @@ int main(int argc, char** argv) {
     got.push_back((char)byte);
   }
 
-  tfp->close();
-  delete dut;
-  delete ctx;
-
   printf("cycles=%ld received=\"", cycles);
   for (char c : got) {
     if (c == '\n') printf("\\n");
@@ -91,9 +89,80 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  // ---- Phase 5: JTAG debug bridge, exercised through the REAL soc_top
+  // (crossbar arbitration + sram.v), not a standalone bench -- write then
+  // read back a scratch RAM word to prove the whole JTAG->bridge->
+  // crossbar->SRAM path works end-to-end. Runs after the CPU regression
+  // above completes, since only the JTAG side is driving the bus now.
+  int jtag_fail = 0;
+  auto jtag_check = [&](const char* what, bool cond) {
+    if (!cond) { printf("FAIL: %s\n", what); jtag_fail++; }
+  };
+
+  auto tap_edge = [&](int tms, int tdi) -> int {
+    dut->tms = tms; dut->tdi = tdi;
+    dut->eval();
+    int tdo = dut->tdo;
+    dut->tck = 1; dut->eval();
+    for (int i = 0; i < 5; i++) clock();
+    dut->tck = 0; dut->eval();
+    for (int i = 0; i < 5; i++) clock();
+    return tdo;
+  };
+  auto ir_scan = [&](uint8_t val) {
+    tap_edge(1, 0); tap_edge(1, 0); tap_edge(0, 0); tap_edge(0, 0);
+    for (int i = 0; i < 4; i++) tap_edge(i == 3 ? 1 : 0, (val >> i) & 1);
+    tap_edge(1, 0); tap_edge(0, 0);
+  };
+  auto dr_scan32 = [&](uint32_t val_in) -> uint32_t {
+    tap_edge(1, 0); tap_edge(0, 0); tap_edge(0, 0);
+    uint32_t out = 0;
+    for (int i = 0; i < 32; i++) {
+      int tdo = tap_edge(i == 31 ? 1 : 0, (val_in >> i) & 1);
+      out |= (uint32_t(tdo & 1) << i);
+    }
+    tap_edge(1, 0); tap_edge(0, 0);
+    return out;
+  };
+  const uint8_t IR_AXI_ADDR = 0x2, IR_AXI_DATA = 0x3, IR_AXI_CTRL = 0x4;
+
+  tap_edge(0, 0); // TEST_LOGIC_RESET -> RUN_TEST_IDLE
+
+  const uint32_t SCRATCH_ADDR = 0x10008000; // well clear of this tiny firmware's footprint
+  const uint32_t SCRATCH_VAL  = 0x600DF00D;
+
+  ir_scan(IR_AXI_ADDR); dr_scan32(SCRATCH_ADDR);
+  ir_scan(IR_AXI_DATA); dr_scan32(SCRATCH_VAL);
+  ir_scan(IR_AXI_CTRL); dr_scan32(0x1); // rw=0 (write), start=1
+  uint32_t status; int spins = 0;
+  do { status = dr_scan32(0); spins++; } while ((status & 0x1) && spins < 100);
+  jtag_check("JTAG write to RAM: bridge completed", spins < 100);
+  jtag_check("JTAG write to RAM: OKAY response", (status & 0x2) != 0);
+
+  ir_scan(IR_AXI_ADDR); dr_scan32(SCRATCH_ADDR);
+  ir_scan(IR_AXI_CTRL); dr_scan32(0x3); // rw=1 (read), start=1
+  spins = 0;
+  do { status = dr_scan32(0); spins++; } while ((status & 0x1) && spins < 100);
+  jtag_check("JTAG read from RAM: bridge completed", spins < 100);
+  ir_scan(IR_AXI_DATA);
+  uint32_t rd_val = dr_scan32(0);
+  jtag_check("JTAG read-back matches JTAG-written value (through the real crossbar+SRAM)",
+             rd_val == SCRATCH_VAL);
+
+  tfp->close();
+  delete dut;
+  delete ctx;
+
+  if (jtag_fail) {
+    printf("FAIL: %d JTAG check(s) failed\n", jtag_fail);
+    return 1;
+  }
+
   printf("PASS: soc_top booted firmware, printed \"Hello World\", ran 5 real "
          "Timer interrupts through PicoRV32's getq/setq/retirq ISR path "
          "(kicking the Watchdog each time), and reported the count over "
-         "UART — all through real AXI4-Lite transactions\n");
+         "UART — all through real AXI4-Lite transactions; the JTAG debug "
+         "bridge also wrote and read back a RAM word through the real "
+         "2-master crossbar\n");
   return 0;
 }

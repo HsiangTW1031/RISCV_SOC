@@ -1,33 +1,55 @@
-// Test-only wiring harness: axi_lite_xbar + eight fake_axi_lite_slave
-// stand-ins for ROM/RAM/Timer/WDT/UART/I2C/SPI/AES, so the crossbar's
-// address decode and channel routing can be validated before real
-// peripheral RTL is wired in. Not a synthesizable deliverable — lives in
-// sim/, not rtl/.
+// Test-only wiring harness: axi_lite_xbar (2 masters: s0=CPU, s1=JTAG) +
+// eight fake_axi_lite_slave stand-ins for ROM/RAM/Timer/WDT/UART/I2C/SPI/
+// AES, so the crossbar's address decode, channel routing, and 2-master
+// arbitration can be validated before real peripheral/JTAG-bridge RTL is
+// wired in. Not a synthesizable deliverable — lives in sim/, not rtl/.
 module xbar_testtop (
     input  wire        clk,
     input  wire        rst,
 
-    input  wire        s_awvalid,
-    output wire        s_awready,
-    input  wire [31:0] s_awaddr,
+    input  wire        s0_awvalid,
+    output wire        s0_awready,
+    input  wire [31:0] s0_awaddr,
 
-    input  wire        s_wvalid,
-    output wire        s_wready,
-    input  wire [31:0] s_wdata,
-    input  wire [3:0]  s_wstrb,
+    input  wire        s0_wvalid,
+    output wire        s0_wready,
+    input  wire [31:0] s0_wdata,
+    input  wire [3:0]  s0_wstrb,
 
-    output wire        s_bvalid,
-    input  wire        s_bready,
-    output wire [1:0]  s_bresp,
+    output wire        s0_bvalid,
+    input  wire        s0_bready,
+    output wire [1:0]  s0_bresp,
 
-    input  wire        s_arvalid,
-    output wire        s_arready,
-    input  wire [31:0] s_araddr,
+    input  wire        s0_arvalid,
+    output wire        s0_arready,
+    input  wire [31:0] s0_araddr,
 
-    output wire        s_rvalid,
-    input  wire        s_rready,
-    output wire [31:0] s_rdata,
-    output wire [1:0]  s_rresp
+    output wire        s0_rvalid,
+    input  wire        s0_rready,
+    output wire [31:0] s0_rdata,
+    output wire [1:0]  s0_rresp,
+
+    input  wire        s1_awvalid,
+    output wire        s1_awready,
+    input  wire [31:0] s1_awaddr,
+
+    input  wire        s1_wvalid,
+    output wire        s1_wready,
+    input  wire [31:0] s1_wdata,
+    input  wire [3:0]  s1_wstrb,
+
+    output wire        s1_bvalid,
+    input  wire        s1_bready,
+    output wire [1:0]  s1_bresp,
+
+    input  wire        s1_arvalid,
+    output wire        s1_arready,
+    input  wire [31:0] s1_araddr,
+
+    output wire        s1_rvalid,
+    input  wire        s1_rready,
+    output wire [31:0] s1_rdata,
+    output wire [1:0]  s1_rresp
 );
 
   wire        rom_awvalid, rom_awready, rom_wvalid, rom_wready, rom_bvalid, rom_bready, rom_arvalid, rom_arready, rom_rvalid, rom_rready;
@@ -72,11 +94,17 @@ module xbar_testtop (
 
   axi_lite_xbar u_xbar (
       .clk(clk), .rst(rst),
-      .s_awvalid(s_awvalid), .s_awready(s_awready), .s_awaddr(s_awaddr),
-      .s_wvalid(s_wvalid),   .s_wready(s_wready),   .s_wdata(s_wdata), .s_wstrb(s_wstrb),
-      .s_bvalid(s_bvalid),   .s_bready(s_bready),   .s_bresp(s_bresp),
-      .s_arvalid(s_arvalid), .s_arready(s_arready), .s_araddr(s_araddr),
-      .s_rvalid(s_rvalid),   .s_rready(s_rready),   .s_rdata(s_rdata), .s_rresp(s_rresp),
+      .s0_awvalid(s0_awvalid), .s0_awready(s0_awready), .s0_awaddr(s0_awaddr),
+      .s0_wvalid(s0_wvalid),   .s0_wready(s0_wready),   .s0_wdata(s0_wdata), .s0_wstrb(s0_wstrb),
+      .s0_bvalid(s0_bvalid),   .s0_bready(s0_bready),   .s0_bresp(s0_bresp),
+      .s0_arvalid(s0_arvalid), .s0_arready(s0_arready), .s0_araddr(s0_araddr),
+      .s0_rvalid(s0_rvalid),   .s0_rready(s0_rready),   .s0_rdata(s0_rdata), .s0_rresp(s0_rresp),
+
+      .s1_awvalid(s1_awvalid), .s1_awready(s1_awready), .s1_awaddr(s1_awaddr),
+      .s1_wvalid(s1_wvalid),   .s1_wready(s1_wready),   .s1_wdata(s1_wdata), .s1_wstrb(s1_wstrb),
+      .s1_bvalid(s1_bvalid),   .s1_bready(s1_bready),   .s1_bresp(s1_bresp),
+      .s1_arvalid(s1_arvalid), .s1_arready(s1_arready), .s1_araddr(s1_araddr),
+      .s1_rvalid(s1_rvalid),   .s1_rready(s1_rready),   .s1_rdata(s1_rdata), .s1_rresp(s1_rresp),
 
       .rom_awvalid(rom_awvalid), .rom_awready(rom_awready), .rom_awaddr(rom_awaddr),
       .rom_wvalid(rom_wvalid),   .rom_wready(rom_wready),   .rom_wdata(rom_wdata), .rom_wstrb(rom_wstrb),

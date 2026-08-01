@@ -16,13 +16,14 @@ int main(int argc, char** argv) {
   Vxbar_testtop* dut = new Vxbar_testtop{ctx};
 
   AxiLiteSignals sig;
-  sig.awvalid = &dut->s_awvalid; sig.awready = &dut->s_awready; sig.awaddr = &dut->s_awaddr;
-  sig.wvalid  = &dut->s_wvalid;  sig.wready  = &dut->s_wready;  sig.wdata  = &dut->s_wdata;  sig.wstrb = &dut->s_wstrb;
-  sig.bvalid  = &dut->s_bvalid;  sig.bready  = &dut->s_bready;  sig.bresp  = &dut->s_bresp;
-  sig.arvalid = &dut->s_arvalid; sig.arready = &dut->s_arready; sig.araddr = &dut->s_araddr;
-  sig.rvalid  = &dut->s_rvalid;  sig.rready  = &dut->s_rready;  sig.rdata  = &dut->s_rdata;  sig.rresp = &dut->s_rresp;
+  sig.awvalid = &dut->s0_awvalid; sig.awready = &dut->s0_awready; sig.awaddr = &dut->s0_awaddr;
+  sig.wvalid  = &dut->s0_wvalid;  sig.wready  = &dut->s0_wready;  sig.wdata  = &dut->s0_wdata;  sig.wstrb = &dut->s0_wstrb;
+  sig.bvalid  = &dut->s0_bvalid;  sig.bready  = &dut->s0_bready;  sig.bresp  = &dut->s0_bresp;
+  sig.arvalid = &dut->s0_arvalid; sig.arready = &dut->s0_arready; sig.araddr = &dut->s0_araddr;
+  sig.rvalid  = &dut->s0_rvalid;  sig.rready  = &dut->s0_rready;  sig.rdata  = &dut->s0_rdata;  sig.rresp = &dut->s0_rresp;
 
   dut->clk = 0;
+  dut->s1_awvalid = 0; dut->s1_wvalid = 0; dut->s1_bready = 0; dut->s1_arvalid = 0; dut->s1_rready = 0;
   auto tick_half = [&]() { dut->clk = !dut->clk; dut->eval(); };
   AxiLiteBfm bfm(sig, tick_half);
 
@@ -118,6 +119,42 @@ int main(int argc, char** argv) {
   ok = bfm.read(0x40000000, &rd, &resp);
   check("Timer unaffected by unmapped access", ok && rd == 0x11110004);
 
+  // ---- 11. 2-master arbitration: simultaneous write contention ----
+  // Drives s0 (CPU) and s1 (JTAG) raw signals directly (not through the
+  // BFM, which only knows about one master) to genuinely contend for the
+  // crossbar on the same cycle, rather than just taking turns sequentially.
+  auto clk_edge = [&]() { dut->clk = 0; dut->eval(); dut->clk = 1; dut->eval(); };
+  {
+    dut->s0_awvalid = 1; dut->s0_awaddr = 0x00000000; dut->s0_wvalid = 1; dut->s0_wdata = 0xAAAA1111; dut->s0_wstrb = 0xF; dut->s0_bready = 1;
+    dut->s1_awvalid = 1; dut->s1_awaddr = 0x10000000; dut->s1_wvalid = 1; dut->s1_wdata = 0xBBBB2222; dut->s1_wstrb = 0xF; dut->s1_bready = 1;
+    dut->eval();
+    check("simultaneous write contention: s0 (CPU) wins arbitration (s0_awready asserted)", dut->s0_awready == 1);
+    check("simultaneous write contention: s1 (JTAG) does not win this cycle (s1_awready low)", dut->s1_awready == 0);
+
+    int spins = 0;
+    while (!dut->s0_bvalid && spins < 200) { clk_edge(); spins++; }
+    check("s0's write completes while s1's request just waits", dut->s0_bvalid == 1 && spins < 200);
+    clk_edge(); // consume the B handshake
+    dut->s0_awvalid = 0; dut->s0_wvalid = 0; // s0 stops requesting
+
+    spins = 0;
+    while (!dut->s1_awready && spins < 200) { clk_edge(); spins++; }
+    check("s1 (JTAG) gets granted once s0 stops requesting", dut->s1_awready == 1 && spins < 200);
+
+    spins = 0;
+    while (!dut->s1_bvalid && spins < 200) { clk_edge(); spins++; }
+    check("s1's write completes", dut->s1_bvalid == 1 && spins < 200);
+    clk_edge();
+    dut->s1_awvalid = 0; dut->s1_wvalid = 0;
+  }
+
+  // confirm both writes actually landed correctly (no corruption/deadlock,
+  // and s0's write from the contention above didn't get lost or garbled)
+  ok = bfm.read(0x00000000, &rd, &resp);
+  check("post-arbitration: ROM holds s0's contended write", ok && rd == 0xAAAA1111);
+  ok = bfm.read(0x10000000, &rd, &resp);
+  check("post-arbitration: RAM holds s1's contended write", ok && rd == 0xBBBB2222);
+
   delete dut;
   delete ctx;
 
@@ -125,6 +162,7 @@ int main(int argc, char** argv) {
     printf("FAIL: %d check(s) failed\n", fail_count);
     return 1;
   }
-  printf("PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI/AES + SLVERR on miss) all green\n");
+  printf("PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI/AES + SLVERR on miss) "
+         "+ 2-master arbitration (CPU-priority on contention) all green\n");
   return 0;
 }

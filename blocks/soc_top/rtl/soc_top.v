@@ -1,8 +1,17 @@
 `include "axi_lite.vh"
 
-// Top-level SoC integration — Phase 4 scope: CPU + crossbar + ROM/RAM/UART
-// + Timer + Watchdog + I2C + SPI + AES, interrupts enabled. JTAG lands in
-// a later phase (see docs/phase_plan.md).
+// Top-level SoC integration — Phase 5 scope: CPU + crossbar + ROM/RAM/UART
+// + Timer + Watchdog + I2C + SPI + AES + a JTAG debug bridge, interrupts
+// enabled. The crossbar is now a genuine 2-master design (CPU=s0, JTAG
+// bridge=s1, fixed priority favoring the CPU on contention -- see
+// axi_lite_xbar.v's header comment).
+//
+// `tck`/`tms`/`tdi`/`tdo` are a real, separate clock domain from `clk`
+// (matching actual JTAG hardware); the JTAG side shares this module's
+// `rst` for its own reset rather than getting a dedicated synchronized
+// reset input -- both are simulation-only power-on resets in this
+// project, not something that needs formal per-domain CDC treatment, so
+// this is a deliberate simplification, not an oversight.
 //
 // Known limitation (unchanged from Phase 1): picorv32_axi's mem_axi_b*/r*
 // ports have no BRESP/RRESP pins at all — this adapter never checks for
@@ -28,7 +37,11 @@ module soc_top #(
     output wire spi_sclk,
     output wire spi_mosi,
     input  wire spi_miso,
-    output wire spi_cs_n
+    output wire spi_cs_n,
+    input  wire tck,
+    input  wire tms,
+    input  wire tdi,
+    output wire tdo
 );
   wire resetn = !rst;
 
@@ -128,14 +141,27 @@ module soc_top #(
   wire        aesx_arvalid, aesx_arready; wire [31:0] aesx_araddr;
   wire        aesx_rvalid,  aesx_rready;  wire [31:0] aesx_rdata; wire [1:0] aesx_rresp;
 
+  // ---- JTAG debug bridge's AXI4-Lite master port (crossbar's s1) ----
+  wire        jtag_awvalid, jtag_awready; wire [31:0] jtag_awaddr;
+  wire        jtag_wvalid,  jtag_wready;  wire [31:0] jtag_wdata; wire [3:0] jtag_wstrb;
+  wire        jtag_bvalid,  jtag_bready;  wire [1:0]  jtag_bresp;
+  wire        jtag_arvalid, jtag_arready; wire [31:0] jtag_araddr;
+  wire        jtag_rvalid,  jtag_rready;  wire [31:0] jtag_rdata; wire [1:0] jtag_rresp;
+
   axi_lite_xbar u_xbar (
       .clk(clk), .rst(rst),
 
-      .s_awvalid(cpu_awvalid), .s_awready(cpu_awready), .s_awaddr(cpu_awaddr),
-      .s_wvalid(cpu_wvalid),   .s_wready(cpu_wready),   .s_wdata(cpu_wdata), .s_wstrb(cpu_wstrb),
-      .s_bvalid(cpu_bvalid),   .s_bready(cpu_bready),   .s_bresp(),
-      .s_arvalid(cpu_arvalid), .s_arready(cpu_arready), .s_araddr(cpu_araddr),
-      .s_rvalid(cpu_rvalid),   .s_rready(cpu_rready),   .s_rdata(cpu_rdata), .s_rresp(),
+      .s0_awvalid(cpu_awvalid), .s0_awready(cpu_awready), .s0_awaddr(cpu_awaddr),
+      .s0_wvalid(cpu_wvalid),   .s0_wready(cpu_wready),   .s0_wdata(cpu_wdata), .s0_wstrb(cpu_wstrb),
+      .s0_bvalid(cpu_bvalid),   .s0_bready(cpu_bready),   .s0_bresp(),
+      .s0_arvalid(cpu_arvalid), .s0_arready(cpu_arready), .s0_araddr(cpu_araddr),
+      .s0_rvalid(cpu_rvalid),   .s0_rready(cpu_rready),   .s0_rdata(cpu_rdata), .s0_rresp(),
+
+      .s1_awvalid(jtag_awvalid), .s1_awready(jtag_awready), .s1_awaddr(jtag_awaddr),
+      .s1_wvalid(jtag_wvalid),   .s1_wready(jtag_wready),   .s1_wdata(jtag_wdata), .s1_wstrb(jtag_wstrb),
+      .s1_bvalid(jtag_bvalid),   .s1_bready(jtag_bready),   .s1_bresp(jtag_bresp),
+      .s1_arvalid(jtag_arvalid), .s1_arready(jtag_arready), .s1_araddr(jtag_araddr),
+      .s1_rvalid(jtag_rvalid),   .s1_rready(jtag_rready),   .s1_rdata(jtag_rdata), .s1_rresp(jtag_rresp),
 
       .rom_awvalid(rom_awvalid), .rom_awready(rom_awready), .rom_awaddr(rom_awaddr),
       .rom_wvalid(rom_wvalid),   .rom_wready(rom_wready),   .rom_wdata(rom_wdata), .rom_wstrb(rom_wstrb),
@@ -265,5 +291,28 @@ module soc_top #(
       .s_arvalid(aesx_arvalid), .s_arready(aesx_arready), .s_araddr(aesx_araddr),
       .s_rvalid(aesx_rvalid),   .s_rready(aesx_rready),   .s_rdata(aesx_rdata), .s_rresp(aesx_rresp),
       .irq(aes_irq)
+  );
+
+  // ---- JTAG debug bridge: the crossbar's second master ----
+  wire        jtag_start_pulse_tck, jtag_rw_tck;
+  wire [31:0] jtag_addr_tck, jtag_wdata_tck;
+  wire        jtag_busy_tck, jtag_resp_ok_tck;
+  wire [31:0] jtag_rdata_tck;
+
+  jtag_dtm u_jtag_dtm (
+      .tck(tck), .rst(rst), .tms(tms), .tdi(tdi), .tdo(tdo),
+      .bridge_busy_tck(jtag_busy_tck), .bridge_resp_ok_tck(jtag_resp_ok_tck), .bridge_rdata_tck(jtag_rdata_tck),
+      .start_pulse_tck(jtag_start_pulse_tck), .rw_tck(jtag_rw_tck), .addr_tck(jtag_addr_tck), .wdata_tck(jtag_wdata_tck)
+  );
+
+  jtag_axi_bridge u_jtag_bridge (
+      .clk(clk), .rst(rst), .tck(tck), .tck_rst(rst),
+      .start_pulse_tck(jtag_start_pulse_tck), .rw_tck(jtag_rw_tck), .addr_tck(jtag_addr_tck), .wdata_tck(jtag_wdata_tck),
+      .busy_tck(jtag_busy_tck), .resp_ok_tck(jtag_resp_ok_tck), .rdata_tck(jtag_rdata_tck),
+      .m_awvalid(jtag_awvalid), .m_awready(jtag_awready), .m_awaddr(jtag_awaddr),
+      .m_wvalid(jtag_wvalid),   .m_wready(jtag_wready),   .m_wdata(jtag_wdata), .m_wstrb(jtag_wstrb),
+      .m_bvalid(jtag_bvalid),   .m_bready(jtag_bready),   .m_bresp(jtag_bresp),
+      .m_arvalid(jtag_arvalid), .m_arready(jtag_arready), .m_araddr(jtag_araddr),
+      .m_rvalid(jtag_rvalid),   .m_rready(jtag_rready),   .m_rdata(jtag_rdata), .m_rresp(jtag_rresp)
   );
 endmodule
