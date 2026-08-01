@@ -11,7 +11,7 @@
 
 static const uint8_t  RESP_OKAY    = 0x0;
 static const uint32_t TIMEOUT      = 6;
-static const uint32_t WARN_MARGIN  = 3; // must match watchdog.v's default parameter
+static const uint32_t WARN_MARGIN  = 4; // must match watchdog.v's default parameter
 
 int main(int argc, char** argv) {
   VerilatedContext* ctx = new VerilatedContext;

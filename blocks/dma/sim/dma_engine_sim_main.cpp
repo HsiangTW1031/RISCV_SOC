@@ -34,9 +34,11 @@ int main(int argc, char** argv) {
   sig.rvalid  = &dut->s_rvalid;  sig.rready  = &dut->s_rready;  sig.rdata  = &dut->s_rdata;  sig.rresp = &dut->s_rresp;
 
   dut->clk = 0;
-  auto tick_half = [&]() { dut->clk = !dut->clk; dut->eval(); };
+  long long tick_count = 0; // for performance reporting (docs/performance.md) -- counts every half-cycle across both the raw ram_* burst helpers and the AxiLiteBfm's own internal clocking, so cycles_now() below is accurate regardless of which path drove the clock
+  auto tick_half = [&]() { dut->clk = !dut->clk; dut->eval(); tick_count++; };
   AxiLiteBfm bfm(sig, tick_half);
   auto clock = [&]() { tick_half(); tick_half(); };
+  auto cycles_now = [&]() { return tick_count / 2; };
 
   dut->rst = 1;
   bfm.clock(); bfm.clock();
@@ -118,10 +120,17 @@ int main(int argc, char** argv) {
     bfm.write(0x08, src, 0xF, &resp);  // SRC_ADDR
     bfm.write(0x0C, dst, 0xF, &resp);  // DST_ADDR
     bfm.write(0x10, len, 0xF, &resp);  // LEN
+    long long start_cycle = cycles_now();
     bfm.write(0x00, 0x1 | (encdec << 1) | (mode << 2), 0xF, &resp); // CTRL: START
     for (int i = 0; i < timeout_cycles; i++) {
       bfm.read(0x04, &rd, &resp);
-      if (rd & 0x2) { bfm.write(0x04, 0x2, 0xF, &resp); return true; } // DONE, clear it
+      if (rd & 0x2) {
+        bfm.write(0x04, 0x2, 0xF, &resp); // DONE, clear it
+        long long elapsed = cycles_now() - start_cycle;
+        printf("PERF: DMA %u-block operation took %lld cycles (%.1f cycles/block)\n",
+               len, elapsed, (double)elapsed / len);
+        return true;
+      }
     }
     return false;
   };
