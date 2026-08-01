@@ -1,0 +1,20 @@
+# Yosys synthesis script for the AES-128 core (aes_core.v + aes_key_expand.v),
+# targeting the Nangate45 open-cell library. This synthesizes the crypto
+# datapath itself (not the AXI-Lite register wrapper, which is trivial glue
+# logic) — the numbers here are what's worth citing for the actual engine.
+#
+# Run from blocks/aes/syn/:
+#   yosys synth.ys
+read_verilog -I../rtl ../rtl/aes_key_expand.v ../rtl/aes_core.v
+
+hierarchy -check -top aes_core
+synth -top aes_core
+
+dfflibmap -liberty /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+abc -liberty /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+
+clean
+write_verilog aes_core_out.v
+write_json aes_core_out.json
+
+stat -liberty /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
