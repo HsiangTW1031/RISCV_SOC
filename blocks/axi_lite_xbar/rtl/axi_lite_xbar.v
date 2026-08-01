@@ -1,9 +1,9 @@
 `include "axi_lite.vh"
 `include "addr_map.vh"
 
-// AXI4-Lite crossbar — Phase 2 scope: 1 master x 5 slaves (ROM, RAM, Timer,
-// Watchdog, UART). I2C/SPI/AES land in later phases; any address that
-// decodes into their region is treated as unmapped (SLVERR) until then.
+// AXI4-Lite crossbar — Phase 3 scope: 1 master x 7 slaves (ROM, RAM, Timer,
+// Watchdog, UART, I2C, SPI). AES lands in a later phase; any address that
+// decodes into its region is treated as unmapped (SLVERR) until then.
 // Hand-written (the project's core differentiator); Verilog-2001 only.
 //
 // Single-outstanding per channel group (write / read independently), which
@@ -77,7 +77,21 @@ module axi_lite_xbar (
     output reg          uart_wvalid,  input wire uart_wready,  output reg [31:0] uart_wdata, output reg [3:0] uart_wstrb,
     input  wire         uart_bvalid,  output reg uart_bready,  input wire [1:0]  uart_bresp,
     output reg          uart_arvalid, input wire uart_arready, output reg [31:0] uart_araddr,
-    input  wire         uart_rvalid,  output reg uart_rready,  input wire [31:0] uart_rdata, input wire [1:0] uart_rresp
+    input  wire         uart_rvalid,  output reg uart_rready,  input wire [31:0] uart_rdata, input wire [1:0] uart_rresp,
+
+    // ---- downstream slave: I2C ----
+    output reg          i2c_awvalid, input wire i2c_awready, output reg [31:0] i2c_awaddr,
+    output reg          i2c_wvalid,  input wire i2c_wready,  output reg [31:0] i2c_wdata, output reg [3:0] i2c_wstrb,
+    input  wire         i2c_bvalid,  output reg i2c_bready,  input wire [1:0]  i2c_bresp,
+    output reg          i2c_arvalid, input wire i2c_arready, output reg [31:0] i2c_araddr,
+    input  wire         i2c_rvalid,  output reg i2c_rready,  input wire [31:0] i2c_rdata, input wire [1:0] i2c_rresp,
+
+    // ---- downstream slave: SPI ----
+    output reg          spi_awvalid, input wire spi_awready, output reg [31:0] spi_awaddr,
+    output reg          spi_wvalid,  input wire spi_wready,  output reg [31:0] spi_wdata, output reg [3:0] spi_wstrb,
+    input  wire         spi_bvalid,  output reg spi_bready,  input wire [1:0]  spi_bresp,
+    output reg          spi_arvalid, input wire spi_arready, output reg [31:0] spi_araddr,
+    input  wire         spi_rvalid,  output reg spi_rready,  input wire [31:0] spi_rdata, input wire [1:0] spi_rresp
 );
 
   // slave-select width sized for the full addr_map.vh SLAVE_* numbering
@@ -99,6 +113,10 @@ module axi_lite_xbar (
         decode_addr = `SLAVE_WDT;
       else if (addr[31:28] == `ADDR_REGION_PERIPH && addr[15:12] == `ADDR_PERIPH_UART)
         decode_addr = `SLAVE_UART;
+      else if (addr[31:28] == `ADDR_REGION_PERIPH && addr[15:12] == `ADDR_PERIPH_I2C)
+        decode_addr = `SLAVE_I2C;
+      else if (addr[31:28] == `ADDR_REGION_PERIPH && addr[15:12] == `ADDR_PERIPH_SPI)
+        decode_addr = `SLAVE_SPI;
       else
         decode_addr = `SLAVE_ERR;
     end
@@ -135,6 +153,8 @@ module axi_lite_xbar (
     timer_awvalid = 1'b0; timer_awaddr = w_addr_lat; timer_wvalid = 1'b0; timer_wdata = w_data_lat; timer_wstrb = w_strb_lat; timer_bready = 1'b0;
     wdt_awvalid   = 1'b0; wdt_awaddr   = w_addr_lat; wdt_wvalid   = 1'b0; wdt_wdata   = w_data_lat; wdt_wstrb   = w_strb_lat; wdt_bready   = 1'b0;
     uart_awvalid  = 1'b0; uart_awaddr  = w_addr_lat; uart_wvalid  = 1'b0; uart_wdata  = w_data_lat; uart_wstrb  = w_strb_lat; uart_bready  = 1'b0;
+    i2c_awvalid   = 1'b0; i2c_awaddr   = w_addr_lat; i2c_wvalid   = 1'b0; i2c_wdata   = w_data_lat; i2c_wstrb   = w_strb_lat; i2c_bready   = 1'b0;
+    spi_awvalid   = 1'b0; spi_awaddr   = w_addr_lat; spi_wvalid   = 1'b0; spi_wdata   = w_data_lat; spi_wstrb   = w_strb_lat; spi_bready   = 1'b0;
 
     if (w_state == W_ISSUE) begin
       case (w_sel)
@@ -143,6 +163,8 @@ module axi_lite_xbar (
         `SLAVE_TIMER: begin timer_awvalid = !w_issued_aw; timer_wvalid = !w_issued_w; end
         `SLAVE_WDT:   begin wdt_awvalid   = !w_issued_aw; wdt_wvalid   = !w_issued_w; end
         `SLAVE_UART:  begin uart_awvalid  = !w_issued_aw; uart_wvalid  = !w_issued_w; end
+        `SLAVE_I2C:   begin i2c_awvalid   = !w_issued_aw; i2c_wvalid   = !w_issued_w; end
+        `SLAVE_SPI:   begin spi_awvalid   = !w_issued_aw; spi_wvalid   = !w_issued_w; end
         default:      ; // SLAVE_ERR (or not-yet-implemented): no real slave touched
       endcase
     end else if (w_state == W_WAIT_B) begin
@@ -152,6 +174,8 @@ module axi_lite_xbar (
         `SLAVE_TIMER: timer_bready = 1'b1;
         `SLAVE_WDT:   wdt_bready   = 1'b1;
         `SLAVE_UART:  uart_bready  = 1'b1;
+        `SLAVE_I2C:   i2c_bready   = 1'b1;
+        `SLAVE_SPI:   spi_bready   = 1'b1;
         default:      ;
       endcase
     end
@@ -159,16 +183,20 @@ module axi_lite_xbar (
 
   wire w_slave_awready = (w_sel == `SLAVE_ROM) ? rom_awready : (w_sel == `SLAVE_RAM) ? ram_awready :
                          (w_sel == `SLAVE_TIMER) ? timer_awready : (w_sel == `SLAVE_WDT) ? wdt_awready :
-                         (w_sel == `SLAVE_UART) ? uart_awready : 1'b1;
+                         (w_sel == `SLAVE_UART) ? uart_awready : (w_sel == `SLAVE_I2C) ? i2c_awready :
+                         (w_sel == `SLAVE_SPI) ? spi_awready : 1'b1;
   wire w_slave_wready  = (w_sel == `SLAVE_ROM) ? rom_wready : (w_sel == `SLAVE_RAM) ? ram_wready :
                          (w_sel == `SLAVE_TIMER) ? timer_wready : (w_sel == `SLAVE_WDT) ? wdt_wready :
-                         (w_sel == `SLAVE_UART) ? uart_wready : 1'b1;
+                         (w_sel == `SLAVE_UART) ? uart_wready : (w_sel == `SLAVE_I2C) ? i2c_wready :
+                         (w_sel == `SLAVE_SPI) ? spi_wready : 1'b1;
   wire w_slave_bvalid  = (w_sel == `SLAVE_ROM) ? rom_bvalid : (w_sel == `SLAVE_RAM) ? ram_bvalid :
                          (w_sel == `SLAVE_TIMER) ? timer_bvalid : (w_sel == `SLAVE_WDT) ? wdt_bvalid :
-                         (w_sel == `SLAVE_UART) ? uart_bvalid : 1'b1;
+                         (w_sel == `SLAVE_UART) ? uart_bvalid : (w_sel == `SLAVE_I2C) ? i2c_bvalid :
+                         (w_sel == `SLAVE_SPI) ? spi_bvalid : 1'b1;
   wire [1:0] w_slave_bresp = (w_sel == `SLAVE_ROM) ? rom_bresp : (w_sel == `SLAVE_RAM) ? ram_bresp :
                          (w_sel == `SLAVE_TIMER) ? timer_bresp : (w_sel == `SLAVE_WDT) ? wdt_bresp :
-                         (w_sel == `SLAVE_UART) ? uart_bresp : `AXI_RESP_SLVERR;
+                         (w_sel == `SLAVE_UART) ? uart_bresp : (w_sel == `SLAVE_I2C) ? i2c_bresp :
+                         (w_sel == `SLAVE_SPI) ? spi_bresp : `AXI_RESP_SLVERR;
 
   always @(posedge clk) begin
     if (rst) begin
@@ -251,6 +279,8 @@ module axi_lite_xbar (
     timer_arvalid = 1'b0; timer_araddr = r_addr_lat; timer_rready = 1'b0;
     wdt_arvalid   = 1'b0; wdt_araddr   = r_addr_lat; wdt_rready   = 1'b0;
     uart_arvalid  = 1'b0; uart_araddr  = r_addr_lat; uart_rready  = 1'b0;
+    i2c_arvalid   = 1'b0; i2c_araddr   = r_addr_lat; i2c_rready   = 1'b0;
+    spi_arvalid   = 1'b0; spi_araddr   = r_addr_lat; spi_rready   = 1'b0;
 
     if (r_state == R_ISSUE) begin
       case (r_sel)
@@ -259,6 +289,8 @@ module axi_lite_xbar (
         `SLAVE_TIMER: timer_arvalid = !r_issued_ar;
         `SLAVE_WDT:   wdt_arvalid   = !r_issued_ar;
         `SLAVE_UART:  uart_arvalid  = !r_issued_ar;
+        `SLAVE_I2C:   i2c_arvalid   = !r_issued_ar;
+        `SLAVE_SPI:   spi_arvalid   = !r_issued_ar;
         default:      ; // SLAVE_ERR
       endcase
     end else if (r_state == R_WAIT_R) begin
@@ -268,6 +300,8 @@ module axi_lite_xbar (
         `SLAVE_TIMER: timer_rready = 1'b1;
         `SLAVE_WDT:   wdt_rready   = 1'b1;
         `SLAVE_UART:  uart_rready  = 1'b1;
+        `SLAVE_I2C:   i2c_rready   = 1'b1;
+        `SLAVE_SPI:   spi_rready   = 1'b1;
         default:      ;
       endcase
     end
@@ -275,16 +309,20 @@ module axi_lite_xbar (
 
   wire w_slave_arready_r = (r_sel == `SLAVE_ROM) ? rom_arready : (r_sel == `SLAVE_RAM) ? ram_arready :
                          (r_sel == `SLAVE_TIMER) ? timer_arready : (r_sel == `SLAVE_WDT) ? wdt_arready :
-                         (r_sel == `SLAVE_UART) ? uart_arready : 1'b1;
+                         (r_sel == `SLAVE_UART) ? uart_arready : (r_sel == `SLAVE_I2C) ? i2c_arready :
+                         (r_sel == `SLAVE_SPI) ? spi_arready : 1'b1;
   wire r_slave_rvalid    = (r_sel == `SLAVE_ROM) ? rom_rvalid : (r_sel == `SLAVE_RAM) ? ram_rvalid :
                          (r_sel == `SLAVE_TIMER) ? timer_rvalid : (r_sel == `SLAVE_WDT) ? wdt_rvalid :
-                         (r_sel == `SLAVE_UART) ? uart_rvalid : 1'b1;
+                         (r_sel == `SLAVE_UART) ? uart_rvalid : (r_sel == `SLAVE_I2C) ? i2c_rvalid :
+                         (r_sel == `SLAVE_SPI) ? spi_rvalid : 1'b1;
   wire [31:0] r_slave_rdata = (r_sel == `SLAVE_ROM) ? rom_rdata : (r_sel == `SLAVE_RAM) ? ram_rdata :
                          (r_sel == `SLAVE_TIMER) ? timer_rdata : (r_sel == `SLAVE_WDT) ? wdt_rdata :
-                         (r_sel == `SLAVE_UART) ? uart_rdata : 32'h0;
+                         (r_sel == `SLAVE_UART) ? uart_rdata : (r_sel == `SLAVE_I2C) ? i2c_rdata :
+                         (r_sel == `SLAVE_SPI) ? spi_rdata : 32'h0;
   wire [1:0]  r_slave_rresp = (r_sel == `SLAVE_ROM) ? rom_rresp : (r_sel == `SLAVE_RAM) ? ram_rresp :
                          (r_sel == `SLAVE_TIMER) ? timer_rresp : (r_sel == `SLAVE_WDT) ? wdt_rresp :
-                         (r_sel == `SLAVE_UART) ? uart_rresp : `AXI_RESP_SLVERR;
+                         (r_sel == `SLAVE_UART) ? uart_rresp : (r_sel == `SLAVE_I2C) ? i2c_rresp :
+                         (r_sel == `SLAVE_SPI) ? spi_rresp : `AXI_RESP_SLVERR;
 
   always @(posedge clk) begin
     if (rst) begin

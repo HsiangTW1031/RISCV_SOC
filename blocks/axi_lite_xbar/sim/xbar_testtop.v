@@ -1,7 +1,7 @@
-// Test-only wiring harness: axi_lite_xbar + five fake_axi_lite_slave
-// stand-ins for ROM/RAM/Timer/WDT/UART, so the crossbar's address decode
-// and channel routing can be validated before real peripheral RTL is
-// wired in. Not a synthesizable deliverable — lives in sim/, not rtl/.
+// Test-only wiring harness: axi_lite_xbar + seven fake_axi_lite_slave
+// stand-ins for ROM/RAM/Timer/WDT/UART/I2C/SPI, so the crossbar's address
+// decode and channel routing can be validated before real peripheral RTL
+// is wired in. Not a synthesizable deliverable — lives in sim/, not rtl/.
 module xbar_testtop (
     input  wire        clk,
     input  wire        rst,
@@ -54,6 +54,16 @@ module xbar_testtop (
   wire [3:0]  uart_wstrb;
   wire [1:0]  uart_bresp, uart_rresp;
 
+  wire        i2c_awvalid, i2c_awready, i2c_wvalid, i2c_wready, i2c_bvalid, i2c_bready, i2c_arvalid, i2c_arready, i2c_rvalid, i2c_rready;
+  wire [31:0] i2c_awaddr, i2c_wdata, i2c_araddr, i2c_rdata;
+  wire [3:0]  i2c_wstrb;
+  wire [1:0]  i2c_bresp, i2c_rresp;
+
+  wire        spi_awvalid, spi_awready, spi_wvalid, spi_wready, spi_bvalid, spi_bready, spi_arvalid, spi_arready, spi_rvalid, spi_rready;
+  wire [31:0] spi_awaddr, spi_wdata, spi_araddr, spi_rdata;
+  wire [3:0]  spi_wstrb;
+  wire [1:0]  spi_bresp, spi_rresp;
+
   axi_lite_xbar u_xbar (
       .clk(clk), .rst(rst),
       .s_awvalid(s_awvalid), .s_awready(s_awready), .s_awaddr(s_awaddr),
@@ -90,7 +100,19 @@ module xbar_testtop (
       .uart_wvalid(uart_wvalid),   .uart_wready(uart_wready),   .uart_wdata(uart_wdata), .uart_wstrb(uart_wstrb),
       .uart_bvalid(uart_bvalid),   .uart_bready(uart_bready),   .uart_bresp(uart_bresp),
       .uart_arvalid(uart_arvalid), .uart_arready(uart_arready), .uart_araddr(uart_araddr),
-      .uart_rvalid(uart_rvalid),   .uart_rready(uart_rready),   .uart_rdata(uart_rdata), .uart_rresp(uart_rresp)
+      .uart_rvalid(uart_rvalid),   .uart_rready(uart_rready),   .uart_rdata(uart_rdata), .uart_rresp(uart_rresp),
+
+      .i2c_awvalid(i2c_awvalid), .i2c_awready(i2c_awready), .i2c_awaddr(i2c_awaddr),
+      .i2c_wvalid(i2c_wvalid),   .i2c_wready(i2c_wready),   .i2c_wdata(i2c_wdata), .i2c_wstrb(i2c_wstrb),
+      .i2c_bvalid(i2c_bvalid),   .i2c_bready(i2c_bready),   .i2c_bresp(i2c_bresp),
+      .i2c_arvalid(i2c_arvalid), .i2c_arready(i2c_arready), .i2c_araddr(i2c_araddr),
+      .i2c_rvalid(i2c_rvalid),   .i2c_rready(i2c_rready),   .i2c_rdata(i2c_rdata), .i2c_rresp(i2c_rresp),
+
+      .spi_awvalid(spi_awvalid), .spi_awready(spi_awready), .spi_awaddr(spi_awaddr),
+      .spi_wvalid(spi_wvalid),   .spi_wready(spi_wready),   .spi_wdata(spi_wdata), .spi_wstrb(spi_wstrb),
+      .spi_bvalid(spi_bvalid),   .spi_bready(spi_bready),   .spi_bresp(spi_bresp),
+      .spi_arvalid(spi_arvalid), .spi_arready(spi_arready), .spi_araddr(spi_araddr),
+      .spi_rvalid(spi_rvalid),   .spi_rready(spi_rready),   .spi_rdata(spi_rdata), .spi_rresp(spi_rresp)
   );
 
   fake_axi_lite_slave u_rom (
@@ -136,6 +158,24 @@ module xbar_testtop (
       .s_bvalid(uart_bvalid),   .s_bready(uart_bready),   .s_bresp(uart_bresp),
       .s_arvalid(uart_arvalid), .s_arready(uart_arready), .s_araddr(uart_araddr),
       .s_rvalid(uart_rvalid),   .s_rready(uart_rready),   .s_rdata(uart_rdata), .s_rresp(uart_rresp)
+  );
+
+  fake_axi_lite_slave u_i2c (
+      .clk(clk), .rst(rst),
+      .s_awvalid(i2c_awvalid), .s_awready(i2c_awready), .s_awaddr(i2c_awaddr),
+      .s_wvalid(i2c_wvalid),   .s_wready(i2c_wready),   .s_wdata(i2c_wdata), .s_wstrb(i2c_wstrb),
+      .s_bvalid(i2c_bvalid),   .s_bready(i2c_bready),   .s_bresp(i2c_bresp),
+      .s_arvalid(i2c_arvalid), .s_arready(i2c_arready), .s_araddr(i2c_araddr),
+      .s_rvalid(i2c_rvalid),   .s_rready(i2c_rready),   .s_rdata(i2c_rdata), .s_rresp(i2c_rresp)
+  );
+
+  fake_axi_lite_slave u_spi (
+      .clk(clk), .rst(rst),
+      .s_awvalid(spi_awvalid), .s_awready(spi_awready), .s_awaddr(spi_awaddr),
+      .s_wvalid(spi_wvalid),   .s_wready(spi_wready),   .s_wdata(spi_wdata), .s_wstrb(spi_wstrb),
+      .s_bvalid(spi_bvalid),   .s_bready(spi_bready),   .s_bresp(spi_bresp),
+      .s_arvalid(spi_arvalid), .s_arready(spi_arready), .s_araddr(spi_araddr),
+      .s_rvalid(spi_rvalid),   .s_rready(spi_rready),   .s_rdata(spi_rdata), .s_rresp(spi_rresp)
   );
 
 endmodule
