@@ -63,11 +63,23 @@ int main(int argc, char** argv) {
   ok = bfm.read(0x40002000, &rd, &resp);
   check("read UART 0x4000_2000 data", ok && rd == 0xCCCC0003);
 
-  // ---- 4. cross-region isolation: ROM word 0 unaffected by RAM/UART writes ----
-  ok = bfm.read(0x00000000, &rd, &resp);
-  check("ROM 0x0 unaffected by RAM/UART writes", ok && rd == 0xAAAA0001);
+  // ---- 4. Timer region (0x4000_0000) ----
+  ok = bfm.write(0x40000000, 0x11110004, 0xF, &resp);
+  check("write Timer 0x4000_0000 ok", ok && resp == RESP_OKAY);
+  ok = bfm.read(0x40000000, &rd, &resp);
+  check("read Timer 0x4000_0000 data", ok && rd == 0x11110004);
 
-  // ---- 5. unmapped address -> SLVERR, no slave touched ----
+  // ---- 5. Watchdog region (0x4000_1000) ----
+  ok = bfm.write(0x40001000, 0x22220005, 0xF, &resp);
+  check("write WDT 0x4000_1000 ok", ok && resp == RESP_OKAY);
+  ok = bfm.read(0x40001000, &rd, &resp);
+  check("read WDT 0x4000_1000 data", ok && rd == 0x22220005);
+
+  // ---- 6. cross-region isolation: ROM word 0 unaffected by other writes ----
+  ok = bfm.read(0x00000000, &rd, &resp);
+  check("ROM 0x0 unaffected by RAM/Timer/WDT/UART writes", ok && rd == 0xAAAA0001);
+
+  // ---- 7. unmapped address -> SLVERR, no slave touched ----
   ok = bfm.write(0x50000000, 0xDEADDEAD, 0xF, &resp);
   check("write unmapped completes (crossbar self-answers)", ok);
   check("write unmapped resp SLVERR", resp == RESP_SLVERR);
@@ -76,15 +88,17 @@ int main(int argc, char** argv) {
   check("read unmapped completes", ok);
   check("read unmapped resp SLVERR", resp == RESP_SLVERR);
 
-  // a peripheral address that's in the map but not wired up yet (Timer) —
-  // also expected to SLVERR at this phase, since only ROM/RAM/UART exist.
-  ok = bfm.read(0x40000000, &rd, &resp);
-  check("read not-yet-wired Timer addr completes", ok);
-  check("read not-yet-wired Timer addr resp SLVERR", resp == RESP_SLVERR);
+  // a peripheral address that's in the map but not wired up yet (I2C) —
+  // expected to SLVERR, since only ROM/RAM/Timer/WDT/UART exist this phase.
+  ok = bfm.read(0x40003000, &rd, &resp);
+  check("read not-yet-wired I2C addr completes", ok);
+  check("read not-yet-wired I2C addr resp SLVERR", resp == RESP_SLVERR);
 
   // confirm the unmapped accesses didn't corrupt real slave state.
   ok = bfm.read(0x10000000, &rd, &resp);
   check("RAM 0x1000_0000 unaffected by unmapped access", ok && rd == 0xBBBB0002);
+  ok = bfm.read(0x40000000, &rd, &resp);
+  check("Timer unaffected by unmapped access", ok && rd == 0x11110004);
 
   delete dut;
   delete ctx;
@@ -93,6 +107,6 @@ int main(int argc, char** argv) {
     printf("FAIL: %d check(s) failed\n", fail_count);
     return 1;
   }
-  printf("PASS: axi_lite_xbar routing/decode (ROM/RAM/UART + SLVERR on miss) all green\n");
+  printf("PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART + SLVERR on miss) all green\n");
   return 0;
 }

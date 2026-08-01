@@ -36,8 +36,34 @@ risks: see [`docs/phase_plan.md`](docs/phase_plan.md).
       firmware and prints `Hello World` over the (simulated) UART line —
       1206 cycles, testbench exits 0.**
 
-**Not started:** Phase 2 (interrupts, timer, watchdog) onward — see
-`docs/phase_plan.md`.
+**Phase 2 (interrupts, timer, watchdog) — done:**
+- [x] `axi_lite_xbar` expanded to 5 slaves (added Timer, Watchdog)
+- [x] `timer` — down-counter, auto-reload, sticky STATUS.EXPIRED, one-cycle
+      `irq` pulse; cycle-accurate directed unit test
+- [x] `watchdog` — WARNING interrupt at a configurable margin before
+      timeout, a level-held `wdog_reset_req` output when it actually
+      expires, KICK to feed it; cycle-accurate directed unit test covering
+      both the WARNING and reset-request timing exactly
+- [x] `fw/custom_ops.S` (PicoRV32's getq/setq/retirq/maskirq opcodes) +
+      `fw/start.S` real ISR (saves all caller-saved GPRs + q0, masks IRQs
+      for the duration of the handler, calls a C `irq_handler`)
+- [x] `soc_top`: `ENABLE_IRQ=1`, irq[3]=Timer, irq[4]=Watchdog
+- [x] **Milestone: the full SoC runs 5 real Timer interrupts through
+      PicoRV32's non-standard IRQ mechanism, kicks the Watchdog from the
+      ISR each time, and reports the count over UART — 8907 cycles,
+      testbench exits 0.**
+- [x] Found and fixed a real hardware/firmware interaction bug during
+      bring-up: a **level-held** IRQ line combined with PicoRV32's
+      `LATCHED_IRQ` mechanism (which re-OR's the raw irq input into its
+      internal pending register every cycle, regardless of the dynamic
+      `maskirq` mask) guarantees a spurious second ISR entry once the
+      handler unmasks, no matter how fast firmware clears the status bit.
+      Fixed by making `timer`/`watchdog`'s `irq` outputs single-cycle
+      **pulses** instead, with the sticky status bits kept as separate,
+      independently-readable registers. See `blocks/timer/rtl/timer.v`'s
+      header comment for the full explanation.
+
+**Not started:** Phase 3 (I2C, SPI) onward — see `docs/phase_plan.md`.
 
 ## Running things
 
@@ -53,7 +79,8 @@ verilator -Wall -Wno-UNUSEDSIGNAL -Wno-UNUSEDPARAM -Wno-WIDTHEXPAND -Wno-WIDTHTR
   -Wno-BLKSEQ -Wno-DECLFILENAME -Wno-GENUNNAMED -Wno-PINCONNECTEMPTY \
   --cc --exe --build --trace --top-module soc_top \
   -I../../../rtl/include \
-  ../rtl/picorv32.v ../rtl/axi_lite_xbar.v ../rtl/boot_rom.v ../rtl/sram.v ../rtl/uart.v ../rtl/soc_top.v \
+  ../rtl/picorv32.v ../rtl/axi_lite_xbar.v ../rtl/boot_rom.v ../rtl/sram.v \
+  ../rtl/timer.v ../rtl/watchdog.v ../rtl/uart.v ../rtl/soc_top.v \
   sim_main.cpp -o soc_sim --Mdir obj_dir
 ./obj_dir/soc_sim
 

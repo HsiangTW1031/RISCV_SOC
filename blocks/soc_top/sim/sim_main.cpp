@@ -1,9 +1,12 @@
-// Full-SoC smoke test — Phase 1 exit criterion: the real compiled firmware
-// (fw/main.c) runs on picorv32_axi through the hand-written crossbar,
-// reaches boot_rom via a real AXI transaction on every fetch, and prints
-// "Hello World\n" out the UART TX line, decoded here bit-by-bit (not
-// trusted via any internal probe) exactly like a real serial terminal
-// would see it. Self-checking: exits 0 only on an exact string match.
+// Full-SoC smoke test. Phase 1 proved the CPU/crossbar/ROM/UART path by
+// printing "Hello World". Phase 2 extends the same firmware to configure
+// the Timer for periodic interrupts, count them in a real ISR (through
+// PicoRV32's non-standard getq/setq/retirq mechanism), kick the Watchdog
+// from that ISR, and report the interrupt count over UART — so this test
+// now also proves interrupts actually fired, not just that the program
+// ran. Decoded bit-by-bit off the UART TX line (not an internal probe),
+// exactly like a real serial terminal would see it. Self-checking: exits
+// 0 only on an exact string match.
 #include "Vsoc_top.h"
 #include "verilated.h"
 #include "verilated_vcd_c.h"
@@ -39,7 +42,7 @@ int main(int argc, char** argv) {
   for (int i = 0; i < 4; i++) clock();
   dut->rst = 0;
 
-  const std::string expected = "Hello World\n";
+  const std::string expected = "Hello World\nTimer IRQs: 5\n";
   std::string got;
   const long GLOBAL_TIMEOUT_CYCLES = 2000000;
   long cycles = 0;
@@ -84,13 +87,13 @@ int main(int argc, char** argv) {
     return 1;
   }
   if (got != expected) {
-    printf("FAIL: got %zu byte(s), expected \"Hello World\\n\" (%zu bytes)\n",
-           got.size(), expected.size());
+    printf("FAIL: got %zu byte(s), expected %zu bytes\n", got.size(), expected.size());
     return 1;
   }
 
-  printf("PASS: soc_top booted firmware and printed \"Hello World\" over UART "
-         "(CPU -> crossbar -> boot_rom fetch, -> uart TX, all through real "
-         "AXI4-Lite transactions)\n");
+  printf("PASS: soc_top booted firmware, printed \"Hello World\", ran 5 real "
+         "Timer interrupts through PicoRV32's getq/setq/retirq ISR path "
+         "(kicking the Watchdog each time), and reported the count over "
+         "UART — all through real AXI4-Lite transactions\n");
   return 0;
 }

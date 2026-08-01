@@ -14,7 +14,7 @@ all: firmware.hex
 firmware.elf: start.o main.o linker.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o firmware.elf start.o main.o
 
-start.o: start.S
+start.o: start.S custom_ops.S
 	$(CC) $(CFLAGS) -c -o start.o start.S
 
 main.o: main.c
