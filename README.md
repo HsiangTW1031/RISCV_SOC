@@ -1,9 +1,10 @@
 # RISCV_SOC
 
 A from-scratch RISC-V SoC platform: PicoRV32 core, a hand-written AXI4-Lite
-crossbar, an AES-128 accelerator, and a set of peripherals (timer, watchdog,
-UART, I2C, SPI, JTAG). Simulation-based sign-off (Verilator + Yosys/Nangate45
-+ OpenSTA) — no FPGA or ASIC tape-out target.
+crossbar, an AES-128 accelerator (with CBC/CTR chaining and an AXI4 burst
+DMA engine), and a set of peripherals (timer, watchdog, UART, I2C, SPI,
+JTAG). Simulation-based sign-off (Verilator + Yosys/Nangate45 + OpenSTA) —
+no FPGA or ASIC tape-out target.
 
 Full project plan, phase-by-phase breakdown, architecture rationale, and open
 risks: see [`docs/phase_plan.md`](docs/phase_plan.md).
@@ -113,15 +114,91 @@ risks: see [`docs/phase_plan.md`](docs/phase_plan.md).
       today, and an explicit list of what this RTL implementation does
       *not* provide — no side-channel hardening, not production-secure)
 
-**Not started:** Phase 5 (JTAG TAP + debug bridge) onward — see
-`docs/phase_plan.md`.
+**Phase 5 (JTAG debug bridge, crossbar → 2-master) — done:**
+- [x] `jtag_tap` — IEEE 1149.1 16-state TAP FSM, verified against an
+      independent C++ transition-table model over 5000 random TMS steps,
+      plus an explicit test of the "5 consecutive TMS=1 always returns to
+      Test-Logic-Reset from any state" safety property
+- [x] `jtag_dtm` — IR/DR registers (IDCODE, BYPASS, AXI_ADDR/AXI_DATA/AXI_CTRL)
+- [x] `jtag_axi_bridge` — the only module crossing the `tck`/`clk` clock
+      domains; owns its own CDC (toggle-bit synchronization, not level
+      synchronization — see below)
+- [x] `axi_lite_xbar` upgraded from 1 master to a genuine 2-master design
+      (CPU=s0, JTAG bridge=s1), fixed-priority arbitration (CPU wins ties),
+      write/read channel groups arbitrated independently, grant locked for
+      the full duration of an in-flight transaction
+- [x] `soc_top` wired; JTAG writes and reads back a RAM scratch word
+      through the real crossbar without disturbing the existing firmware
+      regression (Hello World + 5 Timer IRQs still passes unchanged)
+- [x] Found and fixed two real bugs during bring-up: a level-based CDC
+      synchronizer that silently missed short BUSY pulses whenever `tck`
+      ran much slower than `clk` (fixed with toggle-bit synchronization,
+      which can't miss a transition regardless of clock ratio), and a
+      crossbar arbitration bug where the write-side grant could be stolen
+      mid-transaction on the exact cycle both AW and W landed together —
+      caught only by `soc_top`-level integration testing (concurrent CPU +
+      JTAG contention), not the crossbar's own unit test. See
+      `docs/specs/jtag.md` and `docs/project_retrospective.md`.
+
+**Phase 6 (optional extension: AES CBC/CTR + AXI4 burst DMA) — done:**
+- [x] `aes_chain` — CBC/CTR mode-of-operation wrapper around the unmodified
+      Phase 4 `aes_core`, verified against NIST SP 800-38A Appendix F.2/F.5
+      vectors (both directions)
+- [x] `rtl/include/axi4.vh` + `dma_ram` — a deliberately-scoped-down AXI4
+      burst subset (INCR bursts, fixed 4-byte beats), kept architecturally
+      separate from the AXI4-Lite-only crossbar rather than adding burst
+      support project-wide
+- [x] `dma_engine` — AXI4-Lite control port (crossbar's 9th slave) + AXI4
+      burst master streaming multi-block messages straight through
+      `aes_chain` to a private `dma_ram`, zero CPU involvement per block;
+      verified end-to-end (CBC encrypt, CTR, CBC decrypt, 4 blocks each)
+      against NIST vectors — 15/15 checks green
+- [x] `soc_top` wired (DMA control port reachable via the real crossbar);
+      full regression unchanged
+- [x] Found and fixed two real RTL bugs during bring-up (same "combinational
+      logic reads a register that hasn't updated yet this edge" class as a
+      SPI/register-offset bug from Phase 3) plus one test-harness bug — see
+      `docs/specs/dma.md` and `docs/project_retrospective.md` for the full
+      root-cause writeups
+
+**Phase 7 (documentation & sign-off) — done:**
+- [x] `docs/architecture.md`, `docs/memory_map.md`,
+      `docs/verification_summary.md`, `docs/performance.md`
+- [x] Whole-SoC Yosys synthesis + OpenSTA timing (Nangate45; the three
+      plain memory arrays blackboxed as SRAM macros, everything else —
+      PicoRV32, the crossbar, every peripheral, AES, DMA — synthesized for
+      real): **Fmax ≈ 91.2 MHz**, critical path in AES key expansion,
+      consistent with the standalone `aes_core` result from Phase 4
+- [x] Measured (not estimated) performance data: AES throughput ≈ 69.5 MB/s,
+      DMA throughput ≈ 37.4 MB/s (39 cycles/block average), interrupt
+      latency 3-14 cycles (avg 8.6) measured directly from a VCD trace
+- [x] `scripts/run_regression.sh` — rebuilds and runs all 18 block
+      testbenches in one pass; running it caught a real latent bug (a
+      watchdog testbench constant that had drifted from the RTL's actual
+      default and gone unnoticed because a stale binary kept looking green)
+- [x] `docs/project_retrospective.md` — phase-by-phase account of every
+      real bug found across the whole project, root cause and fix,
+      including two error patterns that each recurred independently in
+      more than one phase
+
+**All phases (0-7) complete.** See `docs/phase_plan.md` for the original
+plan and `docs/project_retrospective.md` for the full bug/debugging history.
 
 ## Running things
 
-There's no flow-automation skill wired up yet for this project (the
-generic `IC_fe_flow` skill was retired — a project-specific one will
-replace it once the architecture has settled). For now, lint/synth/sim/STA
-are run directly:
+The easiest way to check everything at once:
+
+```bash
+./scripts/run_regression.sh
+```
+
+This rebuilds and runs all 18 block testbenches fresh (no incremental-build
+assumptions) and prints a PASS/FAIL summary table — the same script used to
+sign off Phase 7 (see `docs/verification_summary.md`).
+
+There's no flow-automation skill wired up yet for synth/STA (the generic
+`IC_fe_flow` skill was retired — a project-specific one will replace it once
+the architecture has settled). For now those are run directly, e.g.:
 
 ```bash
 # full-SoC smoke test (rebuilds + runs; firmware.hex must already be built)
@@ -132,9 +209,16 @@ verilator -Wall -Wno-UNUSEDSIGNAL -Wno-UNUSEDPARAM -Wno-WIDTHEXPAND -Wno-WIDTHTR
   -I../../../rtl/include -I../rtl \
   ../rtl/picorv32.v ../rtl/axi_lite_xbar.v ../rtl/boot_rom.v ../rtl/sram.v \
   ../rtl/timer.v ../rtl/watchdog.v ../rtl/uart.v ../rtl/i2c_master.v ../rtl/spi_master.v \
-  ../rtl/aes_key_expand.v ../rtl/aes_core.v ../rtl/aes.v ../rtl/soc_top.v \
-  sim_main.cpp -o soc_sim --Mdir obj_dir
+  ../rtl/aes_key_expand.v ../rtl/aes_core.v ../rtl/aes_chain.v ../rtl/aes.v \
+  ../rtl/dma_ram.v ../rtl/dma_engine.v \
+  ../rtl/jtag_tap.v ../rtl/jtag_dtm.v ../rtl/jtag_axi_bridge.v \
+  ../rtl/soc_top.v sim_main.cpp -o soc_sim --Mdir obj_dir
 ./obj_dir/soc_sim
+
+# whole-SoC synthesis + STA (Nangate45; memories blackboxed, see
+# docs/performance.md for why)
+cd blocks/soc_top/syn && yosys synth.ys
+cd ../sta && sta sta.tcl
 
 # rebuild firmware after editing fw/main.c or fw/start.S
 cd fw && make && cp firmware.hex ../blocks/soc_top/sim/firmware.hex
@@ -147,8 +231,9 @@ style, not from this project's RTL.
 ## Layout
 
 Each block under `blocks/` has its own `rtl/lint/sdc/syn/sta/sim` —
-independent enough to lint/synthesize/STA on its own (already done for
-`aes`: see `blocks/aes/syn/synth.ys` and `blocks/aes/sta/sta.tcl`).
+independent enough to lint/synthesize/STA on its own (done for `aes`: see
+`blocks/aes/syn/synth.ys` and `blocks/aes/sta/sta.tcl`; and for the whole
+SoC: see `blocks/soc_top/syn/synth.ys` and `blocks/soc_top/sta/sta.tcl`).
 `soc_top`'s `rtl/` is a set of symlinks into every other block's canonical
 source, so there's exactly one copy of each module. See
 `docs/phase_plan.md` for the full rationale.
