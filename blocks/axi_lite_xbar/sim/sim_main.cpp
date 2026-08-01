@@ -87,11 +87,17 @@ int main(int argc, char** argv) {
   ok = bfm.read(0x40004000, &rd, &resp);
   check("read SPI 0x4000_4000 data", ok && rd == 0x44440007);
 
-  // ---- 8. cross-region isolation: ROM word 0 unaffected by other writes ----
-  ok = bfm.read(0x00000000, &rd, &resp);
-  check("ROM 0x0 unaffected by RAM/Timer/WDT/UART/I2C/SPI writes", ok && rd == 0xAAAA0001);
+  // ---- 8. AES region (0x4000_5000) ----
+  ok = bfm.write(0x40005000, 0x55550008, 0xF, &resp);
+  check("write AES 0x4000_5000 ok", ok && resp == RESP_OKAY);
+  ok = bfm.read(0x40005000, &rd, &resp);
+  check("read AES 0x4000_5000 data", ok && rd == 0x55550008);
 
-  // ---- 9. unmapped address -> SLVERR, no slave touched ----
+  // ---- 9. cross-region isolation: ROM word 0 unaffected by other writes ----
+  ok = bfm.read(0x00000000, &rd, &resp);
+  check("ROM 0x0 unaffected by RAM/Timer/WDT/UART/I2C/SPI/AES writes", ok && rd == 0xAAAA0001);
+
+  // ---- 10. unmapped address -> SLVERR, no slave touched ----
   ok = bfm.write(0x50000000, 0xDEADDEAD, 0xF, &resp);
   check("write unmapped completes (crossbar self-answers)", ok);
   check("write unmapped resp SLVERR", resp == RESP_SLVERR);
@@ -100,11 +106,11 @@ int main(int argc, char** argv) {
   check("read unmapped completes", ok);
   check("read unmapped resp SLVERR", resp == RESP_SLVERR);
 
-  // a peripheral address that's in the map but not wired up yet (AES) —
-  // expected to SLVERR, since AES lands in a later phase.
-  ok = bfm.read(0x40005000, &rd, &resp);
-  check("read not-yet-wired AES addr completes", ok);
-  check("read not-yet-wired AES addr resp SLVERR", resp == RESP_SLVERR);
+  // a peripheral sub-address beyond AES that's still genuinely unmapped —
+  // expected to SLVERR (all 8 defined peripheral slots are wired up now).
+  ok = bfm.read(0x40006000, &rd, &resp);
+  check("read genuinely-unmapped peripheral addr completes", ok);
+  check("read genuinely-unmapped peripheral addr resp SLVERR", resp == RESP_SLVERR);
 
   // confirm the unmapped accesses didn't corrupt real slave state.
   ok = bfm.read(0x10000000, &rd, &resp);
@@ -119,6 +125,6 @@ int main(int argc, char** argv) {
     printf("FAIL: %d check(s) failed\n", fail_count);
     return 1;
   }
-  printf("PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI + SLVERR on miss) all green\n");
+  printf("PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI/AES + SLVERR on miss) all green\n");
   return 0;
 }

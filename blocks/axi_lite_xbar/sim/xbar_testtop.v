@@ -1,7 +1,8 @@
-// Test-only wiring harness: axi_lite_xbar + seven fake_axi_lite_slave
-// stand-ins for ROM/RAM/Timer/WDT/UART/I2C/SPI, so the crossbar's address
-// decode and channel routing can be validated before real peripheral RTL
-// is wired in. Not a synthesizable deliverable — lives in sim/, not rtl/.
+// Test-only wiring harness: axi_lite_xbar + eight fake_axi_lite_slave
+// stand-ins for ROM/RAM/Timer/WDT/UART/I2C/SPI/AES, so the crossbar's
+// address decode and channel routing can be validated before real
+// peripheral RTL is wired in. Not a synthesizable deliverable — lives in
+// sim/, not rtl/.
 module xbar_testtop (
     input  wire        clk,
     input  wire        rst,
@@ -64,6 +65,11 @@ module xbar_testtop (
   wire [3:0]  spi_wstrb;
   wire [1:0]  spi_bresp, spi_rresp;
 
+  wire        aes_awvalid, aes_awready, aes_wvalid, aes_wready, aes_bvalid, aes_bready, aes_arvalid, aes_arready, aes_rvalid, aes_rready;
+  wire [31:0] aes_awaddr, aes_wdata, aes_araddr, aes_rdata;
+  wire [3:0]  aes_wstrb;
+  wire [1:0]  aes_bresp, aes_rresp;
+
   axi_lite_xbar u_xbar (
       .clk(clk), .rst(rst),
       .s_awvalid(s_awvalid), .s_awready(s_awready), .s_awaddr(s_awaddr),
@@ -112,7 +118,13 @@ module xbar_testtop (
       .spi_wvalid(spi_wvalid),   .spi_wready(spi_wready),   .spi_wdata(spi_wdata), .spi_wstrb(spi_wstrb),
       .spi_bvalid(spi_bvalid),   .spi_bready(spi_bready),   .spi_bresp(spi_bresp),
       .spi_arvalid(spi_arvalid), .spi_arready(spi_arready), .spi_araddr(spi_araddr),
-      .spi_rvalid(spi_rvalid),   .spi_rready(spi_rready),   .spi_rdata(spi_rdata), .spi_rresp(spi_rresp)
+      .spi_rvalid(spi_rvalid),   .spi_rready(spi_rready),   .spi_rdata(spi_rdata), .spi_rresp(spi_rresp),
+
+      .aes_awvalid(aes_awvalid), .aes_awready(aes_awready), .aes_awaddr(aes_awaddr),
+      .aes_wvalid(aes_wvalid),   .aes_wready(aes_wready),   .aes_wdata(aes_wdata), .aes_wstrb(aes_wstrb),
+      .aes_bvalid(aes_bvalid),   .aes_bready(aes_bready),   .aes_bresp(aes_bresp),
+      .aes_arvalid(aes_arvalid), .aes_arready(aes_arready), .aes_araddr(aes_araddr),
+      .aes_rvalid(aes_rvalid),   .aes_rready(aes_rready),   .aes_rdata(aes_rdata), .aes_rresp(aes_rresp)
   );
 
   fake_axi_lite_slave u_rom (
@@ -176,6 +188,15 @@ module xbar_testtop (
       .s_bvalid(spi_bvalid),   .s_bready(spi_bready),   .s_bresp(spi_bresp),
       .s_arvalid(spi_arvalid), .s_arready(spi_arready), .s_araddr(spi_araddr),
       .s_rvalid(spi_rvalid),   .s_rready(spi_rready),   .s_rdata(spi_rdata), .s_rresp(spi_rresp)
+  );
+
+  fake_axi_lite_slave u_aes (
+      .clk(clk), .rst(rst),
+      .s_awvalid(aes_awvalid), .s_awready(aes_awready), .s_awaddr(aes_awaddr),
+      .s_wvalid(aes_wvalid),   .s_wready(aes_wready),   .s_wdata(aes_wdata), .s_wstrb(aes_wstrb),
+      .s_bvalid(aes_bvalid),   .s_bready(aes_bready),   .s_bresp(aes_bresp),
+      .s_arvalid(aes_arvalid), .s_arready(aes_arready), .s_araddr(aes_araddr),
+      .s_rvalid(aes_rvalid),   .s_rready(aes_rready),   .s_rdata(aes_rdata), .s_rresp(aes_rresp)
   );
 
 endmodule

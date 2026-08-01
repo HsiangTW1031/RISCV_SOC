@@ -1,8 +1,8 @@
 `include "axi_lite.vh"
 
-// Top-level SoC integration — Phase 3 scope: CPU + crossbar + ROM/RAM/UART
-// + Timer + Watchdog + I2C + SPI, interrupts enabled. AES/JTAG land in
-// later phases (see docs/phase_plan.md).
+// Top-level SoC integration — Phase 4 scope: CPU + crossbar + ROM/RAM/UART
+// + Timer + Watchdog + I2C + SPI + AES, interrupts enabled. JTAG lands in
+// a later phase (see docs/phase_plan.md).
 //
 // Known limitation (unchanged from Phase 1): picorv32_axi's mem_axi_b*/r*
 // ports have no BRESP/RRESP pins at all — this adapter never checks for
@@ -11,11 +11,11 @@
 //
 // IRQ map (matches docs/phase_plan.md): irq[3] = Timer EXPIRED,
 // irq[4] = Watchdog WARNING, irq[5] = I2C transfer done, irq[6] = SPI
-// transfer done. irq[0]/irq[1] are PicoRV32's own built-in bus-error/
-// illegal-instruction traps; everything else is unused this phase.
-// wdog_reset_req is exposed at the top level for observability but is NOT
-// yet wired to actually reset the SoC — that's a deliberate, documented
-// scope cut (see docs/phase_plan.md risk notes).
+// transfer done, irq[7] = AES block done. irq[0]/irq[1] are PicoRV32's own
+// built-in bus-error/illegal-instruction traps; everything else is unused
+// this phase. wdog_reset_req is exposed at the top level for
+// observability but is NOT yet wired to actually reset the SoC — that's a
+// deliberate, documented scope cut (see docs/phase_plan.md risk notes).
 module soc_top #(
     parameter FIRMWARE_HEX = "firmware.hex"
 ) (
@@ -44,10 +44,11 @@ module soc_top #(
   wire        cpu_rvalid, cpu_rready;
   wire [31:0] cpu_rdata;
 
-  wire        timer_irq, wdt_irq, i2c_irq, spi_irq;
-  wire [31:0] irq_bus = {25'b0, spi_irq, i2c_irq, wdt_irq, timer_irq, 3'b0};
-  // bit6=spi_irq, bit5=i2c_irq, bit4=wdt_irq, bit3=timer_irq, bits[2:0]
-  // reserved for PicoRV32's own bus-error/illegal-instruction/(unused) traps.
+  wire        timer_irq, wdt_irq, i2c_irq, spi_irq, aes_irq;
+  wire [31:0] irq_bus = {24'b0, aes_irq, spi_irq, i2c_irq, wdt_irq, timer_irq, 3'b0};
+  // bit7=aes_irq, bit6=spi_irq, bit5=i2c_irq, bit4=wdt_irq, bit3=timer_irq,
+  // bits[2:0] reserved for PicoRV32's own bus-error/illegal-instruction/
+  // (unused) traps.
 
   picorv32_axi #(
       .ENABLE_MUL(1),
@@ -121,6 +122,12 @@ module soc_top #(
   wire        spix_arvalid, spix_arready; wire [31:0] spix_araddr;
   wire        spix_rvalid,  spix_rready;  wire [31:0] spix_rdata; wire [1:0] spix_rresp;
 
+  wire        aesx_awvalid, aesx_awready; wire [31:0] aesx_awaddr;
+  wire        aesx_wvalid,  aesx_wready;  wire [31:0] aesx_wdata; wire [3:0] aesx_wstrb;
+  wire        aesx_bvalid,  aesx_bready;  wire [1:0]  aesx_bresp;
+  wire        aesx_arvalid, aesx_arready; wire [31:0] aesx_araddr;
+  wire        aesx_rvalid,  aesx_rready;  wire [31:0] aesx_rdata; wire [1:0] aesx_rresp;
+
   axi_lite_xbar u_xbar (
       .clk(clk), .rst(rst),
 
@@ -170,7 +177,13 @@ module soc_top #(
       .spi_wvalid(spix_wvalid),   .spi_wready(spix_wready),   .spi_wdata(spix_wdata), .spi_wstrb(spix_wstrb),
       .spi_bvalid(spix_bvalid),   .spi_bready(spix_bready),   .spi_bresp(spix_bresp),
       .spi_arvalid(spix_arvalid), .spi_arready(spix_arready), .spi_araddr(spix_araddr),
-      .spi_rvalid(spix_rvalid),   .spi_rready(spix_rready),   .spi_rdata(spix_rdata), .spi_rresp(spix_rresp)
+      .spi_rvalid(spix_rvalid),   .spi_rready(spix_rready),   .spi_rdata(spix_rdata), .spi_rresp(spix_rresp),
+
+      .aes_awvalid(aesx_awvalid), .aes_awready(aesx_awready), .aes_awaddr(aesx_awaddr),
+      .aes_wvalid(aesx_wvalid),   .aes_wready(aesx_wready),   .aes_wdata(aesx_wdata), .aes_wstrb(aesx_wstrb),
+      .aes_bvalid(aesx_bvalid),   .aes_bready(aesx_bready),   .aes_bresp(aesx_bresp),
+      .aes_arvalid(aesx_arvalid), .aes_arready(aesx_arready), .aes_araddr(aesx_araddr),
+      .aes_rvalid(aesx_rvalid),   .aes_rready(aesx_rready),   .aes_rdata(aesx_rdata), .aes_rresp(aesx_rresp)
   );
 
   boot_rom #(.HEXFILE(FIRMWARE_HEX)) u_rom (
@@ -242,5 +255,15 @@ module soc_top #(
       .s_rvalid(spix_rvalid),   .s_rready(spix_rready),   .s_rdata(spix_rdata), .s_rresp(spix_rresp),
       .sclk(spi_sclk), .mosi(spi_mosi), .miso(spi_miso), .cs_n(spi_cs_n),
       .irq(spi_irq)
+  );
+
+  aes u_aes (
+      .clk(clk), .rst(rst),
+      .s_awvalid(aesx_awvalid), .s_awready(aesx_awready), .s_awaddr(aesx_awaddr),
+      .s_wvalid(aesx_wvalid),   .s_wready(aesx_wready),   .s_wdata(aesx_wdata), .s_wstrb(aesx_wstrb),
+      .s_bvalid(aesx_bvalid),   .s_bready(aesx_bready),   .s_bresp(aesx_bresp),
+      .s_arvalid(aesx_arvalid), .s_arready(aesx_arready), .s_araddr(aesx_araddr),
+      .s_rvalid(aesx_rvalid),   .s_rready(aesx_rready),   .s_rdata(aesx_rdata), .s_rresp(aesx_rresp),
+      .irq(aes_irq)
   );
 endmodule
