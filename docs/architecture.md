@@ -102,3 +102,5 @@ Vendored,原封不動（見 `rtl/core/VENDORED_SOURCE.md`)。設定：`ENABLE_MU
 - `picorv32_axi` 不檢查 SLVERR。
 - JTAG 橋接沒有真正的 CPU halt/single-step。
 - UART 只有 TX,沒有 RX,也沒有 FIFO。
+- 幾乎每個周邊(Timer/Watchdog/UART/I2C/SPI/AES/DMA/boot_rom)的 AXI-Lite response channel,都是「固定拉一拍 `s_bvalid`/`s_rvalid` 就自動放下」,沒有真的檢查對方的 `s_bready`/`s_rready`。嚴格照 AXI4 規範,VALID 應該撐到 READY 也是高電位才能撤——這裡目前是「跟這個專案自己的 crossbar 搭配剛好沒事」(crossbar 進入等待狀態就已經先把 `bready`/`rready` 拉高),不是規範保證的正確性。這是跑 `scripts/run_lint.sh`(拿掉 `-Wno-UNUSEDSIGNAL` 後)才浮現的,詳見 `docs/project_retrospective.md`。
+- `dma_engine.v` 自己的 AXI4 burst master,完全不檢查 `dma_ram` 回應的 `m_bresp`/`m_rresp`——跟已知的 `picorv32_axi` 不檢查 BRESP/RRESP 是同一類限制,只是這次是這個專案自己寫的模組。

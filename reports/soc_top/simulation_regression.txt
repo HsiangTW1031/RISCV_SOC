@@ -1,0 +1,25 @@
+=== RISCV_SOC regression: rebuilding + running every block's testbench ===
+
+
+BLOCK              RESULT       DETAIL
+------------------ ------------ ------
+timer              PASS         PASS: timer (cycle-accurate down-count, auto-reload, sticky EXPIRED, EN stop/hold) all green
+watchdog           PASS         PASS: watchdog (cycle-accurate WARNING + reset-request timing, KICK, STATUS semantics) all green
+uart               PASS         PASS: uart TX (frame decode, busy behavior, write-while-busy dropped) all green
+sram               PASS         PASS: sram (full/partial write, read-back, word independence) all green
+boot_rom           PASS         PASS: boot_rom (load + read + write-rejected) all green
+i2c                PASS         PASS: i2c_master (write, read, NACK-on-unknown-address, busy/no-queue) all green
+spi                PASS         PASS: spi_master (all 4 CPOL/CPHA modes byte-accurate, busy/done, START-while-busy ignored) all green
+jtag_tap           PASS         PASS: jtag_tap (16-state IEEE 1149.1 FSM matches reference model, TMS-reset safety property holds from arbitrary states) all green
+jtag_chain         PASS         PASS: JTAG chain (TAP+DTM+bridge, tck<->clk CDC, IDCODE, BYPASS, AXI write/read-back through a real AXI4-Lite slave) all green
+aes_key_expand     PASS         PASS: aes_key_expand (all 11 round keys match FIPS-197 Appendix A.1) all green
+aes_core           PASS         PASS: aes_core (FIPS-197 App.B + App.C.1, encrypt and decrypt) all green
+aes_chain          PASS         PASS: aes_chain (CBC + CTR vs NIST SP 800-38A vectors, encrypt+decrypt) all green
+aes_axi_wrapper    PASS         PASS: aes AXI-Lite wrapper (FIPS-197 App.B + App.C.1 ECB encrypt/decrypt, NIST SP800-38A CBC via MODE/LOAD_IV/IV registers, KEY write-only, busy/no-queue) all green
+aes_diff           PASS         PASS: aes differential test (500 random plaintext/key pairs, RTL vs from-scratch C++ reference model, encrypt match + decrypt round-trip) all green
+axi_lite_xbar      PASS         PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI/AES/DMA + SLVERR on miss) + 2-master arbitration (CPU-priority on contention) all green
+dma_ram            PASS         PASS: dma_ram (AXI4 INCR burst read/write, byte strobes, single-beat, back-to-back bursts) all green
+dma_engine         PASS         PASS: dma_engine (multi-block CBC encrypt/decrypt + CTR streamed through AXI4 bursts + aes_chain with zero per-block CPU involvement, matches NIST SP 800-38A vectors) all green
+soc_top            PASS         PASS: soc_top booted firmware, printed "Hello World", ran 5 real Timer interrupts through PicoRV32's getq/setq/retirq ISR path (kicking the Watchdog each time), and reported the count over UART — all through real AXI4-Lite transactions; the JTAG debug bridge also wrote and read back a RAM word through the real 2-master crossbar, and reached the DMA engine's control port as the crossbar's 9th slave (Phase 6)
+
+ALL 18 regression targets PASS

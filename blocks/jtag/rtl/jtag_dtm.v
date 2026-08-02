@@ -58,12 +58,11 @@ module jtag_dtm (
   // TAP apart from a BYPASS-only one while walking an unknown chain.
   localparam [31:0] IDCODE_VALUE = {4'h1, 16'hC0DE, 11'h051, 1'b1};
 
-  wire [3:0] tap_state;
   wire capture_dr, shift_dr, update_dr, capture_ir, shift_ir, update_ir, test_logic_reset;
 
   jtag_tap u_tap (
       .tck(tck), .rst(rst), .tms(tms),
-      .state(tap_state),
+      .state(),
       .test_logic_reset(test_logic_reset),
       .run_test_idle(), .select_dr_scan(), .capture_dr(capture_dr), .shift_dr(shift_dr),
       .exit1_dr(), .pause_dr(), .exit2_dr(), .update_dr(update_dr),

@@ -86,7 +86,6 @@ module jtag_axi_bridge (
   localparam RD_R   = 3'd4; // waiting for RVALID
 
   reg [2:0]  state;
-  reg        rw_reg;
   reg [31:0] addr_reg, wdata_reg, rdata_reg;
   reg        aw_done, w_done;
   reg        resp_ok;
@@ -110,7 +109,6 @@ module jtag_axi_bridge (
       case (state)
         IDLE: begin
           if (start_pulse_clk) begin
-            rw_reg    <= rw_tck;
             addr_reg  <= addr_tck;
             wdata_reg <= wdata_tck;
             aw_done   <= 1'b0;

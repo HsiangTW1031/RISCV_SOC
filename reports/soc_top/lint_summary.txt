@@ -1,0 +1,21 @@
+=== RISCV_SOC per-block lint-only pass ===
+
+
+BLOCK/TOP                RESULT          
+------------------------ ----------------
+timer/timer              5 warning(s)    
+watchdog/watchdog        5 warning(s)    
+uart/uart                6 warning(s)    
+sram/sram                4 warning(s)    
+boot_rom/boot_rom        6 warning(s)    
+i2c/i2c_master           5 warning(s)    
+spi/spi_master           5 warning(s)    
+jtag/jtag_dtm            CLEAN           
+jtag/jtag_axi_bridge     CLEAN           
+aes/aes                  7 warning(s)    
+axi_lite_xbar/axi_lite_xbar 1 warning(s)    
+dma/dma_engine           10 warning(s)   
+dma/dma_ram              6 warning(s)    
+soc_top/soc_top          75 warning(s)   
+
+12 lint target(s) have warnings -- see blocks/<name>/lint/lint_report.txt

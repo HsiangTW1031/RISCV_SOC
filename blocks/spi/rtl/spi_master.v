@@ -67,7 +67,9 @@ module spi_master (
   reg [31:0] divider_reg;
   reg [31:0] div_cnt;
   reg [4:0]  edge_cnt;    // 0..16 (16 edges = 8 bits x 2)
-  reg [7:0]  tx_shift;
+  reg [6:0]  tx_shift; // holds only the 7 remaining bits after the first
+                       // (bit 7 goes straight from txdata_reg to mosi at
+                       // START, so tx_shift never needs to carry it)
   reg [7:0]  rx_shift;
   reg [7:0]  rxdata_reg;
   reg        busy, done;
@@ -122,7 +124,7 @@ module spi_master (
           if (do_start) begin
             cpol_r      <= s_wdata[1];
             cpha_r      <= s_wdata[2];
-            tx_shift    <= txdata_reg;
+            tx_shift    <= txdata_reg[6:0];
             mosi        <= txdata_reg[7];
             cs_n        <= 1'b0;
             sclk        <= s_wdata[1]; // idle level = CPOL

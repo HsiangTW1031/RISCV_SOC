@@ -1,0 +1,206 @@
+OpenSTA 3.1.0 5be03c5cca Copyright (c) 2026, Parallax Software, Inc.
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+
+This is free software, and you are free to change and redistribute it
+under certain conditions; type `show_copying' for details. 
+This program comes with ABSOLUTELY NO WARRANTY; for details type `show_warranty'.
+Warning 441: soc_top.sdc line 14, set_input_delay relative to a clock defined on the same port/pin not allowed.
+Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint: u_aes/u_chain/u_core/u_key_expand/_15429_
+          (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+     Cap     Slew    Delay     Time   Description
+---------------------------------------------------------------------------
+            0.000    0.000    0.000   clock clk (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+            0.000    0.000    0.000 ^ u_aes/u_chain/u_core/u_key_expand/_15566_/CK (DFF_X1)
+  61.298    0.067    0.154    0.154 v u_aes/u_chain/u_core/u_key_expand/_15566_/Q (DFF_X1)
+            0.067    0.000    0.154 v u_aes/u_chain/u_core/u_key_expand/_07850_/A2 (NOR2_X1)
+ 782.599    3.595    3.992    4.147 ^ u_aes/u_chain/u_core/u_key_expand/_07850_/ZN (NOR2_X1)
+            3.595    0.000    4.147 ^ u_aes/u_chain/u_core/u_key_expand/_12876_/B2 (AOI21_X1)
+ 231.105    0.796    6.546   10.693 v u_aes/u_chain/u_core/u_key_expand/_12876_/ZN (AOI21_X1)
+            0.796    0.000   10.693 v u_aes/u_chain/u_core/u_key_expand/_13008_/S (MUX2_X1)
+   1.062    0.036    0.273   10.966 v u_aes/u_chain/u_core/u_key_expand/_13008_/Z (MUX2_X1)
+            0.036    0.000   10.966 v u_aes/u_chain/u_core/u_key_expand/_15429_/D (DFF_X1)
+                             10.966   data arrival time
+
+            0.000    2.000    2.000   clock clk (rise edge)
+                     0.000    2.000   clock network delay (ideal)
+                     0.000    2.000   clock reconvergence pessimism
+                              2.000 ^ u_aes/u_chain/u_core/u_key_expand/_15429_/CK (DFF_X1)
+                    -0.052    1.948   library setup time
+                              1.948   data required time
+---------------------------------------------------------------------------
+                              1.948   data required time
+                            -10.966   data arrival time
+---------------------------------------------------------------------------
+                             -9.017   slack (VIOLATED)
+
+
+
+wns max -9.02
+tns max -27316.75
+
+Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint: u_aes/u_chain/u_core/u_key_expand/_15429_
+          (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock clk (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_aes/u_chain/u_core/u_key_expand/_15566_/CK (DFF_X1)
+   0.154    0.154 v u_aes/u_chain/u_core/u_key_expand/_15566_/Q (DFF_X1)
+   3.992    4.147 ^ u_aes/u_chain/u_core/u_key_expand/_07850_/ZN (NOR2_X1)
+   6.546   10.693 v u_aes/u_chain/u_core/u_key_expand/_12876_/ZN (AOI21_X1)
+   0.273   10.966 v u_aes/u_chain/u_core/u_key_expand/_13008_/Z (MUX2_X1)
+   0.000   10.966 v u_aes/u_chain/u_core/u_key_expand/_15429_/D (DFF_X1)
+           10.966   data arrival time
+
+   2.000    2.000   clock clk (rise edge)
+   0.000    2.000   clock network delay (ideal)
+   0.000    2.000   clock reconvergence pessimism
+            2.000 ^ u_aes/u_chain/u_core/u_key_expand/_15429_/CK (DFF_X1)
+  -0.052    1.948   library setup time
+            1.948   data required time
+-----------------------------------------------------------
+            1.948   data required time
+          -10.966   data arrival time
+-----------------------------------------------------------
+           -9.017   slack (VIOLATED)
+
+
+Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint: u_aes/u_chain/u_core/u_key_expand/_15430_
+          (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock clk (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_aes/u_chain/u_core/u_key_expand/_15566_/CK (DFF_X1)
+   0.154    0.154 v u_aes/u_chain/u_core/u_key_expand/_15566_/Q (DFF_X1)
+   3.992    4.147 ^ u_aes/u_chain/u_core/u_key_expand/_07850_/ZN (NOR2_X1)
+   6.546   10.693 v u_aes/u_chain/u_core/u_key_expand/_12876_/ZN (AOI21_X1)
+   0.273   10.966 v u_aes/u_chain/u_core/u_key_expand/_13007_/Z (MUX2_X1)
+   0.000   10.966 v u_aes/u_chain/u_core/u_key_expand/_15430_/D (DFF_X1)
+           10.966   data arrival time
+
+   2.000    2.000   clock clk (rise edge)
+   0.000    2.000   clock network delay (ideal)
+   0.000    2.000   clock reconvergence pessimism
+            2.000 ^ u_aes/u_chain/u_core/u_key_expand/_15430_/CK (DFF_X1)
+  -0.052    1.948   library setup time
+            1.948   data required time
+-----------------------------------------------------------
+            1.948   data required time
+          -10.966   data arrival time
+-----------------------------------------------------------
+           -9.017   slack (VIOLATED)
+
+
+Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint: u_aes/u_chain/u_core/u_key_expand/_15431_
+          (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock clk (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_aes/u_chain/u_core/u_key_expand/_15566_/CK (DFF_X1)
+   0.154    0.154 v u_aes/u_chain/u_core/u_key_expand/_15566_/Q (DFF_X1)
+   3.992    4.147 ^ u_aes/u_chain/u_core/u_key_expand/_07850_/ZN (NOR2_X1)
+   6.546   10.693 v u_aes/u_chain/u_core/u_key_expand/_12876_/ZN (AOI21_X1)
+   0.273   10.966 v u_aes/u_chain/u_core/u_key_expand/_13006_/Z (MUX2_X1)
+   0.000   10.966 v u_aes/u_chain/u_core/u_key_expand/_15431_/D (DFF_X1)
+           10.966   data arrival time
+
+   2.000    2.000   clock clk (rise edge)
+   0.000    2.000   clock network delay (ideal)
+   0.000    2.000   clock reconvergence pessimism
+            2.000 ^ u_aes/u_chain/u_core/u_key_expand/_15431_/CK (DFF_X1)
+  -0.052    1.948   library setup time
+            1.948   data required time
+-----------------------------------------------------------
+            1.948   data required time
+          -10.966   data arrival time
+-----------------------------------------------------------
+           -9.017   slack (VIOLATED)
+
+
+Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint: u_aes/u_chain/u_core/u_key_expand/_15432_
+          (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock clk (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_aes/u_chain/u_core/u_key_expand/_15566_/CK (DFF_X1)
+   0.154    0.154 v u_aes/u_chain/u_core/u_key_expand/_15566_/Q (DFF_X1)
+   3.992    4.147 ^ u_aes/u_chain/u_core/u_key_expand/_07850_/ZN (NOR2_X1)
+   6.546   10.693 v u_aes/u_chain/u_core/u_key_expand/_12876_/ZN (AOI21_X1)
+   0.273   10.966 v u_aes/u_chain/u_core/u_key_expand/_13003_/Z (MUX2_X1)
+   0.000   10.966 v u_aes/u_chain/u_core/u_key_expand/_15432_/D (DFF_X1)
+           10.966   data arrival time
+
+   2.000    2.000   clock clk (rise edge)
+   0.000    2.000   clock network delay (ideal)
+   0.000    2.000   clock reconvergence pessimism
+            2.000 ^ u_aes/u_chain/u_core/u_key_expand/_15432_/CK (DFF_X1)
+  -0.052    1.948   library setup time
+            1.948   data required time
+-----------------------------------------------------------
+            1.948   data required time
+          -10.966   data arrival time
+-----------------------------------------------------------
+           -9.017   slack (VIOLATED)
+
+
+Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint: u_aes/u_chain/u_core/u_key_expand/_15433_
+          (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock clk (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_aes/u_chain/u_core/u_key_expand/_15566_/CK (DFF_X1)
+   0.154    0.154 v u_aes/u_chain/u_core/u_key_expand/_15566_/Q (DFF_X1)
+   3.992    4.147 ^ u_aes/u_chain/u_core/u_key_expand/_07850_/ZN (NOR2_X1)
+   6.546   10.693 v u_aes/u_chain/u_core/u_key_expand/_12876_/ZN (AOI21_X1)
+   0.273   10.966 v u_aes/u_chain/u_core/u_key_expand/_13002_/Z (MUX2_X1)
+   0.000   10.966 v u_aes/u_chain/u_core/u_key_expand/_15433_/D (DFF_X1)
+           10.966   data arrival time
+
+   2.000    2.000   clock clk (rise edge)
+   0.000    2.000   clock network delay (ideal)
+   0.000    2.000   clock reconvergence pessimism
+            2.000 ^ u_aes/u_chain/u_core/u_key_expand/_15433_/CK (DFF_X1)
+  -0.052    1.948   library setup time
+            1.948   data required time
+-----------------------------------------------------------
+            1.948   data required time
+          -10.966   data arrival time
+-----------------------------------------------------------
+           -9.017   slack (VIOLATED)
+
+

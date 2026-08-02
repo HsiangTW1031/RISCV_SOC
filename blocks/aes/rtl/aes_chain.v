@@ -50,7 +50,6 @@ module aes_chain (
 
   localparam ST_IDLE  = 2'd0;
   localparam ST_CORE  = 2'd1; // waiting for aes_core
-  localparam ST_DONE  = 2'd2;
 
   reg  [1:0]   state;
   reg  [1:0]   mode_reg;

@@ -130,3 +130,28 @@ Phase 7 的效能數據(`docs/performance.md`)全部來自**真正跑起來的�
 - Fmax 來自對整顆 SoC(記憶體陣列以 blackbox 處理)做真正的 Yosys 合成 + OpenSTA timing analysis,不是只合成單一模組後外推。
 - DMA 的 cycles/block 數字來自在 C++ testbench 裡對 `tick_half` 呼叫次數做精確計數,不是理論值。
 - 中斷延遲(3-14 cycles,平均 8.6)是直接寫一支 scope-aware 的 VCD parser,對 `blocks/soc_top/sim/wave.vcd` 這份已經存在的完整波形做後處理量出來的——過程中也踩到一個小坑:一開始猜測需要透過 Verilator 的內部 hierarchy signal 存取 PicoRV32 深層的 `irq_active` 暫存器,但 Verilator 預設不會把這類內部訊號暴露成可以直接存取的 C++ member,與其冒險用 `--public` 之類的旗標重新編譯、或用不穩定的內部命名去猜 C++ member 名稱,不如**直接解析既有的 VCD 波形檔**——`soc_top_sim` 本來就已經用 `--trace` 深度 99 產生完整波形,VCD 格式本身很單純(`$scope`/`$var`/`$upscope` 定義 hierarchy,後面是逐拍的訊號變化),不需要額外的 Python 套件也能寫出一支可靠的最小化 parser。
+
+## Phase 7 後續補強:補上獨立的 lint pass,抓到真正的 dead code
+
+Phase 7 完成、簽核之後,原本的判斷是「整顆 SoC 都合成得出來了,而且每次 build 都會附帶跑一輪 Verilator 內建 lint,再花時間跑一次獨立、有自己 report 的 `--lint-only` pass 意義不大」。但後來重新想了一下:整個專案每一次 build(包含 `scripts/run_regression.sh`)都固定加了 `-Wno-UNUSEDSIGNAL -Wno-UNUSEDPARAM`——這兩個 flag 剛好就是專門抓「訊號/parameter 宣告了但沒人用」的警告,一直被關掉,等於這整條路徑上,真正的死碼從來沒被檢查過。
+
+實際拿掉這兩個 flag、對整顆 SoC 跑一次 `--lint-only`,抓到 4 處真正的死碼:
+
+1. **`jtag_axi_bridge.v`**:`rw_reg` 有被賦值(`rw_reg <= rw_tck`),但 FSM 實際判斷用的是即時的 `rw_tck`,`rw_reg` 從頭到尾沒人讀過。
+2. **`jtag_dtm.v`**:`tap_state` 接了 `jtag_tap` 的 state 輸出,但 `jtag_dtm` 全部判斷都是用明確的 pulse 訊號(`capture_dr`/`shift_dr`/`update_dr`...),這條線完全沒用到。
+3. **`aes_chain.v`**:`ST_DONE` 這個 FSM 狀態常數宣告了,但 `state` 只在 `ST_IDLE`/`ST_CORE` 兩個狀態之間切換,`ST_DONE` 從來沒被真正進入過——像是早期設計是 3-state,後來簡化成 2-state,但沒清掉這個殘留常數。
+4. **`spi_master.v`**:`tx_shift[7]` 被載入(`tx_shift <= txdata_reg`)但從沒被讀過——第一個要送出的 bit 其實是直接從 `txdata_reg[7]` 拿,之後每次 shift 只讀 `tx_shift[6:0]`,bit 7 形同虛設。修法是把 `tx_shift` 從 8-bit 縮成 7-bit(只保留真正會被讀到的 `[6:0]`),shift/mosi 讀取的 bit index 完全不用改,因為它們本來就只碰 `[6:0]`。
+
+四處都全部驗證過:重新跑一次 `-Wall`(不含前述兩個 `-Wno-*`)的 lint,確認這 4 個警告消失;再跑一次完整的 18 項 regression,確認全部維持綠燈,且整顆 SoC 的 STA 關鍵路徑數字(10.966ns)完全沒變——這些都是功能上無害的殘留,合成本來就會默默優化掉,只是原始碼裡多留了幾行沒人讀的邏輯。
+
+同一次 lint pass 也發現(但判斷為刻意的架構取捨、不修改,只補進 `docs/architecture.md` 第 7 節):**幾乎每個周邊的 AXI-Lite response channel 都沒有真的檢查對方的 `s_bready`/`s_rready`**(固定拉一拍 valid 就自動放下),以及 **`dma_engine.v` 自己的 burst master 不檢查 `dma_ram` 回應的 `m_bresp`/`m_rresp`**(跟已知的 `picorv32_axi` 不檢查 BRESP/RRESP 同一類)。這兩個之所以沒引發任何測試失敗,是因為這個專案自己的 crossbar/測試環境剛好都是「提前準備好接收」的行為,跟 AXI4 規範要求的「VALID 必須撐到 READY 也是高電位」不完全等價——是巧合式正確,不是規範保證的正確。
+
+### 新的政策:每個 block 都固定跑一次獨立的 lint
+
+`scripts/run_lint.sh` 對每個 block 的真實 deliverable RTL(不含測試專用的 testtop/fake slave)各自跑一次 `verilator --lint-only`,結果存進 `blocks/<name>/lint/lint_report.txt`。跟 `-Wno-UNUSEDSIGNAL`/`-Wno-UNUSEDPARAM` 被關掉的一般 build 不同,這支腳本刻意保留這兩個檢查,只保留 `-Wno-WIDTHEXPAND -Wno-WIDTHTRUNC`(這個專案大量使用 register-offset 常數跟位址欄位的寬度轉換,這兩個警告噪音大於訊號)跟 PicoRV32 自己風格造成的 4 個 flag。
+
+也對 vendored 的 `rtl/core/picorv32.v` 單獨跑了一次**完全不加任何 `-Wno-*`** 的 lint(`rtl/core/lint/lint_report.txt`),列出全部 44 個警告供參考,但**沒有修改這個檔案**——PicoRV32 是這個專案明確規定「vendored、不修改」的核心。44 個警告裡,21 個 BLKSEQ + 7 個 GENUNNAMED + 1 個 DECLFILENAME 都是已知、已經在 README 記錄過的 PicoRV32 自身編碼風格(不是這個專案的問題);15 個 UNUSEDSIGNAL 裡有 14 個是 `dbg_*` 開頭的內部除錯訊號(PicoRV32 自己刻意留給波形除錯用、本來就不會被消費的慣例),剩下 1 個是 `mem_busy`(一個算出來但從沒被讀過的便利訊號)——這些都只是記錄下來,留給任何未來真的需要動 PicoRV32 fork 版本的人參考,這個專案本身不動它。
+
+### 新增:`reports/soc_top/` 一站式 sign-off 報告快照
+
+`scripts/collect_soc_reports.sh` 一次跑完整個 SoC 層級的 simulation regression、lint、synthesis、STA,把結果收斂進 `reports/soc_top/`(這個資料夾**會**進版控,是刻意留下的簽核快照,跟 `blocks/*/syn`、`blocks/*/sta` 那些隨時可重新產生、故意不進版控的 scratch log 不同)。合成產生的完整 Yosys log 動輒幾十 MB(每一輪 PicoRV32 hierarchy 的中間優化 pass 都會印出來),不值得進版控,所以只保留最後的面積/cell 統計摘要;完整版留在本地的 `blocks/soc_top/syn/synth_log.txt`(已在 `.gitignore`)。

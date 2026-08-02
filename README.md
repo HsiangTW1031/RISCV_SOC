@@ -196,6 +196,32 @@ This rebuilds and runs all 18 block testbenches fresh (no incremental-build
 assumptions) and prints a PASS/FAIL summary table — the same script used to
 sign off Phase 7 (see `docs/verification_summary.md`).
 
+There's also a dedicated, independent lint-only pass per block (separate
+from whatever warnings a given simulation build happens to suppress):
+
+```bash
+./scripts/run_lint.sh
+```
+
+Each block's report lands in `blocks/<name>/lint/lint_report.txt`. This is
+what caught a handful of genuine dead code across the project (an unused
+register in the JTAG bridge, an unused FSM state in `aes_chain`, etc.) —
+see `docs/project_retrospective.md`'s "Phase 7 後續補強" section for the
+full story on why a dedicated lint pass turned out to be worth adding after
+all, and what it found.
+
+To collect a full whole-SoC sign-off snapshot (simulation regression +
+lint + synthesis + STA) into one place:
+
+```bash
+./scripts/collect_soc_reports.sh
+```
+
+This writes into `reports/soc_top/` — unlike the per-block `syn`/`sta`/`lint`
+scratch output (gitignored, regenerable), `reports/` **is** committed: it's
+the sign-off snapshot, readable straight from the repo without needing the
+toolchain installed.
+
 There's no flow-automation skill wired up yet for synth/STA (the generic
 `IC_fe_flow` skill was retired — a project-specific one will replace it once
 the architecture has settled). For now those are run directly, e.g.:
