@@ -4,7 +4,7 @@ Maps each git tag to what changed and why. Commit messages have the "what";
 `docs/project_retrospective.md` has the full bug-by-bug story behind most of
 these — this file is the short index between the two.
 
-## [Unreleased]
+## [v1.2.0] - 2026-08-03
 
 Convention-over-configuration for lint/regression/coverage: every block now
 owns its own `dv/testlist.sh` (regression+coverage targets) and
@@ -47,6 +47,16 @@ adding its manifest files, not editing shared scripts.
   name -- the result is the 2nd column. Now correctly shows the real
   pass count (`19/19 PASS`), and would show a partial count in red if a
   future run actually had failures instead of silently reading zero
+- `bootstrap_check.sh` only requires the RISC-V toolchain when
+  `scripts/build_firmware.sh` exists, instead of unconditionally (a
+  project without an embedded CPU would have failed this check for a
+  toolchain it doesn't need)
+
+This engine was also packaged as a reusable skill
+(`Levi-agent/.claude/skills/ic-verification-scaffold`) for scaffolding
+future IC/SoC projects with the same automation from day one — see that
+skill's `references/design-rationale.md` for the full story, including
+these two bugs.
 
 Verified regression (19/19 PASS), lint (135 findings, identical
 per-block counts), coverage (line/branch/toggle before+after waivers),
