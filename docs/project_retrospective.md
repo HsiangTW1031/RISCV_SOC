@@ -169,10 +169,43 @@ Phase 7 完成、簽核之後,原本的判斷是「整顆 SoC 都合成得出來
 
 ### 再往下一層:量化的 coverage(line/toggle/branch/FSM)+ 圖像化的 sign-off dashboard
 
-lint 抓到「有沒有死碼」,但沒辦法回答「測試到底覆蓋了多少邏輯」——這需要真正的 coverage 數據。`scripts/run_coverage.sh` 對全部 18 個 regression 測試,改用 `--coverage-line --coverage-toggle` 重新建置、跑過一輪,把每個測試自己的 `coverage.dat` 合併成一份專案層級的聚合結果,再用 `verilator_coverage` 產生 per-file annotated source(每一行標上被 hit 幾次)跟一份 lcov `.info`。
+lint 抓到「有沒有死碼」,但沒辦法回答「測試到底覆蓋了多少邏輯」——這需要真正的 coverage 數據。這一段完整記錄實際建置這套 coverage + dashboard 流程時,真的卡住、真的踩過的每一個坑,不是事後補寫的乾淨版本。
 
-**FSM state coverage 沒有現成的路可以直接拿**:Verilator 的 `--coverage-fsm` 是針對它自己能辨識的特定 FSM 樣式做的啟發式偵測,實際對這個專案裡全部 11 個用 `localparam` + `case` 寫的純 Verilog-2001 FSM(`spi_master`、`i2c_master`、`uart`、`jtag_tap`、`aes_core`、`aes_chain`、`axi_lite_xbar` 的讀寫兩個 FSM、`dma_ram` 的讀寫兩個 FSM、`dma_engine`)測試後,一個都沒抓到——`fsm_state`/`fsm_arc` 兩個類別的 summary 永遠是 0/0。改用另一個角度:annotated 檔案裡,每一個 `case (state)` 的分支開頭(例如 `ST_IDLE: begin`)本來就會帶有自己的 line-coverage hit count——這其實就是「這個狀態有沒有被進入過」最直接、最精確的訊號,不需要額外的 instrumentation。`scripts/analyze_coverage.py` 直接從 annotated 檔案裡,對每個 FSM 已知的狀態名稱清單(從原始碼讀出來的,不是猜的)去查對應那一行的 hit count,組出一份真正的「每個狀態有沒有被走到過」表格。結果:**11 個 FSM,全部狀態都被走到至少一次(100%)**。
+#### 第一個坑:`--coverage` build 出來,但 `coverage.dat` 從沒出現過
 
-同一支腳本也把 `blocks/*/lint/lint_report.txt` 的全部 135 筆 lint 發現,依照訊息內容自動分類成幾個桶(已修好的死碼類型此時已經歸零、剩下的是「文件記錄過的限制」如 BREADY/RREADY/BRESP/RRESP 沒被檢查、「刻意的設計」如位址高位元/byte-strobe/burst 欄位不用、「vendored PicoRV32 自身風格」),避免簡單粗暴地把 135 行原始警告直接倒給人看。
+用 `--coverage-line --coverage-toggle` 重新編譯 `timer` 測試、跑完,`VM_COVERAGE=1` 確認有生效,程式也正常印出 PASS——但目錄裡完全找不到 `coverage.dat`。查了才知道:`--coverage` 只是在 Verilated model 裡打開 instrumentation(每個 coverage point 都會在模擬過程中累積次數),但**不會自動把結果寫成檔案**——一定要在 C++ testbench 的 `main()` 裡明確呼叫 `VerilatedCov::write("coverage.dat")`。這個專案裡全部 18 支 `sim_main.cpp`(或等效檔名)都沒有這行,得手動一一補上。因為要同時保留原本乾淨的 `run_regression.sh`(不掛 coverage instrumentation)不受影響,補上的寫法是用 `#if VM_COVERAGE` 包起來——`VM_COVERAGE` 這個 macro 只有在真的用 `--coverage-*` build 時才會是 1,一般 build 底下這整段完全是 no-op,兩條路徑共用同一份原始碼,不用維護兩份測試檔。
 
-最後 `scripts/build_dashboard.py` 把這些數據(coverage 百分比、FSM 狀態表、分類後的 lint 發現、架構圖)全部渲染成一個單一的靜態 HTML 頁面(`reports/soc_top/dashboard.html`),取代原本純文字的 report——這個檔案本身也進版控,跟其他 `reports/soc_top/` 底下的檔案一樣是刻意留下的快照,不是每次都要重新產生才能看的東西。
+#### 第二個坑:寫是寫了,但 `coverage.dat` 只有 22 bytes(只有 header,沒有任何真實的 coverage point)
+
+補上 `VerilatedCov::write(...)` 呼叫的第一次嘗試,把它放在 `delete dut; delete ctx;` **之後**——build 成功、跑起來也是 PASS,`coverage.dat` 確實出現了,但只有一行 `# SystemC::Coverage-3`,完全沒有任何實際的 coverage point。原因:`delete ctx` 這個動作會把這個 context 自己的 coverage 累積器一起拆掉,寫入呼叫如果排在拆除**之後**,能寫的東西早就沒了。修法:把 `VerilatedCov::write(...)` 移到 `delete dut;` **之前**——這個順序上的細節,跟這個專案先前好幾次「不是邏輯錯,是時序/順序錯了一拍」的教訓是同一個大類別的錯誤,只是這次發生在 C++ testbench 的收尾程式碼,不是 RTL 本身。
+
+#### 第三個坑:`--coverage-fsm` 對這個專案的 FSM 一個都沒認出來
+
+打開 `--coverage-fsm`,先拿 `timer.v`(其實沒有真正的 FSM,只是一個 down-counter)測,`fsm_state`/`fsm_arc` 都是 0/0——合理,反正它本來就不是 FSM。但換成 `spi_master.v`(有明確的 `localparam IDLE = 1'b0; localparam RUN = 1'b1;` 兩態 FSM)重新測,結果還是 0/0。這代表 Verilator 的 `--coverage-fsm` 啟發式偵測,對這種純 Verilog-2001、用 `localparam` + `case` 手寫的 FSM 樣式沒有反應——它辨識的可能是別的、更特定的寫法慣例。既然這條路走不通,只能換個角度自己組出 FSM coverage。
+
+#### 換一個角度:從 line coverage 裡直接撈 case-arm 的 hit count
+
+直接打開 `timer` 那次(--coverage-line 已經開著)產生的原始 `coverage.dat` 逐行看,發現裡面每一個 `case` 分支都各自有自己獨立的 coverage point,格式類似 `tlinepagev_line/timerocaseS107`——也就是說,Verilator 的 line coverage 本來就會替每一個 `case` 分支開頭那一行單獨計數,而這正好就是「這個狀態有沒有被進入過」最精確的訊號,完全不需要額外的 instrumentation 或 covergroup。決定放棄 `--coverage-fsm`,改成直接讀 line coverage,對每個已知 FSM(狀態名稱清單是從原始碼的 `localparam` 宣告讀出來的,不是用猜的)去查每個狀態那一行的 hit count。
+
+#### 除錯過程中一次自己誤讀資料格式的插曲
+
+第一次寫 parser 時,先用 `grep -n` 去看 annotated 檔案內容,看到類似 `160: 017517         ST_IDLE: begin` 這種格式,誤以為檔案本身就帶著「行號:hit count」的前綴,照這個假設寫的正規表示式最後全部解析成 0/0(11 個 FSM 全部顯示 0%)。回頭直接用 Python 讀檔案原始內容、印出 `repr()`,才發現 `grep -n` 自己加的行號前綴混進了我對格式的理解——annotated 檔案其實**沒有**行號欄位,是跟原始檔案逐行一一對應的(第 N 行永遠對應原始檔案第 N 行),每一行開頭固定是 7 個字元的 coverage 標記:要嘛是 7 個空白(這行沒有被 instrument),要嘛是一個標記字元(空白/`~`/`%`,似乎對應不同的 point 類型)後面緊接著 6 位數、補零的 hit count,完全沒有多餘的分隔符。改用正確的格式重新解析後,11 個 FSM 全部變成 100%——這也提醒:先看工具的原始輸出,不要透過另一個工具(這裡是 grep)包過一層再去理解格式,中間可能會混進不屬於原始資料的東西。
+
+#### 合併 18 個測試的 coverage 時,路徑對不齊導致 annotate 一直報錯
+
+把全部 18 個測試的 coverage.dat 用 `verilator_coverage --write` 合併起來後,想再跑 `--annotate` 產生完整的 per-file 標註原始碼,卻一路連續踩到好幾次「Can't read annotation file: X」的錯誤,而且**每次修好一個,下一次又換另一個檔案報錯**——先是 `../rtl/../rtl/aes.v`(某個測試用絕對路徑指到 aes 目錄下的檔案、另一個測試卻用相對路徑指到同一個檔案,合併後 annotate 想用「當初 build 時的路徑原文」去開檔案,但 annotate 執行時的當下目錄跟原本 build 時的目錄不一樣),修完換成 `../rtl/../rtl/soc_top.v`(同一類問題,只是換一個檔案),再來是 `../rtl/aes_pkg.vh`(這個是被 `` `include `` 進來的,問題出在不同測試給的 `-I` include 路徑寫法不一致,導致 Verilator 記錄下來的 `aes_pkg.vh` 解析路徑也不一致),最後是 `dma_engine_testtop.v` 這類測試專用的 testtop 檔案(原本用單純的檔名相對於各自測試的目錄,annotate 執行時的目錄跟它對不上)。逐一排查、修正的過程中確認一個規律:**同一份底層原始碼,只要在不同測試的 build 指令裡用了不一樣寫法的路徑(絕對 vs. 相對、不同的 `-I` 順序),合併之後就會被當成路徑不同、annotate 沒辦法穩定解析**。最後的作法是把 `scripts/run_coverage.sh` 裡**全部**檔案引用(不管是主要的 RTL 檔案、testtop 測試專用檔案、還是純粹拿來給 `-I` 用的 include 目錄)一致改成絕對路徑,才終於讓 18 個測試合併後的 annotate 一次跑完、不再報錯。
+
+#### 一個單純被漏掉的 build flag
+
+修完路徑問題後,`soc_top` 這個測試改用 coverage flag 重新編譯直接建置失敗——連結階段找不到 `VerilatedVcdC` 的符號。原因很單純:`soc_top` 的 testbench 本來就有用 `--trace` 產生 VCD 波形(拿去給 Phase 7 的中斷延遲分析用),但這次幫它加 coverage flag 的時候忘記把 `--trace` 也一起加回去,導致 verilated 出來的程式碼裡有用到 tracing 相關的 class,卻沒有連結對應的實作。補上 `--trace` 後就正常了。
+
+#### Lint 分類規則也是逐步補出來的,不是一次到位
+
+寫 `scripts/analyze_coverage.py` 把 135 筆 lint 發現分類時,第一版規則跑完還剩 31 筆「uncategorized」,逐一看過內容才補齊剩下的規則:`aes_chain.v` 的 `MODE_ECB` parameter 屬於「只是拿來記錄暫存器編碼、程式邏輯裡沒有真的拿去比對」的文件性常數;`core_busy`/`chain_busy` 屬於「子模組給的 busy 訊號,消費端只需要 done pulse 就夠,busy 沒讀不是問題」;`boot_rom.v` 的 `s_awaddr`/`s_wdata` 整個訊號沒被用到(不是只有高位元沒用到),因為它本來就是唯讀記憶體,寫入本來就會被直接拒絕;`uart.v` 的 `s_wdata[31:8]` 沒被用到,是因為 TXDATA 本身就只是 8-bit 暫存器;最後,凡是出現在 `picorv32.v` 裡的發現,不管訊息內容是什麼,一律先歸進「vendored PicoRV32,不是這個專案自己的問題」這個桶,不套用其他規則。補完之後 135 筆全部有分類,沒有遺漏。
+
+#### 最後的結果
+
+- 這個專案自己寫的 RTL,line coverage **96.3%**
+- 全部 **11 個 FSM,狀態 coverage 100%**(每個狀態都至少被進入過一次)
+- 135 筆 lint 發現全部分類完畢(文件記錄過的限制 / 刻意的設計 / vendored PicoRV32 風格),沒有一筆是「不知道算什麼」
+- `scripts/build_dashboard.py` 把以上全部數據 + 架構圖,渲染成一個單一的靜態 HTML(`reports/soc_top/dashboard.html`),取代原本純文字的 report——這個檔案本身也進版控,是刻意留下的快照,不是每次都要重新產生才能看的東西。
