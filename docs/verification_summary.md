@@ -69,6 +69,8 @@ Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、wai
 
 完整方法論、逐條訊號的 review 結果、以及明確標注的範圍界限(數位模擬無法重現真實 metastability,這部分需要 timing library MTBF 計算,不在這個專案範圍內):`docs/cdc_report.md`。
 
+同一份報告的第 6 節另外補上 **RDC(Reset Domain Crossing)**:`rst` 原本未經同步直接餵給 `clk`/`tck` 兩個 domain,已在 `soc_top.v` 加上兩個「非同步 assert、同步 de-assert」的 2-flop reset synchronizer(每個 domain 一個),改完全部 19 個 regression 測試仍然全線 PASS。
+
 ## 6. 這次 Phase 7 regression 抓到的一個真實 bug
 
 跑 `scripts/run_regression.sh` 的過程中,`watchdog` 測試意外地從乾淨重編後失敗(2 個 check),但目錄裡舊的、還沒清掉的 binary 卻是綠的——追下去發現:`blocks/watchdog/dv/sim_main.cpp` 裡寫死的 `WARN_MARGIN = 3`,跟 `watchdog.v` 實際的 default parameter `WARN_MARGIN = 4`（從 Phase 2 第一次 commit 就是 4,`docs/specs/watchdog.md` 也一直寫 4)對不上——測試本身的常數從一開始就是錯的,只是舊的 binary 剛好是在某次意外用對的數字建出來的,之後沒人重新乾淨編譯過,才一直「看起來是綠的」。這正是「一次性乾淨 regression」存在的意義:抓到「原始碼其實已經不吻合、只是沒人重新建置驗證過」這種腐化。修法:把測試的常數改成 4,重編後全綠。詳細除錯過程見 `docs/project_retrospective.md`。

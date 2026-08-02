@@ -294,3 +294,15 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 - `blocks/jtag/rtl/jtag_axi_bridge.v` 的每一條跨 domain 訊號(START/DONE toggle、BUSY 比較、RESP_OK/RDATA 的 2-flop 同步)逐條對照 RTL review 過,確認同步器級數跟拓樸(第一級直接取樣來源暫存器,無組合邏輯夾雜)。
 - 新增 `jtag_chain_fast_tck` regression target,補上原本沒測過的「tck 比 clk 快」方向,跟原有的 `jtag_chain` 一起涵蓋兩個時脈比例的極端。
 - 完整報告、每條訊號的 review 結果、以及明確標注的範圍界限(數位模擬無法重現真實 metastability)寫在 `docs/cdc_report.md`。
+
+### 再往下一層:RDC(Reset Domain Crossing)——reset 訊號本身也需要同步
+
+做完 CDC 之後,問「跟業界標準比還缺什麼」時翻出一個之前就寫在 `soc_top.v` header comment 裡、但當時刻意擱置的問題:`rst` 這個訊號未經任何同步,直接餵給 `clk` domain 跟 `tck` domain 的每一個模組(包括 `jtag_axi_bridge.v` 的 `tck_rst` 埠)。真實晶片的 reset 通常來自外部電路,本質上是非同步的,直接餵給同步邏輯有 metastability 風險——這是跟 CDC 同一類、但專門處理「reset 訊號本身跨 domain」的問題。
+
+修法是在 `soc_top.v` 加兩個「非同步 assert、同步 de-assert」的 2-flop reset synchronizer,一個 domain 一個,所有內部模組改吃同步過的 `rst_clk_sync`/`rst_tck_sync`,不再直接吃外部 `rst`。這是這個專案「一律 synchronous reset」慣例的**唯一刻意例外**——同步器自己的暫存器必須把 `rst` 放進 sensitivity list 才能立即 assert,這正是它存在的目的,已經在 RTL comment 裡把「為什麼這裡例外」寫清楚,避免之後被誤會成風格不一致。
+
+改完之後重跑 regression,一開始又看到 14/19 測試 BUILD-FAIL——查了發現又是同一類跟這次改動完全無關的舊問題:`obj_dir_*` 建置快取目錄裡再次出現帶空格的殘留檔案(這次連 `timer`/`watchdog` 這種我完全沒碰過的 block 也一起中獎,直接證實不是這次 RTL 改動造成的)。這是這個 session 第二次遇到同一種快取損毀——原因還沒查清楚(可能是背景某個系統程序,例如 Time Machine 或 Spotlight,在建置期間對這些目錄做了什麼),但修法一樣:整批刪掉 `obj_dir_*` 重建。清乾淨之後 19 個測試全部 PASS,包含唯一真的會受這次改動影響的 `soc_top`(多了 2-cycle 的 reset 釋放延遲,沒有讓任何 cycle-accurate 檢查失敗)。
+
+**這個改動只動了 `soc_top.v`**,單一 block 的獨立測試都是直接 instantiate 各自 RTL、自己驅動 `rst`,不經過這層同步器,完全不受影響——這也是為什麼可以只在整合層級加,不用動到每個周邊自己的 RTL。完整說明寫在 `docs/cdc_report.md` 第 6 節。
+
+**待辦**:`soc_top.v` 的 RTL 改了,連帶讓 `blocks/soc_top/syn/soc_top_out.v`(以及 generic netlist)、STA 報告、`docs/lec_report.md` 的 soc_top 數字、以及 coverage dashboard 都變成基於舊 RTL 的過時快照——這幾個目前還沒重新跑過,留到下次需要那些數字時再重新產生。

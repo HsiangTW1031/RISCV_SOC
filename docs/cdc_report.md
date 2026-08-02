@@ -65,7 +65,32 @@ set_clock_groups -asynchronous -group {clk} -group {tck}
 | 邏輯/協定在任意時脈比例下的正確性 | 模擬,兩個方向的極端比例 | `jtag_chain`(tck 慢)+ `jtag_chain_fast_tck`(tck 快)都 PASS |
 | 實體電路 metastability 機率 | 需要真正的 timing library MTBF 計算或流片測試 | 不在這個專案的範圍內(沒有目標製程資料),明確標注,不是遺漏 |
 
-## 6. 如何重跑
+## 6. Reset domain(RDC, Reset Domain Crossing)
+
+CDC 處理的是「資料訊號跨時脈」,還有一個同一類、但不同的問題:**reset 訊號本身跨時脈**。原本 `soc_top.v` 的寫法是把外部 `rst` 這一個訊號,未經任何同步,直接餵給 `clk` domain 跟 `tck` domain 的每一個模組(`jtag_axi_bridge.v` 的 `tck_rst` 埠也直接接 `rst`)——RTL 原本的註解甚至明講這是「刻意的簡化」。問題在於:真實晶片的 reset 訊號通常來自外部電路(POR、reset 按鈕),本質上是非同步的,直接餵給同步邏輯取樣,有可能在 reset 訊號上升/下降的瞬間造成 metastability。
+
+修法:在 `soc_top.v` 裡加了兩個 reset synchronizer,各自負責一個 domain,標準的「非同步 assert、同步 de-assert」2-flop 寫法:
+
+```verilog
+reg rst_clk_meta, rst_clk_sync;
+always @(posedge clk or posedge rst) begin
+  if (rst) begin
+    rst_clk_meta <= 1'b1;
+    rst_clk_sync <= 1'b1;
+  end else begin
+    rst_clk_meta <= 1'b0;
+    rst_clk_sync <= rst_clk_meta;
+  end
+end
+```
+
+(`tck` domain同一套邏輯,換成 `rst_tck_sync`)。這是這個專案「一律 synchronous reset」慣例的**唯一刻意例外**——同步器自己的暫存器必須把 `rst`放進 sensitivity list 才能立即 assert,這正是同步器存在的目的。所有 clk domain 的模組(CPU、crossbar、每個周邊、AES、DMA、`jtag_axi_bridge` 的 clk 側)改吃 `rst_clk_sync`;`jtag_tap`/`jtag_dtm`/`jtag_axi_bridge` 的 `tck_rst` 改吃 `rst_tck_sync`。
+
+改完重跑過 lint(乾淨,新加的訊號沒有觸發任何新警告)跟全部 19 個 regression 測試(全線 PASS,包含唯一會受影響的 `soc_top`——多出來的 2-cycle reset 釋放延遲沒有讓任何 cycle-accurate 的檢查失敗)。
+
+**注意**:這個改動只動了 `soc_top.v` 這個整合層級的檔案,單一 block 的獨立測試(`timer`/`watchdog`/...)都是直接 instantiate 各自的 RTL、自己驅動 `rst`,不經過 `soc_top.v` 的這層同步器,所以完全不受影響——這也是為什麼可以直接在頂層加,不用去動每個周邊自己的 RTL。
+
+## 7. 如何重跑
 
 ```bash
 ./scripts/run_regression.sh   # 含 jtag_chain + jtag_chain_fast_tck 兩個方向
