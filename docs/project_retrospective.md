@@ -152,6 +152,17 @@ Phase 7 完成、簽核之後,原本的判斷是「整顆 SoC 都合成得出來
 
 也對 vendored 的 `rtl/core/picorv32.v` 單獨跑了一次**完全不加任何 `-Wno-*`** 的 lint(`rtl/core/lint/lint_report.txt`),列出全部 44 個警告供參考,但**沒有修改這個檔案**——PicoRV32 是這個專案明確規定「vendored、不修改」的核心。44 個警告裡,21 個 BLKSEQ + 7 個 GENUNNAMED + 1 個 DECLFILENAME 都是已知、已經在 README 記錄過的 PicoRV32 自身編碼風格(不是這個專案的問題);15 個 UNUSEDSIGNAL 裡有 14 個是 `dbg_*` 開頭的內部除錯訊號(PicoRV32 自己刻意留給波形除錯用、本來就不會被消費的慣例),剩下 1 個是 `mem_busy`(一個算出來但從沒被讀過的便利訊號)——這些都只是記錄下來,留給任何未來真的需要動 PicoRV32 fork 版本的人參考,這個專案本身不動它。
 
+### 重要的釐清:Verilator lint 到底能抓什麼、不能抓什麼
+
+`--lint-only` 完全是**靜態分析**——不跑模擬、不合成,純粹分析 RTL 的語法樹跟訊號流,能抓的是「寫法上看得出來有問題」的東西,不是「邏輯在時序上到底對不對」。實際會用到的檢查大致分四類:
+
+- **寬度/型別**:`WIDTHEXPAND`/`WIDTHTRUNC`(賦值兩邊 bit 寬度不一致)、`SELRANGE`(bit-select 索引超出訊號寬度)。這個專案大量用register-offset 常數跟位址欄位寬度轉換,雜訊大於訊號,所以這兩個從一開始就被 `-Wno-` 關掉。
+- **訊號流**:`UNUSEDSIGNAL`/`UNUSEDPARAM`(這次抓到的 4 個死碼)、`UNDRIVEN`(訊號被讀但沒人驅動——Phase 6 `dma_engine.v` 早期忘記驅動 `m_wstrb` 就是這個警告攔下來的)、`MULTIDRIVEN`(同一訊號被多處驅動)。
+- **FSM/邏輯結構**:`CASEINCOMPLETE`/`CASEOVERLAP`(case 沒 default、或多個分支常數值重疊——Phase 3 SPI 跟 Phase 6 AES 的 register-offset 截斷 bug 都是這個警告抓到的)、`LATCH`(組合邏輯 `always` block 漏寫分支,意外推導出 latch)、`UNOPTFLAT`(偵測不到拓樸順序的組合邏輯迴圈)。
+- **風格/慣例**(比較主觀,PicoRV32 自身風格用的那 4 個 `-Wno-*` 都屬於這類):`BLKSEQ`(clocked block 裡用了 blocking assignment)、`DECLFILENAME`(module 名稱跟檔名不一致)、`GENUNNAMED`(`generate` block 沒命名)、`PINCONNECTEMPTY`(port 明確接空的 `()`)。
+
+**它做不到的事,比它能做到的事更值得記住**:這個專案目前為止踩過、修過的真正功能性 bug——`aes_chain` 用了還沒更新的 `mode_reg`、`dma_engine` 的 `wlast` 差一拍、SPI CPHA 的 `edge_cnt==0` 特例、I2C 的 START condition 時序、crossbar 仲裁 grant 被中途偷走——**沒有一個是 lint 能抓到的**,全部都是靠 cycle-accurate 的模擬、逐拍跟軟體參考模型比對才抓到的。Lint 只能回答「這裡有沒有東西宣告了沒用、case 有沒有漏、寬度有沒有兜不齊」,回答不了「這個訊號在這一拍讀到的到底是不是你以為的那個值」——這正是為什麼這個專案從 Phase 1 開始就把驗證重心放在 cycle-accurate simulation + 獨立軟體模型比對,lint 只是這次才補上的、範圍窄很多的第二道防線,補的是「死碼/風格」這一層,不是「邏輯正確性」那一層。
+
 ### 新增:`reports/soc_top/` 一站式 sign-off 報告快照
 
 `scripts/collect_soc_reports.sh` 一次跑完整個 SoC 層級的 simulation regression、lint、synthesis、STA,把結果收斂進 `reports/soc_top/`(這個資料夾**會**進版控,是刻意留下的簽核快照,跟 `blocks/*/syn`、`blocks/*/sta` 那些隨時可重新產生、故意不進版控的 scratch log 不同)。合成產生的完整 Yosys log 動輒幾十 MB(每一輪 PicoRV32 hierarchy 的中間優化 pass 都會印出來),不值得進版控,所以只保留最後的面積/cell 統計摘要;完整版留在本地的 `blocks/soc_top/syn/synth_log.txt`(已在 `.gitignore`)。
