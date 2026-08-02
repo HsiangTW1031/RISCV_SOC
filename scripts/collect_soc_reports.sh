@@ -17,13 +17,13 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/reports/soc_top"
 mkdir -p "$OUT"
 
-echo "=== 1/4: full regression (scripts/run_regression.sh) ==="
+echo "=== 1/6: full regression (scripts/run_regression.sh) ==="
 "$ROOT/scripts/run_regression.sh" > "$OUT/simulation_regression.txt" 2>&1
 regr_rc=$?
 tail -25 "$OUT/simulation_regression.txt"
 
 echo
-echo "=== 2/4: lint (scripts/run_lint.sh) ==="
+echo "=== 2/6: lint (scripts/run_lint.sh) ==="
 "$ROOT/scripts/run_lint.sh" > "$OUT/lint_summary.txt" 2>&1
 lint_rc=$?
 # run_lint.sh's soc_top entry uses absolute paths (needed so its
@@ -33,7 +33,7 @@ sed "s#$ROOT/##g" "$ROOT/blocks/soc_top/lint/lint_report.txt" > "$OUT/soc_top_li
 tail -20 "$OUT/lint_summary.txt"
 
 echo
-echo "=== 3/4: synthesis (blocks/soc_top/syn/synth.ys) ==="
+echo "=== 3/6: synthesis (blocks/soc_top/syn/synth.ys) ==="
 SYNTH_FULL_LOG="$ROOT/blocks/soc_top/syn/synth_log.txt"
 ( cd "$ROOT/blocks/soc_top/syn" && yosys synth.ys > "$SYNTH_FULL_LOG" 2>&1 )
 synth_rc=$?
@@ -73,10 +73,23 @@ PYEOF
 fi
 
 echo
-echo "=== 4/4: STA (blocks/soc_top/sta/sta.tcl) ==="
+echo "=== 4/6: STA (blocks/soc_top/sta/sta.tcl) ==="
 ( cd "$ROOT/blocks/soc_top/sta" && sta sta.tcl > "$OUT/timing_sta.txt" 2>&1 )
 sta_rc=$?
 tail -20 "$OUT/timing_sta.txt"
+
+echo
+echo "=== 5/6: coverage (scripts/run_coverage.sh + analyze_coverage.py) ==="
+"$ROOT/scripts/run_coverage.sh" > "$OUT/coverage_run.txt" 2>&1
+cov_rc=$?
+tail -15 "$OUT/coverage_run.txt"
+python3 "$ROOT/scripts/analyze_coverage.py"
+analyze_rc=$?
+
+echo
+echo "=== 6/6: building the HTML dashboard (scripts/build_dashboard.py) ==="
+python3 "$ROOT/scripts/build_dashboard.py"
+dashboard_rc=$?
 
 {
   echo "# soc_top sign-off report snapshot"
@@ -89,6 +102,8 @@ tail -20 "$OUT/timing_sta.txt"
   echo "| Lint (per-block, lint-only) | $([ $lint_rc -eq 0 ] && echo CLEAN || echo "warnings present") | \`lint_summary.txt\`, \`soc_top_lint_full.txt\` |"
   echo "| Synthesis (Yosys, Nangate45) | $([ $synth_rc -eq 0 ] && echo OK || echo FAIL) | \`synthesis_area.txt\` |"
   echo "| STA (OpenSTA) | $([ $sta_rc -eq 0 ] && echo OK || echo FAIL) | \`timing_sta.txt\` |"
+  echo "| Coverage (line/toggle/branch/FSM) | $([ $cov_rc -eq 0 ] && echo OK || echo FAIL) | \`coverage/merged.dat\`, \`dashboard_data.json\` |"
+  echo "| HTML dashboard | $([ $dashboard_rc -eq 0 ] && echo OK || echo FAIL) | \`dashboard.html\` (open directly in a browser) |"
   echo
   echo "See \`docs/performance.md\` and \`docs/verification_summary.md\` for the narrative writeup of these numbers."
 } > "$OUT/README.md"

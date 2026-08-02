@@ -9,6 +9,9 @@
 // 0 only on an exact string match.
 #include "Vsoc_top.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "verilated_vcd_c.h"
 #include <cstdio>
 #include <string>
@@ -182,6 +185,9 @@ int main(int argc, char** argv) {
              rd_val == DMA_TEST_VAL);
 
   tfp->close();
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

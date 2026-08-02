@@ -3,6 +3,9 @@
 // exist on the bus.
 #include "Vi2c_testtop.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "axi_lite_bfm.h"
 #include <cstdio>
 
@@ -100,6 +103,9 @@ int main(int argc, char** argv) {
   check("slave received the ORIGINAL byte (0x11), not the mid-flight one (0x99)",
         dut->slave_rx_byte == 0x11);
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

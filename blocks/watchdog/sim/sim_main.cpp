@@ -6,6 +6,9 @@
 // the model's expected value must be captured before advancing it.
 #include "Vwatchdog.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "axi_lite_bfm.h"
 #include <cstdio>
 
@@ -165,6 +168,9 @@ int main(int argc, char** argv) {
     check("STATUS fully cleared after KICK", ok && rd == 0 && expected_status == 0);
   }
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

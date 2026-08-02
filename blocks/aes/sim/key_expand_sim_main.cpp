@@ -5,6 +5,9 @@
 // is an internal building block, not a CPU-visible peripheral).
 #include "Vaes_key_expand.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include <cstdio>
 #include <cstring>
 
@@ -88,6 +91,9 @@ int main(int argc, char** argv) {
     }
   }
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

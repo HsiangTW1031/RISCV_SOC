@@ -2,6 +2,9 @@
 // writes, and address independence between words.
 #include "Vsram.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "axi_lite_bfm.h"
 #include <cstdio>
 
@@ -59,6 +62,9 @@ int main(int argc, char** argv) {
   ok = bfm.read(0x0001FFFC, &rd, &resp);
   check("last word round-trips", ok && rd == 0xFEEDFACE);
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

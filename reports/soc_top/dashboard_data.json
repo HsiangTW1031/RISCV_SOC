@@ -1,0 +1,1752 @@
+{
+  "coverage_overall": {
+    "line": {
+      "pct": 47.2,
+      "covered": 3153,
+      "total": 6684
+    },
+    "toggle": {
+      "pct": 58.1,
+      "covered": 43157,
+      "total": 74282
+    },
+    "branch": {
+      "pct": 77.3,
+      "covered": 1500,
+      "total": 1940
+    }
+  },
+  "coverage_by_file": [
+    {
+      "file": "aes.v",
+      "block": "aes",
+      "covered": 73,
+      "total": 82,
+      "pct": 89.0
+    },
+    {
+      "file": "aes_chain.v",
+      "block": "aes",
+      "covered": 60,
+      "total": 61,
+      "pct": 98.4
+    },
+    {
+      "file": "aes_core.v",
+      "block": "aes",
+      "covered": 125,
+      "total": 126,
+      "pct": 99.2
+    },
+    {
+      "file": "aes_key_expand.v",
+      "block": "aes",
+      "covered": 55,
+      "total": 56,
+      "pct": 98.2
+    },
+    {
+      "file": "axi_lite_xbar.v",
+      "block": "axi_lite_xbar",
+      "covered": 332,
+      "total": 337,
+      "pct": 98.5
+    },
+    {
+      "file": "boot_rom.v",
+      "block": "boot_rom",
+      "covered": 27,
+      "total": 27,
+      "pct": 100.0
+    },
+    {
+      "file": "dma_engine.v",
+      "block": "dma",
+      "covered": 158,
+      "total": 167,
+      "pct": 94.6
+    },
+    {
+      "file": "dma_ram.v",
+      "block": "dma",
+      "covered": 79,
+      "total": 83,
+      "pct": 95.2
+    },
+    {
+      "file": "i2c_master.v",
+      "block": "i2c",
+      "covered": 198,
+      "total": 204,
+      "pct": 97.1
+    },
+    {
+      "file": "jtag_axi_bridge.v",
+      "block": "jtag",
+      "covered": 78,
+      "total": 79,
+      "pct": 98.7
+    },
+    {
+      "file": "jtag_dtm.v",
+      "block": "jtag",
+      "covered": 51,
+      "total": 51,
+      "pct": 100.0
+    },
+    {
+      "file": "jtag_tap.v",
+      "block": "jtag",
+      "covered": 43,
+      "total": 44,
+      "pct": 97.7
+    },
+    {
+      "file": "picorv32.v",
+      "block": "picorv32 (vendored)",
+      "covered": 1136,
+      "total": 1417,
+      "pct": 80.2
+    },
+    {
+      "file": "soc_top.v",
+      "block": "soc_top",
+      "covered": 71,
+      "total": 88,
+      "pct": 80.7
+    },
+    {
+      "file": "spi_master.v",
+      "block": "spi",
+      "covered": 96,
+      "total": 100,
+      "pct": 96.0
+    },
+    {
+      "file": "sram.v",
+      "block": "sram",
+      "covered": 29,
+      "total": 29,
+      "pct": 100.0
+    },
+    {
+      "file": "timer.v",
+      "block": "timer",
+      "covered": 54,
+      "total": 56,
+      "pct": 96.4
+    },
+    {
+      "file": "uart.v",
+      "block": "uart",
+      "covered": 77,
+      "total": 79,
+      "pct": 97.5
+    },
+    {
+      "file": "watchdog.v",
+      "block": "watchdog",
+      "covered": 63,
+      "total": 65,
+      "pct": 96.9
+    }
+  ],
+  "fsm_coverage": {
+    "uart": {
+      "file": "uart.v",
+      "states": [
+        {
+          "name": "TX_IDLE",
+          "hits": 16477,
+          "visited": true
+        },
+        {
+          "name": "TX_START",
+          "hits": 104,
+          "visited": true
+        },
+        {
+          "name": "TX_DATA",
+          "hits": 832,
+          "visited": true
+        },
+        {
+          "name": "TX_STOP",
+          "hits": 104,
+          "visited": true
+        }
+      ],
+      "visited": 4,
+      "total": 4,
+      "pct": 100.0
+    },
+    "i2c_master": {
+      "file": "i2c_master.v",
+      "states": [
+        {
+          "name": "ST_IDLE",
+          "hits": 17517,
+          "visited": true
+        },
+        {
+          "name": "ST_START",
+          "hits": 16,
+          "visited": true
+        },
+        {
+          "name": "ST_ADDR",
+          "hits": 128,
+          "visited": true
+        },
+        {
+          "name": "ST_ADDR_ACK",
+          "hits": 16,
+          "visited": true
+        },
+        {
+          "name": "ST_WDATA",
+          "hits": 64,
+          "visited": true
+        },
+        {
+          "name": "ST_WDATA_ACK",
+          "hits": 8,
+          "visited": true
+        },
+        {
+          "name": "ST_RDATA",
+          "hits": 32,
+          "visited": true
+        },
+        {
+          "name": "ST_RDATA_ACK",
+          "hits": 4,
+          "visited": true
+        },
+        {
+          "name": "ST_STOP",
+          "hits": 24,
+          "visited": true
+        }
+      ],
+      "visited": 9,
+      "total": 9,
+      "pct": 100.0
+    },
+    "spi_master": {
+      "file": "spi_master.v",
+      "states": [
+        {
+          "name": "IDLE",
+          "hits": 17517,
+          "visited": true
+        },
+        {
+          "name": "RUN",
+          "hits": 340,
+          "visited": true
+        }
+      ],
+      "visited": 2,
+      "total": 2,
+      "pct": 100.0
+    },
+    "jtag_tap": {
+      "file": "jtag_tap.v",
+      "states": [
+        {
+          "name": "TEST_LOGIC_RESET",
+          "hits": 489,
+          "visited": true
+        },
+        {
+          "name": "RUN_TEST_IDLE",
+          "hits": 876,
+          "visited": true
+        },
+        {
+          "name": "SELECT_DR_SCAN",
+          "hits": 661,
+          "visited": true
+        },
+        {
+          "name": "CAPTURE_DR",
+          "hits": 306,
+          "visited": true
+        },
+        {
+          "name": "SHIFT_DR",
+          "hits": 834,
+          "visited": true
+        },
+        {
+          "name": "EXIT1_DR",
+          "hits": 397,
+          "visited": true
+        },
+        {
+          "name": "PAUSE_DR",
+          "hits": 403,
+          "visited": true
+        },
+        {
+          "name": "EXIT2_DR",
+          "hits": 201,
+          "visited": true
+        },
+        {
+          "name": "UPDATE_DR",
+          "hits": 306,
+          "visited": true
+        },
+        {
+          "name": "SELECT_IR_SCAN",
+          "hits": 355,
+          "visited": true
+        },
+        {
+          "name": "CAPTURE_IR",
+          "hits": 148,
+          "visited": true
+        },
+        {
+          "name": "SHIFT_IR",
+          "hits": 250,
+          "visited": true
+        },
+        {
+          "name": "EXIT1_IR",
+          "hits": 201,
+          "visited": true
+        },
+        {
+          "name": "PAUSE_IR",
+          "hits": 240,
+          "visited": true
+        },
+        {
+          "name": "EXIT2_IR",
+          "hits": 115,
+          "visited": true
+        },
+        {
+          "name": "UPDATE_IR",
+          "hits": 147,
+          "visited": true
+        }
+      ],
+      "visited": 16,
+      "total": 16,
+      "pct": 100.0
+    },
+    "aes_core": {
+      "file": "aes_core.v",
+      "states": [
+        {
+          "name": "ST_IDLE",
+          "hits": 35034,
+          "visited": true
+        },
+        {
+          "name": "ST_KEYEXP",
+          "hits": 11099,
+          "visited": true
+        },
+        {
+          "name": "ST_ROUND",
+          "hits": 9081,
+          "visited": true
+        },
+        {
+          "name": "ST_FINAL",
+          "hits": 1009,
+          "visited": true
+        }
+      ],
+      "visited": 4,
+      "total": 4,
+      "pct": 100.0
+    },
+    "aes_chain": {
+      "file": "aes_chain.v",
+      "states": [
+        {
+          "name": "ST_IDLE",
+          "hits": 35034,
+          "visited": true
+        },
+        {
+          "name": "ST_CORE",
+          "hits": 22198,
+          "visited": true
+        }
+      ],
+      "visited": 2,
+      "total": 2,
+      "pct": 100.0
+    },
+    "axi_lite_xbar (write)": {
+      "file": "axi_lite_xbar.v",
+      "states": [
+        {
+          "name": "W_IDLE",
+          "hits": 16849,
+          "visited": true
+        },
+        {
+          "name": "W_ISSUE",
+          "hits": 167,
+          "visited": true
+        },
+        {
+          "name": "W_WAIT_B",
+          "hits": 167,
+          "visited": true
+        },
+        {
+          "name": "W_RESP",
+          "hits": 334,
+          "visited": true
+        }
+      ],
+      "visited": 4,
+      "total": 4,
+      "pct": 100.0
+    },
+    "axi_lite_xbar (read)": {
+      "file": "axi_lite_xbar.v",
+      "states": [
+        {
+          "name": "R_IDLE",
+          "hits": 8432,
+          "visited": true
+        },
+        {
+          "name": "R_ISSUE",
+          "hits": 2272,
+          "visited": true
+        },
+        {
+          "name": "R_WAIT_R",
+          "hits": 2271,
+          "visited": true
+        },
+        {
+          "name": "R_RESP",
+          "hits": 4542,
+          "visited": true
+        }
+      ],
+      "visited": 4,
+      "total": 4,
+      "pct": 100.0
+    },
+    "dma_ram (write)": {
+      "file": "dma_ram.v",
+      "states": [
+        {
+          "name": "W_IDLE",
+          "hits": 17517,
+          "visited": true
+        },
+        {
+          "name": "W_BURST",
+          "hits": 480,
+          "visited": true
+        }
+      ],
+      "visited": 2,
+      "total": 2,
+      "pct": 100.0
+    },
+    "dma_ram (read)": {
+      "file": "dma_ram.v",
+      "states": [
+        {
+          "name": "R_IDLE",
+          "hits": 17517,
+          "visited": true
+        },
+        {
+          "name": "R_BURST",
+          "hits": 243,
+          "visited": true
+        }
+      ],
+      "visited": 2,
+      "total": 2,
+      "pct": 100.0
+    },
+    "dma_engine": {
+      "file": "dma_engine.v",
+      "states": [
+        {
+          "name": "ST_IDLE",
+          "hits": 17517,
+          "visited": true
+        },
+        {
+          "name": "ST_RD_ADDR",
+          "hits": 24,
+          "visited": true
+        },
+        {
+          "name": "ST_RD_DATA",
+          "hits": 60,
+          "visited": true
+        },
+        {
+          "name": "ST_AES_GO",
+          "hits": 12,
+          "visited": true
+        },
+        {
+          "name": "ST_AES_WAIT",
+          "hits": 276,
+          "visited": true
+        },
+        {
+          "name": "ST_WR_ADDR",
+          "hits": 24,
+          "visited": true
+        },
+        {
+          "name": "ST_WR_DATA",
+          "hits": 48,
+          "visited": true
+        },
+        {
+          "name": "ST_WR_RESP",
+          "hits": 12,
+          "visited": true
+        },
+        {
+          "name": "ST_DONE",
+          "hits": 3,
+          "visited": true
+        }
+      ],
+      "visited": 9,
+      "total": 9,
+      "pct": 100.0
+    }
+  },
+  "lint_findings": [
+    {
+      "block": "aes",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 51,
+      "message": "Bits of signal are not used: 's_awaddr'[31:7]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "aes",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 52,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "aes",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 53,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "aes",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 54,
+      "message": "Bits of signal are not used: 's_araddr'[31:7]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "aes",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 55,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "aes",
+      "type": "UNUSEDPARAM",
+      "file": "aes_chain.v",
+      "line": 47,
+      "message": "Parameter is not used: 'MODE_ECB'",
+      "category": "benign-documentation-constant",
+      "note": "MODE_ECB documents aes_chain's mode encoding for aes.v's register interface; ECB itself is handled as the implicit default (not CBC, not CTR), so the constant is never directly compared."
+    },
+    {
+      "block": "aes",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes_chain.v",
+      "line": 78,
+      "message": "Signal is not used: 'core_busy'",
+      "category": "benign-unused-status-signal",
+      "note": "A busy/done status wire from the instantiated sub-block; the consuming FSM only needs the done pulse (busy is informational only, safe to leave unread)."
+    },
+    {
+      "block": "axi_lite_xbar",
+      "type": "UNUSEDSIGNAL",
+      "file": "axi_lite_xbar.v",
+      "line": 159,
+      "message": "Bits of function variable are not used: 'addr'[27:16,11:0]",
+      "category": "benign-decode-function",
+      "note": "The crossbar's decode_addr() function only inspects the specific bit ranges needed for region/peripheral selection."
+    },
+    {
+      "block": "boot_rom",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 15,
+      "message": "Signal is not used: 's_awaddr'",
+      "category": "benign-readonly-ignores-write",
+      "note": "boot_rom is read-only (writes are rejected with SLVERR) -- it never needs the write address or data at all, not even partially."
+    },
+    {
+      "block": "boot_rom",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 16,
+      "message": "Signal is not used: 's_wdata'",
+      "category": "benign-readonly-ignores-write",
+      "note": "boot_rom is read-only (writes are rejected with SLVERR) -- it never needs the write address or data at all, not even partially."
+    },
+    {
+      "block": "boot_rom",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 16,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "boot_rom",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 17,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "boot_rom",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 18,
+      "message": "Bits of signal are not used: 's_araddr'[31:16,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "boot_rom",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 19,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 47,
+      "message": "Bits of signal are not used: 's_awaddr'[31:7]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 48,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 49,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 50,
+      "message": "Bits of signal are not used: 's_araddr'[31:7]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 51,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 57,
+      "message": "Signal is not used: 'm_bresp'",
+      "category": "documented-limitation-bresp",
+      "note": "dma_engine's own burst master doesn't check dma_ram's write response code -- same class of limitation as picorv32_axi not checking BRESP/RRESP."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 60,
+      "message": "Signal is not used: 'm_rresp'",
+      "category": "documented-limitation-rresp",
+      "note": "dma_engine's own burst master doesn't check dma_ram's read response code."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 117,
+      "message": "Signal is not used: 'chain_busy'",
+      "category": "benign-unused-status-signal",
+      "note": "A busy/done status wire from the instantiated sub-block; the consuming FSM only needs the done pulse (busy is informational only, safe to leave unread)."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDPARAM",
+      "file": "aes_chain.v",
+      "line": 47,
+      "message": "Parameter is not used: 'MODE_ECB'",
+      "category": "benign-documentation-constant",
+      "note": "MODE_ECB documents aes_chain's mode encoding for aes.v's register interface; ECB itself is handled as the implicit default (not CBC, not CTR), so the constant is never directly compared."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes_chain.v",
+      "line": 78,
+      "message": "Signal is not used: 'core_busy'",
+      "category": "benign-unused-status-signal",
+      "note": "A busy/done status wire from the instantiated sub-block; the consuming FSM only needs the done pulse (busy is informational only, safe to leave unread)."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 27,
+      "message": "Bits of signal are not used: 's_awaddr'[31:13,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 29,
+      "message": "Signal is not used: 's_awsize'",
+      "category": "benign-burst-subset",
+      "note": "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 30,
+      "message": "Signal is not used: 's_awburst'",
+      "category": "benign-burst-subset",
+      "note": "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 47,
+      "message": "Bits of signal are not used: 's_araddr'[31:13,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 49,
+      "message": "Signal is not used: 's_arsize'",
+      "category": "benign-burst-subset",
+      "note": "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."
+    },
+    {
+      "block": "dma",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 50,
+      "message": "Signal is not used: 's_arburst'",
+      "category": "benign-burst-subset",
+      "note": "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."
+    },
+    {
+      "block": "i2c",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 36,
+      "message": "Bits of signal are not used: 's_awaddr'[31:5]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "i2c",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 37,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "i2c",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 38,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "i2c",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 39,
+      "message": "Bits of signal are not used: 's_araddr'[31:5]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "i2c",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 40,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "axi_lite_xbar.v",
+      "line": 159,
+      "message": "Bits of function variable are not used: 'addr'[27:16,11:0]",
+      "category": "benign-decode-function",
+      "note": "The crossbar's decode_addr() function only inspects the specific bit ranges needed for region/peripheral selection."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "sram.v",
+      "line": 10,
+      "message": "Bits of signal are not used: 's_awaddr'[31:17,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "sram.v",
+      "line": 12,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "sram.v",
+      "line": 13,
+      "message": "Bits of signal are not used: 's_araddr'[31:17,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "sram.v",
+      "line": 14,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 29,
+      "message": "Bits of signal are not used: 's_awaddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 30,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 31,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 32,
+      "message": "Bits of signal are not used: 's_araddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 33,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 34,
+      "message": "Bits of signal are not used: 's_awaddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 35,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 36,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 37,
+      "message": "Bits of signal are not used: 's_araddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 38,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 21,
+      "message": "Bits of signal are not used: 's_awaddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 22,
+      "message": "Bits of signal are not used: 's_wdata'[31:8]",
+      "category": "benign-narrow-register-width",
+      "note": "TXDATA is an 8-bit register (one UART byte) -- the upper 24 bits of a 32-bit AXI word are never meaningful here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 22,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 23,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 24,
+      "message": "Bits of signal are not used: 's_araddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 25,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 36,
+      "message": "Bits of signal are not used: 's_awaddr'[31:5]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 37,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 38,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 39,
+      "message": "Bits of signal are not used: 's_araddr'[31:5]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "i2c_master.v",
+      "line": 40,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 42,
+      "message": "Bits of signal are not used: 's_awaddr'[31:5]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 43,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 44,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 45,
+      "message": "Bits of signal are not used: 's_araddr'[31:5]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 46,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 51,
+      "message": "Bits of signal are not used: 's_awaddr'[31:7]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 52,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 53,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 54,
+      "message": "Bits of signal are not used: 's_araddr'[31:7]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes.v",
+      "line": 55,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 27,
+      "message": "Bits of signal are not used: 's_awaddr'[31:13,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 29,
+      "message": "Signal is not used: 's_awsize'",
+      "category": "benign-burst-subset",
+      "note": "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 30,
+      "message": "Signal is not used: 's_awburst'",
+      "category": "benign-burst-subset",
+      "note": "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 47,
+      "message": "Bits of signal are not used: 's_araddr'[31:13,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 49,
+      "message": "Signal is not used: 's_arsize'",
+      "category": "benign-burst-subset",
+      "note": "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_ram.v",
+      "line": 50,
+      "message": "Signal is not used: 's_arburst'",
+      "category": "benign-burst-subset",
+      "note": "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 47,
+      "message": "Bits of signal are not used: 's_awaddr'[31:7]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 48,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 49,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 50,
+      "message": "Bits of signal are not used: 's_araddr'[31:7]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 51,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 57,
+      "message": "Signal is not used: 'm_bresp'",
+      "category": "documented-limitation-bresp",
+      "note": "dma_engine's own burst master doesn't check dma_ram's write response code -- same class of limitation as picorv32_axi not checking BRESP/RRESP."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 60,
+      "message": "Signal is not used: 'm_rresp'",
+      "category": "documented-limitation-rresp",
+      "note": "dma_engine's own burst master doesn't check dma_ram's read response code."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "dma_engine.v",
+      "line": 117,
+      "message": "Signal is not used: 'chain_busy'",
+      "category": "benign-unused-status-signal",
+      "note": "A busy/done status wire from the instantiated sub-block; the consuming FSM only needs the done pulse (busy is informational only, safe to leave unread)."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 15,
+      "message": "Signal is not used: 's_awaddr'",
+      "category": "benign-readonly-ignores-write",
+      "note": "boot_rom is read-only (writes are rejected with SLVERR) -- it never needs the write address or data at all, not even partially."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 16,
+      "message": "Signal is not used: 's_wdata'",
+      "category": "benign-readonly-ignores-write",
+      "note": "boot_rom is read-only (writes are rejected with SLVERR) -- it never needs the write address or data at all, not even partially."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 16,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 17,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 18,
+      "message": "Bits of signal are not used: 's_araddr'[31:16,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "boot_rom.v",
+      "line": 19,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDPARAM",
+      "file": "aes_chain.v",
+      "line": 47,
+      "message": "Parameter is not used: 'MODE_ECB'",
+      "category": "benign-documentation-constant",
+      "note": "MODE_ECB documents aes_chain's mode encoding for aes.v's register interface; ECB itself is handled as the implicit default (not CBC, not CTR), so the constant is never directly compared."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "aes_chain.v",
+      "line": 78,
+      "message": "Signal is not used: 'core_busy'",
+      "category": "benign-unused-status-signal",
+      "note": "A busy/done status wire from the instantiated sub-block; the consuming FSM only needs the done pulse (busy is informational only, safe to leave unread)."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 181,
+      "message": "Signal is not used: 'dbg_insn_addr'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 183,
+      "message": "Signal is not used: 'dbg_mem_valid'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 184,
+      "message": "Signal is not used: 'dbg_mem_instr'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 185,
+      "message": "Signal is not used: 'dbg_mem_ready'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 186,
+      "message": "Signal is not used: 'dbg_mem_addr'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 187,
+      "message": "Signal is not used: 'dbg_mem_wdata'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 188,
+      "message": "Signal is not used: 'dbg_mem_wstrb'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 189,
+      "message": "Signal is not used: 'dbg_mem_rdata'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 375,
+      "message": "Signal is not used: 'mem_busy'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 696,
+      "message": "Signal is not used: 'dbg_rs1val'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 697,
+      "message": "Signal is not used: 'dbg_rs2val'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 698,
+      "message": "Signal is not used: 'dbg_rs1val_valid'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 699,
+      "message": "Signal is not used: 'dbg_rs2val_valid'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 769,
+      "message": "Signal is not used: 'dbg_valid_insn'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 1184,
+      "message": "Signal is not used: 'dbg_ascii_state'",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 2204,
+      "message": "Bits of signal are not used: 'pcpi_insn'[24:15,11:7]",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "soc_top",
+      "type": "UNUSEDSIGNAL",
+      "file": "picorv32.v",
+      "line": 2424,
+      "message": "Bits of signal are not used: 'pcpi_insn'[24:15,11:7]",
+      "category": "vendored-picorv32-style",
+      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+    },
+    {
+      "block": "spi",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 42,
+      "message": "Bits of signal are not used: 's_awaddr'[31:5]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "spi",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 43,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "spi",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 44,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "spi",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 45,
+      "message": "Bits of signal are not used: 's_araddr'[31:5]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "spi",
+      "type": "UNUSEDSIGNAL",
+      "file": "spi_master.v",
+      "line": 46,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "sram",
+      "type": "UNUSEDSIGNAL",
+      "file": "sram.v",
+      "line": 10,
+      "message": "Bits of signal are not used: 's_awaddr'[31:17,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "sram",
+      "type": "UNUSEDSIGNAL",
+      "file": "sram.v",
+      "line": 12,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "sram",
+      "type": "UNUSEDSIGNAL",
+      "file": "sram.v",
+      "line": 13,
+      "message": "Bits of signal are not used: 's_araddr'[31:17,1:0]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "sram",
+      "type": "UNUSEDSIGNAL",
+      "file": "sram.v",
+      "line": 14,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "timer",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 29,
+      "message": "Bits of signal are not used: 's_awaddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "timer",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 30,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "timer",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 31,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "timer",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 32,
+      "message": "Bits of signal are not used: 's_araddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "timer",
+      "type": "UNUSEDSIGNAL",
+      "file": "timer.v",
+      "line": 33,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "uart",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 21,
+      "message": "Bits of signal are not used: 's_awaddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "uart",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 22,
+      "message": "Bits of signal are not used: 's_wdata'[31:8]",
+      "category": "benign-narrow-register-width",
+      "note": "TXDATA is an 8-bit register (one UART byte) -- the upper 24 bits of a 32-bit AXI word are never meaningful here."
+    },
+    {
+      "block": "uart",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 22,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "uart",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 23,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "uart",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 24,
+      "message": "Bits of signal are not used: 's_araddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "uart",
+      "type": "UNUSEDSIGNAL",
+      "file": "uart.v",
+      "line": 25,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    },
+    {
+      "block": "watchdog",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 34,
+      "message": "Bits of signal are not used: 's_awaddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "watchdog",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 35,
+      "message": "Signal is not used: 's_wstrb'",
+      "category": "benign-no-byte-strobe",
+      "note": "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."
+    },
+    {
+      "block": "watchdog",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 36,
+      "message": "Signal is not used: 's_bready'",
+      "category": "documented-limitation-bready",
+      "note": "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."
+    },
+    {
+      "block": "watchdog",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 37,
+      "message": "Bits of signal are not used: 's_araddr'[31:4]",
+      "category": "benign-address-decode",
+      "note": "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."
+    },
+    {
+      "block": "watchdog",
+      "type": "UNUSEDSIGNAL",
+      "file": "watchdog.v",
+      "line": 38,
+      "message": "Signal is not used: 's_rready'",
+      "category": "documented-limitation-rready",
+      "note": "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."
+    }
+  ],
+  "coverage_own_rtl_line_pct": 96.3
+}

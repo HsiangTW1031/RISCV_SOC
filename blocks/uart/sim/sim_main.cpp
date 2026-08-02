@@ -4,6 +4,9 @@
 // dropped (no FIFO yet — documented behavior, not a bug).
 #include "Vuart.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "axi_lite_bfm.h"
 #include <cstdio>
 
@@ -96,6 +99,9 @@ int main(int argc, char** argv) {
   for (int i = 0; i < 3; i++) bfm.clock();
   check("no second frame queued after the dropped write", !read_busy());
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

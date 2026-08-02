@@ -4,6 +4,9 @@
 // already cross-checked in Python before this RTL was written.
 #include "Vaes_chain.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include <cstdio>
 #include <cstdint>
 #include <cstring>
@@ -131,6 +134,9 @@ int main(int argc, char** argv) {
     check(msg, pt == pt_hex[i]);
   }
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

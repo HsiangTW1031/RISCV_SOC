@@ -1,0 +1,381 @@
+Coverage Summary:
+  line      : 47.2% ( 3153/ 6684)
+  toggle    : 58.1% (43157/74282)
+  branch    : 77.3% ( 1500/ 1940)
+  expr      : 0.0% (    0/    0)
+  fsm_state : 0.0% (    0/    0)
+  fsm_arc   : 0.0% (    0/    0)
+Note: hierarchy report contains collapsed hierarchy paths; it is not precise per-instance coverage.
+Hierarchy Coverage Summary:
+  TOP
+    line      : 47.2% ( 3153/ 6684)
+    toggle    : 58.1% (43157/74282)
+    branch    : 77.3% ( 1500/ 1940)
+  TOP.aes
+    line      : 74.8% ( 836/1117)
+    toggle    : 97.9% (7688/7856)
+    branch    : 94.6% (  53/  56)
+  TOP.aes.u_chain
+    line      : 75.0% ( 814/1086)
+    toggle    : 99.7% (6210/6230)
+    branch    : 92.9% (  39/  42)
+  TOP.aes.u_chain.u_core
+    line      : 75.0% ( 809/1079)
+    toggle    : 100.0% (3632/3632)
+    branch    : 92.3% (  24/  26)
+  TOP.aes.u_chain.u_core.u_key_expand
+    line      : 50.6% (274/541)
+    toggle    : 100.0% (786/786)
+    branch    : 75.0% (  6/  8)
+  TOP.aes_chain
+    line      : 54.7% ( 594/1086)
+    toggle    : 89.8% (5593/6230)
+    branch    : 95.2% (  40/  42)
+  TOP.aes_chain.u_core
+    line      : 54.6% ( 589/1079)
+    toggle    : 91.0% (3306/3632)
+    branch    : 92.3% (  24/  26)
+  TOP.aes_chain.u_core.u_key_expand
+    line      : 10.0% ( 54/541)
+    toggle    : 79.3% (623/786)
+    branch    : 75.0% (  6/  8)
+  TOP.aes_core
+    line      : 54.2% ( 585/1079)
+    toggle    : 93.9% (3411/3632)
+    branch    : 92.3% (  24/  26)
+  TOP.aes_core.u_key_expand
+    line      : 15.2% ( 82/541)
+    toggle    : 88.9% (699/786)
+    branch    : 75.0% (  6/  8)
+  TOP.aes_key_expand
+    line      : 10.2% ( 55/541)
+    toggle    : 73.2% (575/786)
+    branch    : 75.0% (  6/  8)
+  TOP.boot_rom
+    line      : 100.0% (  2/  2)
+    toggle    : 30.9% (100/324)
+    branch    : 87.5% (  7/  8)
+  TOP.dma_engine_testtop
+    line      : 55.4% (  625/ 1129)
+    toggle    : 76.5% ( 7940/10382)
+    branch    : 94.7% (  144/  152)
+  TOP.dma_engine_testtop.u_engine
+    line      : 55.2% ( 619/1121)
+    toggle    : 81.9% (7050/8604)
+    branch    : 94.6% (  70/  74)
+  TOP.dma_engine_testtop.u_engine.u_chain
+    line      : 54.7% ( 594/1086)
+    toggle    : 90.8% (5654/6230)
+    branch    : 95.2% (  40/  42)
+  TOP.dma_engine_testtop.u_engine.u_chain.u_core
+    line      : 54.6% ( 589/1079)
+    toggle    : 91.0% (3304/3632)
+    branch    : 92.3% (  24/  26)
+  TOP.dma_engine_testtop.u_engine.u_chain.u_core.u_key_expand
+    line      : 10.0% ( 54/541)
+    toggle    : 79.3% (623/786)
+    branch    : 75.0% (  6/  8)
+  TOP.dma_engine_testtop.u_ram
+    line      : 75.0% (  6/  8)
+    toggle    : 54.2% (234/432)
+    branch    : 84.6% ( 22/ 26)
+  TOP.dma_ram
+    line      : 75.0% (  6/  8)
+    toggle    : 46.3% (200/432)
+    branch    : 84.6% ( 22/ 26)
+  TOP.i2c_testtop
+    line      : 81.6% (  31/  38)
+    toggle    : 34.7% ( 360/1038)
+    branch    : 96.0% (  96/ 100)
+  TOP.i2c_testtop.u_i2c
+    line      : 76.0% ( 19/ 25)
+    toggle    : 31.0% (179/578)
+    branch    : 93.9% ( 62/ 66)
+  TOP.i2c_testtop.u_slave
+    line      : 92.3% ( 12/ 13)
+    toggle    : 77.4% ( 82/106)
+    branch    : 100.0% ( 34/ 34)
+  TOP.jtag_chain_testtop
+    line      : 86.0% (  37/  43)
+    toggle    : 50.8% (1089/2144)
+    branch    : 71.2% (  57/  80)
+  TOP.jtag_chain_testtop.u_bridge
+    line      : 90.9% ( 10/ 11)
+    toggle    : 50.5% (430/852)
+    branch    : 75.0% ( 18/ 24)
+  TOP.jtag_chain_testtop.u_dtm
+    line      : 83.9% ( 26/ 31)
+    toggle    : 62.2% (305/490)
+    branch    : 66.0% ( 33/ 50)
+  TOP.jtag_chain_testtop.u_dtm.u_tap
+    line      : 73.7% (14/19)
+    toggle    : 85.2% (46/54)
+    branch    : 50.0% (17/34)
+  TOP.jtag_chain_testtop.u_slave
+    line      : 100.0% (  1/  1)
+    toggle    : 41.2% (122/296)
+    branch    : 100.0% (  6/  6)
+  TOP.jtag_tap
+    line      : 94.7% (18/19)
+    toggle    : 100.0% (54/54)
+    branch    : 100.0% (34/34)
+  TOP.soc_top
+    line      : 17.8% (  269/ 1514)
+    toggle    : 38.3% (12050/31432)
+    branch    : 64.6% (  686/ 1062)
+  TOP.soc_top.u_*
+    line      : 2.9% (  32/1086)
+    toggle    : 6.8% ( 422/6230)
+    branch    : 42.9% (  18/  42)
+  TOP.soc_top.u_*.u_chain
+    line      : 2.9% (  32/1086)
+    toggle    : 6.8% ( 422/6230)
+    branch    : 42.9% (  18/  42)
+  TOP.soc_top.u_*.u_chain.u_core
+    line      : 2.8% (  30/1079)
+    toggle    : 11.3% ( 410/3632)
+    branch    : 30.8% (   8/  26)
+  TOP.soc_top.u_*.u_chain.u_core.u_key_expand
+    line      : 1.5% (  8/541)
+    toggle    : 8.7% ( 68/786)
+    branch    : 37.5% (  3/  8)
+  TOP.soc_top.u_aes
+    line      : 9.7% (   3/  31)
+    toggle    : 9.7% ( 158/1626)
+    branch    : 57.1% (   8/  14)
+  TOP.soc_top.u_cpu
+    line      : 71.1% ( 128/ 180)
+    toggle    : 58.3% (5032/8630)
+    branch    : 68.1% ( 323/ 474)
+  TOP.soc_top.u_cpu.axi_adapter
+    line      : 100.0% (  1/  1)
+    toggle    : 72.6% (373/514)
+    branch    : 100.0% ( 12/ 12)
+  TOP.soc_top.u_cpu.picorv32_core
+    line      : 70.9% ( 127/ 179)
+    toggle    : 57.6% (4116/7142)
+    branch    : 67.3% ( 311/ 462)
+  TOP.soc_top.u_cpu.picorv32_core.genblk1
+    line      : 61.5% (   8/  13)
+    toggle    : 32.3% ( 512/1586)
+    branch    : 50.0% (   9/  18)
+  TOP.soc_top.u_cpu.picorv32_core.genblk1.pcpi_mul
+    line      : 61.5% (   8/  13)
+    toggle    : 32.3% ( 512/1586)
+    branch    : 50.0% (   9/  18)
+  TOP.soc_top.u_cpu.picorv32_core.genblk2
+    line      : 80.0% (  8/ 10)
+    toggle    : 55.1% (333/604)
+    branch    : 75.0% (  9/ 12)
+  TOP.soc_top.u_cpu.picorv32_core.genblk2.pcpi_div
+    line      : 80.0% (  8/ 10)
+    toggle    : 55.1% (333/604)
+    branch    : 75.0% (  9/ 12)
+  TOP.soc_top.u_dma
+    line      : 17.1% (   6/  35)
+    toggle    : 9.1% ( 216/2374)
+    branch    : 34.4% (  11/  32)
+  TOP.soc_top.u_dma_ram
+    line      : 50.0% (  4/  8)
+    toggle    : 2.3% ( 10/432)
+    branch    : 26.9% (  7/ 26)
+  TOP.soc_top.u_i2c
+    line      : 12.0% (  3/ 25)
+    toggle    : 26.3% (152/578)
+    branch    : 18.2% ( 12/ 66)
+  TOP.soc_top.u_jtag_bridge
+    line      : 81.8% (  9/ 11)
+    toggle    : 39.4% (336/852)
+    branch    : 83.3% ( 20/ 24)
+  TOP.soc_top.u_jtag_dtm
+    line      : 74.2% ( 23/ 31)
+    toggle    : 56.1% (275/490)
+    branch    : 60.0% ( 30/ 50)
+  TOP.soc_top.u_jtag_dtm.u_tap
+    line      : 73.7% (14/19)
+    toggle    : 85.2% (46/54)
+    branch    : 47.1% (16/34)
+  TOP.soc_top.u_ram
+    line      : 100.0% (  1/  1)
+    toggle    : 69.7% (248/356)
+    branch    : 92.9% ( 13/ 14)
+  TOP.soc_top.u_rom
+    line      : 100.0% (  2/  2)
+    toggle    : 72.8% (236/324)
+    branch    : 75.0% (  6/  8)
+  TOP.soc_top.u_spi
+    line      : 36.4% (  4/ 11)
+    toggle    : 28.1% (154/548)
+    branch    : 35.7% ( 10/ 28)
+  TOP.soc_top.u_timer
+    line      : 44.4% (  4/  9)
+    toggle    : 63.7% (288/452)
+    branch    : 92.9% ( 13/ 14)
+  TOP.soc_top.u_uart
+    line      : 85.7% (  6/  7)
+    toggle    : 55.3% (208/376)
+    branch    : 90.9% ( 20/ 22)
+  TOP.soc_top.u_wdt
+    line      : 50.0% (  5/ 10)
+    toggle    : 63.7% (293/460)
+    branch    : 87.5% ( 14/ 16)
+  TOP.soc_top.u_xbar
+    line      : 58.2% (  39/  67)
+    toggle    : 57.1% (2195/3846)
+    branch    : 78.0% ( 181/ 232)
+  TOP.spi_testtop
+    line      : 69.2% (  9/ 13)
+    toggle    : 39.9% (387/970)
+    branch    : 97.6% ( 41/ 42)
+  TOP.spi_testtop.u_slave
+    line      : 100.0% ( 2/ 2)
+    toggle    : 100.0% (78/78)
+    branch    : 100.0% (14/14)
+  TOP.spi_testtop.u_spi
+    line      : 63.6% (  7/ 11)
+    toggle    : 35.0% (192/548)
+    branch    : 96.4% ( 27/ 28)
+  TOP.sram
+    line      : 100.0% (  1/  1)
+    toggle    : 54.2% (193/356)
+    branch    : 92.9% ( 13/ 14)
+  TOP.timer
+    line      : 77.8% (  7/  9)
+    toggle    : 41.4% (187/452)
+    branch    : 100.0% ( 14/ 14)
+  TOP.uart
+    line      : 85.7% (  6/  7)
+    toggle    : 22.6% ( 85/376)
+    branch    : 90.9% ( 20/ 22)
+  TOP.watchdog
+    line      : 80.0% (  8/ 10)
+    toggle    : 48.3% (222/460)
+    branch    : 100.0% ( 16/ 16)
+  TOP.xbar_testtop
+    line      : 94.1% (  64/  68)
+    toggle    : 41.1% (3023/7358)
+    branch    : 95.4% ( 227/ 238)
+  TOP.xbar_testtop.u_*
+    line      : 100.0% (  1/  1)
+    toggle    : 45.3% (134/296)
+    branch    : 100.0% (  6/  6)
+  TOP.xbar_testtop.u_xbar
+    line      : 94.0% (  63/  67)
+    toggle    : 42.2% (1623/3846)
+    branch    : 95.3% ( 221/ 232)
+Design Unit Coverage Summary:
+  aes
+    line      : 40.3% (  25/  62)
+    toggle    : 50.3% (1636/3252)
+    branch    : 78.6% (  22/  28)
+  aes_chain
+    line      : 60.7% (   17/   28)
+    toggle    : 69.5% ( 7227/10392)
+    branch    : 89.1% (   57/   64)
+  aes_core
+    line      : 79.2% ( 2130/ 2690)
+    toggle    : 79.2% (11264/14230)
+    branch    : 85.6% (   77/   90)
+  aes_key_expand
+    line      : 16.2% ( 527/3246)
+    toggle    : 71.5% (3374/4716)
+    branch    : 68.8% (  33/  48)
+  axi_lite_xbar
+    line      : 76.1% ( 102/ 134)
+    toggle    : 49.6% (3818/7692)
+    branch    : 86.6% ( 402/ 464)
+  boot_rom
+    line      : 100.0% (  2/  2)
+    toggle    : 30.9% (100/324)
+    branch    : 87.5% (  7/  8)
+  boot_rom__Hz2
+    line      : 100.0% (  2/  2)
+    toggle    : 72.8% (236/324)
+    branch    : 75.0% (  6/  8)
+  dma_engine
+    line      : 44.3% (  31/  70)
+    toggle    : 34.0% (1612/4748)
+    branch    : 64.1% (  41/  64)
+  dma_engine_testtop
+    toggle    : 48.7% ( 656/1346)
+    branch    : 100.0% (  52/  52)
+  dma_ram
+    line      : 66.7% (  16/  24)
+    toggle    : 34.3% ( 444/1296)
+    branch    : 65.4% (  51/  78)
+  fake_axi_lite_slave
+    line      : 100.0% (  2/  2)
+    toggle    : 43.2% (256/592)
+    branch    : 100.0% ( 12/ 12)
+  fake_i2c_slave
+    line      : 92.3% ( 12/ 13)
+    toggle    : 77.4% ( 82/106)
+    branch    : 100.0% ( 34/ 34)
+  fake_spi_slave
+    line      : 100.0% ( 2/ 2)
+    toggle    : 100.0% (78/78)
+    branch    : 100.0% (14/14)
+  i2c_master
+    line      : 44.0% (  22/  50)
+    toggle    : 28.6% ( 331/1156)
+    branch    : 56.1% (  74/ 132)
+  i2c_testtop
+    toggle    : 28.0% ( 99/354)
+  jtag_axi_bridge
+    line      : 86.4% (  19/  22)
+    toggle    : 45.0% ( 766/1704)
+    branch    : 79.2% (  38/  48)
+  jtag_chain_testtop
+    toggle    : 45.8% (232/506)
+  jtag_dtm
+    line      : 87.5% ( 21/ 24)
+    toggle    : 56.0% (488/872)
+    branch    : 93.8% ( 30/ 32)
+  jtag_tap
+    line      : 80.7% ( 46/ 57)
+    toggle    : 90.1% (146/162)
+    branch    : 65.7% ( 67/102)
+  picorv32__pi2
+    line      : 71.2% ( 111/ 156)
+    toggle    : 66.1% (3271/4952)
+    branch    : 67.8% ( 293/ 432)
+  picorv32_axi__pi1
+    toggle    : 55.7% (543/974)
+  picorv32_axi_adapter
+    line      : 100.0% (  1/  1)
+    toggle    : 72.6% (373/514)
+    branch    : 100.0% ( 12/ 12)
+  picorv32_pcpi_div
+    line      : 80.0% (  8/ 10)
+    toggle    : 55.1% (333/604)
+    branch    : 75.0% (  9/ 12)
+  picorv32_pcpi_mul
+    line      : 61.5% (   8/  13)
+    toggle    : 32.3% ( 512/1586)
+    branch    : 50.0% (   9/  18)
+  soc_top
+    toggle    : 47.4% (1827/3858)
+  spi_master
+    line      : 50.0% (  11/  22)
+    toggle    : 31.6% ( 346/1096)
+    branch    : 66.1% (  37/  56)
+  spi_testtop
+    toggle    : 34.0% (117/344)
+  sram
+    line      : 100.0% (  2/  2)
+    toggle    : 61.9% (441/712)
+    branch    : 92.9% ( 26/ 28)
+  timer
+    line      : 61.1% ( 11/ 18)
+    toggle    : 52.5% (475/904)
+    branch    : 96.4% ( 27/ 28)
+  uart
+    line      : 85.7% ( 12/ 14)
+    toggle    : 39.0% (293/752)
+    branch    : 90.9% ( 40/ 44)
+  watchdog
+    line      : 65.0% ( 13/ 20)
+    toggle    : 56.0% (515/920)
+    branch    : 93.8% ( 30/ 32)
+  xbar_testtop
+    toggle    : 39.4% (1266/3216)

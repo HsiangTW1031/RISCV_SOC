@@ -211,7 +211,7 @@ full story on why a dedicated lint pass turned out to be worth adding after
 all, and what it found.
 
 To collect a full whole-SoC sign-off snapshot (simulation regression +
-lint + synthesis + STA) into one place:
+lint + synthesis + STA + coverage + an HTML dashboard) into one place:
 
 ```bash
 ./scripts/collect_soc_reports.sh
@@ -220,7 +220,14 @@ lint + synthesis + STA) into one place:
 This writes into `reports/soc_top/` — unlike the per-block `syn`/`sta`/`lint`
 scratch output (gitignored, regenerable), `reports/` **is** committed: it's
 the sign-off snapshot, readable straight from the repo without needing the
-toolchain installed.
+toolchain installed. Open `reports/soc_top/dashboard.html` directly in a
+browser for a graphical view (coverage bars, an FSM state-coverage
+checklist for all 11 state machines, and the 135 lint findings triaged
+into categories) instead of reading raw text reports — see
+`docs/verification_summary.md` for the numbers and
+`docs/project_retrospective.md` for how the coverage/FSM/lint-triage
+pipeline (`scripts/run_coverage.sh` → `scripts/analyze_coverage.py` →
+`scripts/build_dashboard.py`) actually works.
 
 There's no flow-automation skill wired up yet for synth/STA (the generic
 `IC_fe_flow` skill was retired — a project-specific one will replace it once

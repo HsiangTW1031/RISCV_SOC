@@ -32,6 +32,19 @@
 - **Cycle-accurate 時序驗證**（Timer/Watchdog)：不是只檢查「最後有沒有觸發」,而是每個 cycle 都跟一個軟體模型比對,確保觸發的時機精確到 cycle。
 - **合成後 lint 乾淨**：每個 block 都用同一組 Verilator flag（`-Wall` 開頭)編譯,唯一允許的例外是 vendored PicoRV32 自己的程式碼風格（`-Wno-BLKSEQ -Wno-DECLFILENAME -Wno-GENUNNAMED`,不是這個專案自己寫的 RTL 產生的警告)。
 
-## 3. 這次 Phase 7 regression 抓到的一個真實 bug
+## 3. 量化的 coverage 數據
+
+`scripts/run_coverage.sh` + `scripts/analyze_coverage.py`,完整方法論見 `docs/project_retrospective.md`。跑完全部 18 個 regression 測試(`--coverage-line --coverage-toggle`)合併後:
+
+| 指標 | 結果 |
+|---|---|
+| Line coverage(這個專案自己寫的 RTL,不含 vendored PicoRV32) | **96.3%** |
+| Toggle coverage(全專案合併) | 58.1%(43157/74282 points) |
+| Branch coverage(全專案合併) | 77.3%(1500/1940 points) |
+| **FSM state coverage**（11 個 FSM:spi_master、i2c_master、uart、jtag_tap、aes_core、aes_chain、axi_lite_xbar 讀/寫、dma_ram 讀/寫、dma_engine) | **100%**(全部狀態都至少被進入過一次) |
+
+圖像化的 sign-off dashboard(coverage bar chart、每個 FSM 的狀態 checklist、135 筆 lint 發現分類後的 summary、架構圖)：`reports/soc_top/dashboard.html`,可以直接用瀏覽器打開,不需要額外工具。
+
+## 4. 這次 Phase 7 regression 抓到的一個真實 bug
 
 跑 `scripts/run_regression.sh` 的過程中,`watchdog` 測試意外地從乾淨重編後失敗(2 個 check),但目錄裡舊的、還沒清掉的 binary 卻是綠的——追下去發現:`blocks/watchdog/sim/sim_main.cpp` 裡寫死的 `WARN_MARGIN = 3`,跟 `watchdog.v` 實際的 default parameter `WARN_MARGIN = 4`（從 Phase 2 第一次 commit 就是 4,`docs/specs/watchdog.md` 也一直寫 4)對不上——測試本身的常數從一開始就是錯的,只是舊的 binary 剛好是在某次意外用對的數字建出來的,之後沒人重新乾淨編譯過,才一直「看起來是綠的」。這正是「一次性乾淨 regression」存在的意義:抓到「原始碼其實已經不吻合、只是沒人重新建置驗證過」這種腐化。修法:把測試的常數改成 4,重編後全綠。詳細除錯過程見 `docs/project_retrospective.md`。

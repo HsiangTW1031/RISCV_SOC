@@ -166,3 +166,13 @@ Phase 7 完成、簽核之後,原本的判斷是「整顆 SoC 都合成得出來
 ### 新增:`reports/soc_top/` 一站式 sign-off 報告快照
 
 `scripts/collect_soc_reports.sh` 一次跑完整個 SoC 層級的 simulation regression、lint、synthesis、STA,把結果收斂進 `reports/soc_top/`(這個資料夾**會**進版控,是刻意留下的簽核快照,跟 `blocks/*/syn`、`blocks/*/sta` 那些隨時可重新產生、故意不進版控的 scratch log 不同)。合成產生的完整 Yosys log 動輒幾十 MB(每一輪 PicoRV32 hierarchy 的中間優化 pass 都會印出來),不值得進版控,所以只保留最後的面積/cell 統計摘要;完整版留在本地的 `blocks/soc_top/syn/synth_log.txt`(已在 `.gitignore`)。
+
+### 再往下一層:量化的 coverage(line/toggle/branch/FSM)+ 圖像化的 sign-off dashboard
+
+lint 抓到「有沒有死碼」,但沒辦法回答「測試到底覆蓋了多少邏輯」——這需要真正的 coverage 數據。`scripts/run_coverage.sh` 對全部 18 個 regression 測試,改用 `--coverage-line --coverage-toggle` 重新建置、跑過一輪,把每個測試自己的 `coverage.dat` 合併成一份專案層級的聚合結果,再用 `verilator_coverage` 產生 per-file annotated source(每一行標上被 hit 幾次)跟一份 lcov `.info`。
+
+**FSM state coverage 沒有現成的路可以直接拿**:Verilator 的 `--coverage-fsm` 是針對它自己能辨識的特定 FSM 樣式做的啟發式偵測,實際對這個專案裡全部 11 個用 `localparam` + `case` 寫的純 Verilog-2001 FSM(`spi_master`、`i2c_master`、`uart`、`jtag_tap`、`aes_core`、`aes_chain`、`axi_lite_xbar` 的讀寫兩個 FSM、`dma_ram` 的讀寫兩個 FSM、`dma_engine`)測試後,一個都沒抓到——`fsm_state`/`fsm_arc` 兩個類別的 summary 永遠是 0/0。改用另一個角度:annotated 檔案裡,每一個 `case (state)` 的分支開頭(例如 `ST_IDLE: begin`)本來就會帶有自己的 line-coverage hit count——這其實就是「這個狀態有沒有被進入過」最直接、最精確的訊號,不需要額外的 instrumentation。`scripts/analyze_coverage.py` 直接從 annotated 檔案裡,對每個 FSM 已知的狀態名稱清單(從原始碼讀出來的,不是猜的)去查對應那一行的 hit count,組出一份真正的「每個狀態有沒有被走到過」表格。結果:**11 個 FSM,全部狀態都被走到至少一次(100%)**。
+
+同一支腳本也把 `blocks/*/lint/lint_report.txt` 的全部 135 筆 lint 發現,依照訊息內容自動分類成幾個桶(已修好的死碼類型此時已經歸零、剩下的是「文件記錄過的限制」如 BREADY/RREADY/BRESP/RRESP 沒被檢查、「刻意的設計」如位址高位元/byte-strobe/burst 欄位不用、「vendored PicoRV32 自身風格」),避免簡單粗暴地把 135 行原始警告直接倒給人看。
+
+最後 `scripts/build_dashboard.py` 把這些數據(coverage 百分比、FSM 狀態表、分類後的 lint 發現、架構圖)全部渲染成一個單一的靜態 HTML 頁面(`reports/soc_top/dashboard.html`),取代原本純文字的 report——這個檔案本身也進版控,跟其他 `reports/soc_top/` 底下的檔案一樣是刻意留下的快照,不是每次都要重新產生才能看的東西。

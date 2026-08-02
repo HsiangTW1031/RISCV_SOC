@@ -2,6 +2,9 @@
 // are rejected (SLVERR) without altering memory.
 #include "Vboot_rom.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "axi_lite_bfm.h"
 #include <cstdio>
 
@@ -52,6 +55,9 @@ int main(int argc, char** argv) {
   ok = bfm.read(0x00000000, &rd, &resp);
   check("ROM word 0 unchanged after write attempt", ok && rd == 0xAAAA0001);
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

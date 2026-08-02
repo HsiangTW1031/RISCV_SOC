@@ -4,6 +4,9 @@
 // from a previous burst corrupting the next one).
 #include "Vdma_ram.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include <cstdio>
 #include <cstdint>
 #include <vector>
@@ -122,6 +125,9 @@ int main(int argc, char** argv) {
     check("earlier burst's data untouched by the later one", rd_old.size() == 1 && rd_old[0] == 0x11111111);
   }
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

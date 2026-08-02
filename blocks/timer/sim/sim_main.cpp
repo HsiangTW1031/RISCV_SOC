@@ -6,6 +6,9 @@
 // and advanced after every single BFM call, then checked against readback.
 #include "Vtimer.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "axi_lite_bfm.h"
 #include <cstdio>
 
@@ -128,6 +131,9 @@ int main(int argc, char** argv) {
     check("COUNT holds while disabled", ok && rd == expected && expected == held_count);
   }
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

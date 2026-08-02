@@ -4,6 +4,9 @@
 // UART RTL isn't needed yet to prove the crossbar's routing logic correct.
 #include "Vxbar_testtop.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "axi_lite_bfm.h"
 #include <cstdio>
 
@@ -161,6 +164,9 @@ int main(int argc, char** argv) {
   ok = bfm.read(0x10000000, &rd, &resp);
   check("post-arbitration: RAM holds s1's contended write", ok && rd == 0xBBBB2222);
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

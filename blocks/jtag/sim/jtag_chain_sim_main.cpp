@@ -7,6 +7,9 @@
 // happen to be in lockstep.
 #include "Vjtag_chain_testtop.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include <cstdio>
 #include <cstdint>
 
@@ -130,6 +133,9 @@ int main(int argc, char** argv) {
   check("BYPASS captures a fixed 0", tdo1 == 0);
   check("BYPASS shifts TDI through to TDO with 1 tck latency", tdo2 == 1);
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

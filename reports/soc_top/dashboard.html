@@ -1,0 +1,548 @@
+<title>RISCV_SOC — Sign-off Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #0b0e14;
+  --panel: #12161f;
+  --panel-alt: #171c27;
+  --border: #232838;
+  --text: #e6e9f0;
+  --text-dim: #8b93a7;
+  --accent: #ff9d5c;
+  --good: #4ade80;
+  --bad: #f87171;
+  --warn: #fbbf24;
+  --info: #64748b;
+  --vendor: #8b7cf6;
+}
+:root[data-theme="light"] {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --panel-alt: #eef0f4;
+  --border: #dde1e8;
+  --text: #1a1f2b;
+  --text-dim: #5b6474;
+  --accent: #d97a3d;
+  --good: #16a34a;
+  --bad: #dc2626;
+  --warn: #b45309;
+  --info: #64748b;
+  --vendor: #6d5bd0;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --panel-alt: #eef0f4;
+    --border: #dde1e8;
+    --text: #1a1f2b;
+    --text-dim: #5b6474;
+    --accent: #d97a3d;
+    --good: #16a34a;
+    --bad: #dc2626;
+    --warn: #b45309;
+    --info: #64748b;
+    --vendor: #6d5bd0;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 15px; line-height: 1.5;
+}
+.mono, .cov-frac, td.mono, .fsm-file, .bar-label {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+}
+header.top {
+  padding: 28px 32px 20px; border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--panel-alt), var(--bg));
+}
+header.top h1 {
+  margin: 0 0 4px; font-size: 1.6rem; letter-spacing: -0.01em;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+header.top .sub { color: var(--text-dim); font-size: 0.92rem; }
+main { max-width: 1180px; margin: 0 auto; padding: 28px 32px 80px; }
+.kpi-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px; margin: 24px 0 40px;
+}
+.kpi {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px 18px;
+}
+.kpi .label { color: var(--text-dim); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.kpi .value { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 1.6rem; margin-top: 4px; font-weight: 600; }
+.kpi .value.good { color: var(--good); }
+.kpi .value.accent { color: var(--accent); }
+section { margin: 48px 0; }
+section > h2 {
+  font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px;
+  margin-bottom: 18px;
+}
+.arch-wrap {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; overflow-x: auto;
+}
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+table.filecov td, table.filecov th { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+table.filecov th { color: var(--text-dim); font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+table.mini { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 8px 0 4px; }
+table.mini td, table.mini th { padding: 5px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+table.mini th { color: var(--text-dim); font-weight: 500; }
+.bar { position: relative; display: inline-block; width: 140px; height: 16px; background: var(--panel-alt); border-radius: 4px; overflow: hidden; vertical-align: middle; }
+.bar-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
+.bar-fill.good { background: var(--good); }
+.bar-fill.warn { background: var(--warn); }
+.bar-fill.bad { background: var(--bad); }
+.bar-fill.info { background: var(--info); }
+.bar-label { position: absolute; right: 6px; top: 0; font-size: 0.68rem; color: var(--text); line-height: 16px; }
+.cov-frac { color: var(--text-dim); font-size: 0.78rem; margin-left: 8px; }
+.overall-bars { display: flex; gap: 28px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.overall-bars .metric { min-width: 200px; }
+.overall-bars .metric .name { color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+.overall-bars .bar { width: 200px; height: 20px; }
+.fsm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.fsm-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.fsm-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.fsm-name { font-weight: 600; }
+.fsm-file { color: var(--text-dim); font-size: 0.76rem; }
+.fsm-pct { margin-left: auto; font-family: ui-monospace, monospace; font-size: 0.78rem; padding: 2px 8px; border-radius: 20px; }
+.fsm-pct.good { background: color-mix(in srgb, var(--good) 20%, transparent); color: var(--good); }
+.fsm-pct.warn { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--warn); }
+.fsm-states { display: flex; flex-wrap: wrap; gap: 6px; }
+.state-chip { font-family: ui-monospace, monospace; font-size: 0.72rem; padding: 3px 8px; border-radius: 5px; border: 1px solid var(--border); }
+.state-chip.good { color: var(--good); border-color: color-mix(in srgb, var(--good) 40%, var(--border)); }
+.state-chip.bad { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, var(--border)); }
+.lint-bucket { margin-bottom: 22px; }
+.lint-bucket h3 { font-size: 0.95rem; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.dot.warn { background: var(--warn); }
+.dot.benign { background: var(--info); }
+.dot.vendor { background: var(--vendor); }
+.dot.bad { background: var(--bad); }
+.count { color: var(--text-dim); font-weight: 400; font-size: 0.85em; }
+details.cat { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; margin-bottom: 8px; }
+details.cat summary { cursor: pointer; font-size: 0.88rem; }
+details.cat .note { color: var(--text-dim); font-size: 0.82rem; margin: 8px 0; }
+footer { color: var(--text-dim); font-size: 0.8rem; text-align: center; padding: 30px 0; }
+a { color: var(--accent); }
+</style>
+
+<header class="top">
+  <h1>RISCV_SOC &mdash; Sign-off Dashboard</h1>
+  <div class="sub">Generated 2026-08-02 12:08 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
+</header>
+
+<main>
+  <div class="kpi-row">
+    <div class="kpi"><div class="label">Regression</div><div class="value good">0/0 PASS</div></div>
+    <div class="kpi"><div class="label">Own-RTL line coverage</div><div class="value good">96.3%</div></div>
+    <div class="kpi"><div class="label">FSM state coverage</div><div class="value good">11/11 FSMs @ 100%</div></div>
+    <div class="kpi"><div class="label">Whole-SoC Fmax</div><div class="value accent">91.2 MHz</div></div>
+    <div class="kpi"><div class="label">Gate count (NAND2-eq)</div><div class="value accent">162,687</div></div>
+    <div class="kpi"><div class="label">Lint findings</div><div class="value">135 <span style="font-size:0.5em;color:var(--text-dim)">(all triaged)</span></div></div>
+  </div>
+
+  <section id="architecture">
+    <h2>Architecture</h2>
+    <div class="arch-wrap">
+      <pre class="mermaid">
+flowchart TB
+    CPU["PicoRV32 (picorv32_axi)<br/>vendored, unmodified"]
+    JTAGPROBE(("external JTAG probe"))
+    JTAGDTM["jtag_dtm + jtag_tap"]
+    BRIDGE["jtag_axi_bridge<br/>(CDC owner)"]
+    XBAR["axi_lite_xbar<br/>hand-written, 2 master x 9 slave"]
+    ROM["boot_rom 64KB"]
+    RAM["sram 128KB"]
+    TIMER["timer"]
+    WDT["watchdog"]
+    UART["uart"]
+    I2C["i2c_master"]
+    SPI["spi_master"]
+    AES["aes (CBC/CTR)"]
+    DMACTRL["dma_engine ctrl port"]
+    DMABURST["dma_engine burst master"]
+    DMARAM["dma_ram 8KB<br/>private, not on crossbar"]
+
+    JTAGPROBE <--> JTAGDTM
+    JTAGDTM <--> BRIDGE
+    BRIDGE -->|s1| XBAR
+    CPU -->|s0| XBAR
+    XBAR --> ROM
+    XBAR --> RAM
+    XBAR --> TIMER
+    XBAR --> WDT
+    XBAR --> UART
+    XBAR --> I2C
+    XBAR --> SPI
+    XBAR --> AES
+    XBAR --> DMACTRL
+    DMACTRL -.same module.-> DMABURST
+    DMABURST <-->|AXI4 burst| DMARAM
+      </pre>
+      <p style="color:var(--text-dim);font-size:0.85rem;margin-top:14px">Full rationale: <code>docs/architecture.md</code>. Bug history: <code>docs/project_retrospective.md</code>.</p>
+    </div>
+  </section>
+
+  <section id="coverage">
+    <h2>Coverage</h2>
+    <div class="overall-bars">
+      <div class="metric"><div class="name">Line (all merged tests)</div><div class="bar"><div class="bar-fill warn" style="width:47.2%"></div><span class="bar-label">47.2%</span></div><div class="cov-frac">3153/6684 points</div></div>
+      <div class="metric"><div class="name">Toggle</div><div class="bar"><div class="bar-fill warn" style="width:58.1%"></div><span class="bar-label">58.1%</span></div><div class="cov-frac">43157/74282 points</div></div>
+      <div class="metric"><div class="name">Branch</div><div class="bar"><div class="bar-fill good" style="width:77.3%"></div><span class="bar-label">77.3%</span></div><div class="cov-frac">1500/1940 points</div></div>
+    </div>
+    <p style="color:var(--text-dim);font-size:0.85rem">Aggregate numbers above are diluted by shared sub-modules counted once per instantiating test (e.g. aes_core is exercised by 5 different tests) &mdash; the per-file table below is the more meaningful "was this actual source file exercised" view.</p>
+    <table class="filecov"><thead><tr><th>Block</th><th>File</th><th>Line coverage</th></tr></thead><tbody>
+<tr><td>aes</td><td class="mono">aes.v</td><td><div class="bar"><div class="bar-fill warn" style="width:89.0%"></div><span class="bar-label">89.0%</span></div> <span class="cov-frac">73/82</span></td></tr>
+<tr><td>aes</td><td class="mono">aes_chain.v</td><td><div class="bar"><div class="bar-fill good" style="width:98.4%"></div><span class="bar-label">98.4%</span></div> <span class="cov-frac">60/61</span></td></tr>
+<tr><td>aes</td><td class="mono">aes_core.v</td><td><div class="bar"><div class="bar-fill good" style="width:99.2%"></div><span class="bar-label">99.2%</span></div> <span class="cov-frac">125/126</span></td></tr>
+<tr><td>aes</td><td class="mono">aes_key_expand.v</td><td><div class="bar"><div class="bar-fill good" style="width:98.2%"></div><span class="bar-label">98.2%</span></div> <span class="cov-frac">55/56</span></td></tr>
+<tr><td>axi_lite_xbar</td><td class="mono">axi_lite_xbar.v</td><td><div class="bar"><div class="bar-fill good" style="width:98.5%"></div><span class="bar-label">98.5%</span></div> <span class="cov-frac">332/337</span></td></tr>
+<tr><td>boot_rom</td><td class="mono">boot_rom.v</td><td><div class="bar"><div class="bar-fill good" style="width:100.0%"></div><span class="bar-label">100.0%</span></div> <span class="cov-frac">27/27</span></td></tr>
+<tr><td>dma</td><td class="mono">dma_engine.v</td><td><div class="bar"><div class="bar-fill good" style="width:94.6%"></div><span class="bar-label">94.6%</span></div> <span class="cov-frac">158/167</span></td></tr>
+<tr><td>dma</td><td class="mono">dma_ram.v</td><td><div class="bar"><div class="bar-fill good" style="width:95.2%"></div><span class="bar-label">95.2%</span></div> <span class="cov-frac">79/83</span></td></tr>
+<tr><td>i2c</td><td class="mono">i2c_master.v</td><td><div class="bar"><div class="bar-fill good" style="width:97.1%"></div><span class="bar-label">97.1%</span></div> <span class="cov-frac">198/204</span></td></tr>
+<tr><td>jtag</td><td class="mono">jtag_axi_bridge.v</td><td><div class="bar"><div class="bar-fill good" style="width:98.7%"></div><span class="bar-label">98.7%</span></div> <span class="cov-frac">78/79</span></td></tr>
+<tr><td>jtag</td><td class="mono">jtag_dtm.v</td><td><div class="bar"><div class="bar-fill good" style="width:100.0%"></div><span class="bar-label">100.0%</span></div> <span class="cov-frac">51/51</span></td></tr>
+<tr><td>jtag</td><td class="mono">jtag_tap.v</td><td><div class="bar"><div class="bar-fill good" style="width:97.7%"></div><span class="bar-label">97.7%</span></div> <span class="cov-frac">43/44</span></td></tr>
+<tr><td>picorv32 (vendored)</td><td class="mono">picorv32.v</td><td><div class="bar"><div class="bar-fill info" style="width:80.2%"></div><span class="bar-label">80.2%</span></div> <span class="cov-frac">1136/1417</span></td></tr>
+<tr><td>soc_top</td><td class="mono">soc_top.v</td><td><div class="bar"><div class="bar-fill warn" style="width:80.7%"></div><span class="bar-label">80.7%</span></div> <span class="cov-frac">71/88</span></td></tr>
+<tr><td>spi</td><td class="mono">spi_master.v</td><td><div class="bar"><div class="bar-fill good" style="width:96.0%"></div><span class="bar-label">96.0%</span></div> <span class="cov-frac">96/100</span></td></tr>
+<tr><td>sram</td><td class="mono">sram.v</td><td><div class="bar"><div class="bar-fill good" style="width:100.0%"></div><span class="bar-label">100.0%</span></div> <span class="cov-frac">29/29</span></td></tr>
+<tr><td>timer</td><td class="mono">timer.v</td><td><div class="bar"><div class="bar-fill good" style="width:96.4%"></div><span class="bar-label">96.4%</span></div> <span class="cov-frac">54/56</span></td></tr>
+<tr><td>uart</td><td class="mono">uart.v</td><td><div class="bar"><div class="bar-fill good" style="width:97.5%"></div><span class="bar-label">97.5%</span></div> <span class="cov-frac">77/79</span></td></tr>
+<tr><td>watchdog</td><td class="mono">watchdog.v</td><td><div class="bar"><div class="bar-fill good" style="width:96.9%"></div><span class="bar-label">96.9%</span></div> <span class="cov-frac">63/65</span></td></tr>
+</tbody></table>
+  </section>
+
+  <section id="fsm">
+    <h2>FSM State Coverage</h2>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-top:-8px">Plain Verilog-2001 case-based FSMs aren't picked up by Verilator's <code>--coverage-fsm</code> heuristic &mdash; this is derived instead from each state's own case-arm line-coverage hit count (an exact "was this state ever entered" signal). See <code>docs/project_retrospective.md</code>.</p>
+    <div class="fsm-grid">
+      <div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">uart</span><span class="fsm-file">uart.v</span><span class="fsm-pct good">4/4 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="16477 hits">TX_IDLE</span>
+<span class="state-chip good" title="104 hits">TX_START</span>
+<span class="state-chip good" title="832 hits">TX_DATA</span>
+<span class="state-chip good" title="104 hits">TX_STOP</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">i2c_master</span><span class="fsm-file">i2c_master.v</span><span class="fsm-pct good">9/9 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="17517 hits">ST_IDLE</span>
+<span class="state-chip good" title="16 hits">ST_START</span>
+<span class="state-chip good" title="128 hits">ST_ADDR</span>
+<span class="state-chip good" title="16 hits">ST_ADDR_ACK</span>
+<span class="state-chip good" title="64 hits">ST_WDATA</span>
+<span class="state-chip good" title="8 hits">ST_WDATA_ACK</span>
+<span class="state-chip good" title="32 hits">ST_RDATA</span>
+<span class="state-chip good" title="4 hits">ST_RDATA_ACK</span>
+<span class="state-chip good" title="24 hits">ST_STOP</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">spi_master</span><span class="fsm-file">spi_master.v</span><span class="fsm-pct good">2/2 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="17517 hits">IDLE</span>
+<span class="state-chip good" title="340 hits">RUN</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">jtag_tap</span><span class="fsm-file">jtag_tap.v</span><span class="fsm-pct good">16/16 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="489 hits">TEST_LOGIC_RESET</span>
+<span class="state-chip good" title="876 hits">RUN_TEST_IDLE</span>
+<span class="state-chip good" title="661 hits">SELECT_DR_SCAN</span>
+<span class="state-chip good" title="306 hits">CAPTURE_DR</span>
+<span class="state-chip good" title="834 hits">SHIFT_DR</span>
+<span class="state-chip good" title="397 hits">EXIT1_DR</span>
+<span class="state-chip good" title="403 hits">PAUSE_DR</span>
+<span class="state-chip good" title="201 hits">EXIT2_DR</span>
+<span class="state-chip good" title="306 hits">UPDATE_DR</span>
+<span class="state-chip good" title="355 hits">SELECT_IR_SCAN</span>
+<span class="state-chip good" title="148 hits">CAPTURE_IR</span>
+<span class="state-chip good" title="250 hits">SHIFT_IR</span>
+<span class="state-chip good" title="201 hits">EXIT1_IR</span>
+<span class="state-chip good" title="240 hits">PAUSE_IR</span>
+<span class="state-chip good" title="115 hits">EXIT2_IR</span>
+<span class="state-chip good" title="147 hits">UPDATE_IR</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">aes_core</span><span class="fsm-file">aes_core.v</span><span class="fsm-pct good">4/4 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="35034 hits">ST_IDLE</span>
+<span class="state-chip good" title="11099 hits">ST_KEYEXP</span>
+<span class="state-chip good" title="9081 hits">ST_ROUND</span>
+<span class="state-chip good" title="1009 hits">ST_FINAL</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">aes_chain</span><span class="fsm-file">aes_chain.v</span><span class="fsm-pct good">2/2 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="35034 hits">ST_IDLE</span>
+<span class="state-chip good" title="22198 hits">ST_CORE</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">axi_lite_xbar (write)</span><span class="fsm-file">axi_lite_xbar.v</span><span class="fsm-pct good">4/4 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="16849 hits">W_IDLE</span>
+<span class="state-chip good" title="167 hits">W_ISSUE</span>
+<span class="state-chip good" title="167 hits">W_WAIT_B</span>
+<span class="state-chip good" title="334 hits">W_RESP</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">axi_lite_xbar (read)</span><span class="fsm-file">axi_lite_xbar.v</span><span class="fsm-pct good">4/4 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="8432 hits">R_IDLE</span>
+<span class="state-chip good" title="2272 hits">R_ISSUE</span>
+<span class="state-chip good" title="2271 hits">R_WAIT_R</span>
+<span class="state-chip good" title="4542 hits">R_RESP</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">dma_ram (write)</span><span class="fsm-file">dma_ram.v</span><span class="fsm-pct good">2/2 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="17517 hits">W_IDLE</span>
+<span class="state-chip good" title="480 hits">W_BURST</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">dma_ram (read)</span><span class="fsm-file">dma_ram.v</span><span class="fsm-pct good">2/2 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="17517 hits">R_IDLE</span>
+<span class="state-chip good" title="243 hits">R_BURST</span>
+</div></div>
+<div class="fsm-card">
+<div class="fsm-head"><span class="fsm-name">dma_engine</span><span class="fsm-file">dma_engine.v</span><span class="fsm-pct good">9/9 states</span></div>
+<div class="fsm-states">
+<span class="state-chip good" title="17517 hits">ST_IDLE</span>
+<span class="state-chip good" title="24 hits">ST_RD_ADDR</span>
+<span class="state-chip good" title="60 hits">ST_RD_DATA</span>
+<span class="state-chip good" title="12 hits">ST_AES_GO</span>
+<span class="state-chip good" title="276 hits">ST_AES_WAIT</span>
+<span class="state-chip good" title="24 hits">ST_WR_ADDR</span>
+<span class="state-chip good" title="48 hits">ST_WR_DATA</span>
+<span class="state-chip good" title="12 hits">ST_WR_RESP</span>
+<span class="state-chip good" title="3 hits">ST_DONE</span>
+</div></div>
+    </div>
+  </section>
+
+  <section id="lint">
+    <h2>Lint Findings (135 total, all triaged)</h2>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-top:-8px">From <code>scripts/run_lint.sh</code> (independent <code>verilator --lint-only</code> per block, deliberately keeping <code>UNUSEDSIGNAL</code>/<code>UNUSEDPARAM</code> enabled unlike the simulation builds). 4 genuine dead-code findings were already fixed before this snapshot &mdash; everything below is what remained.</p>
+    <div class="lint-bucket">
+<h3><span class="dot warn"></span>Documented limitation <span class="count">40</span></h3>
+<details class="cat">
+<summary>documented-limitation-bready <span class="count">18</span></summary>
+<p class="note">AXI response channel doesn&#x27;t check BREADY before dropping BVALID -- works correctly against this project&#x27;s own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>aes</td><td>aes.v</td><td>53</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>boot_rom</td><td>boot_rom.v</td><td>17</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>dma</td><td>dma_engine.v</td><td>49</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>i2c</td><td>i2c_master.v</td><td>38</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>aes.v</td><td>53</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>boot_rom.v</td><td>17</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_engine.v</td><td>49</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>i2c_master.v</td><td>38</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>spi_master.v</td><td>44</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>sram.v</td><td>12</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>timer.v</td><td>31</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>uart.v</td><td>23</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>soc_top</td><td>watchdog.v</td><td>36</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>spi</td><td>spi_master.v</td><td>44</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>sram</td><td>sram.v</td><td>12</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>timer</td><td>timer.v</td><td>31</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>uart</td><td>uart.v</td><td>23</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+<tr><td>watchdog</td><td>watchdog.v</td><td>36</td><td>Signal is not used: &#x27;s_bready&#x27;</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>documented-limitation-rready <span class="count">18</span></summary>
+<p class="note">AXI response channel doesn&#x27;t check RREADY before dropping RVALID -- same as the BREADY case above.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>aes</td><td>aes.v</td><td>55</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>boot_rom</td><td>boot_rom.v</td><td>19</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>dma</td><td>dma_engine.v</td><td>51</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>i2c</td><td>i2c_master.v</td><td>40</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>aes.v</td><td>55</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>boot_rom.v</td><td>19</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_engine.v</td><td>51</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>i2c_master.v</td><td>40</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>spi_master.v</td><td>46</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>sram.v</td><td>14</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>timer.v</td><td>33</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>uart.v</td><td>25</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>soc_top</td><td>watchdog.v</td><td>38</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>spi</td><td>spi_master.v</td><td>46</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>sram</td><td>sram.v</td><td>14</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>timer</td><td>timer.v</td><td>33</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>uart</td><td>uart.v</td><td>25</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+<tr><td>watchdog</td><td>watchdog.v</td><td>38</td><td>Signal is not used: &#x27;s_rready&#x27;</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>documented-limitation-bresp <span class="count">2</span></summary>
+<p class="note">dma_engine&#x27;s own burst master doesn&#x27;t check dma_ram&#x27;s write response code -- same class of limitation as picorv32_axi not checking BRESP/RRESP.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>dma</td><td>dma_engine.v</td><td>57</td><td>Signal is not used: &#x27;m_bresp&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_engine.v</td><td>57</td><td>Signal is not used: &#x27;m_bresp&#x27;</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>documented-limitation-rresp <span class="count">2</span></summary>
+<p class="note">dma_engine&#x27;s own burst master doesn&#x27;t check dma_ram&#x27;s read response code.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>dma</td><td>dma_engine.v</td><td>60</td><td>Signal is not used: &#x27;m_rresp&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_engine.v</td><td>60</td><td>Signal is not used: &#x27;m_rresp&#x27;</td></tr>
+</tbody></table></details>
+</div>
+<div class="lint-bucket">
+<h3><span class="dot benign"></span>Benign / by design <span class="count">78</span></h3>
+<details class="cat">
+<summary>benign-address-decode <span class="count">38</span></summary>
+<p class="note">Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>aes</td><td>aes.v</td><td>51</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:7]</td></tr>
+<tr><td>aes</td><td>aes.v</td><td>54</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:7]</td></tr>
+<tr><td>boot_rom</td><td>boot_rom.v</td><td>18</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:16,1:0]</td></tr>
+<tr><td>dma</td><td>dma_engine.v</td><td>47</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:7]</td></tr>
+<tr><td>dma</td><td>dma_engine.v</td><td>50</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:7]</td></tr>
+<tr><td>dma</td><td>dma_ram.v</td><td>27</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:13,1:0]</td></tr>
+<tr><td>dma</td><td>dma_ram.v</td><td>47</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:13,1:0]</td></tr>
+<tr><td>i2c</td><td>i2c_master.v</td><td>36</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:5]</td></tr>
+<tr><td>i2c</td><td>i2c_master.v</td><td>39</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:5]</td></tr>
+<tr><td>soc_top</td><td>aes.v</td><td>51</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:7]</td></tr>
+<tr><td>soc_top</td><td>aes.v</td><td>54</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:7]</td></tr>
+<tr><td>soc_top</td><td>boot_rom.v</td><td>18</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:16,1:0]</td></tr>
+<tr><td>soc_top</td><td>dma_engine.v</td><td>47</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:7]</td></tr>
+<tr><td>soc_top</td><td>dma_engine.v</td><td>50</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:7]</td></tr>
+<tr><td>soc_top</td><td>dma_ram.v</td><td>27</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:13,1:0]</td></tr>
+<tr><td>soc_top</td><td>dma_ram.v</td><td>47</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:13,1:0]</td></tr>
+<tr><td>soc_top</td><td>i2c_master.v</td><td>36</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:5]</td></tr>
+<tr><td>soc_top</td><td>i2c_master.v</td><td>39</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:5]</td></tr>
+<tr><td>soc_top</td><td>spi_master.v</td><td>42</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:5]</td></tr>
+<tr><td>soc_top</td><td>spi_master.v</td><td>45</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:5]</td></tr>
+<tr><td>soc_top</td><td>sram.v</td><td>10</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:17,1:0]</td></tr>
+<tr><td>soc_top</td><td>sram.v</td><td>13</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:17,1:0]</td></tr>
+<tr><td>soc_top</td><td>timer.v</td><td>29</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:4]</td></tr>
+<tr><td>soc_top</td><td>timer.v</td><td>32</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:4]</td></tr>
+<tr><td>soc_top</td><td>uart.v</td><td>21</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:4]</td></tr>
+<tr><td>soc_top</td><td>uart.v</td><td>24</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:4]</td></tr>
+<tr><td>soc_top</td><td>watchdog.v</td><td>34</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:4]</td></tr>
+<tr><td>soc_top</td><td>watchdog.v</td><td>37</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:4]</td></tr>
+<tr><td>spi</td><td>spi_master.v</td><td>42</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:5]</td></tr>
+<tr><td>spi</td><td>spi_master.v</td><td>45</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:5]</td></tr>
+<tr><td>sram</td><td>sram.v</td><td>10</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:17,1:0]</td></tr>
+<tr><td>sram</td><td>sram.v</td><td>13</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:17,1:0]</td></tr>
+<tr><td>timer</td><td>timer.v</td><td>29</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:4]</td></tr>
+<tr><td>timer</td><td>timer.v</td><td>32</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:4]</td></tr>
+<tr><td>uart</td><td>uart.v</td><td>21</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:4]</td></tr>
+<tr><td>uart</td><td>uart.v</td><td>24</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:4]</td></tr>
+<tr><td>watchdog</td><td>watchdog.v</td><td>34</td><td>Bits of signal are not used: &#x27;s_awaddr&#x27;[31:4]</td></tr>
+<tr><td>watchdog</td><td>watchdog.v</td><td>37</td><td>Bits of signal are not used: &#x27;s_araddr&#x27;[31:4]</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>benign-no-byte-strobe <span class="count">16</span></summary>
+<p class="note">Byte-strobe writes aren&#x27;t supported on control/status registers -- every register here is written as a full 32-bit word in practice.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>aes</td><td>aes.v</td><td>52</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>boot_rom</td><td>boot_rom.v</td><td>16</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>dma</td><td>dma_engine.v</td><td>48</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>i2c</td><td>i2c_master.v</td><td>37</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>aes.v</td><td>52</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>boot_rom.v</td><td>16</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_engine.v</td><td>48</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>i2c_master.v</td><td>37</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>spi_master.v</td><td>43</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>timer.v</td><td>30</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>uart.v</td><td>22</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>watchdog.v</td><td>35</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>spi</td><td>spi_master.v</td><td>43</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>timer</td><td>timer.v</td><td>30</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>uart</td><td>uart.v</td><td>22</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+<tr><td>watchdog</td><td>watchdog.v</td><td>35</td><td>Signal is not used: &#x27;s_wstrb&#x27;</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>benign-burst-subset <span class="count">8</span></summary>
+<p class="note">This project&#x27;s AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>dma</td><td>dma_ram.v</td><td>29</td><td>Signal is not used: &#x27;s_awsize&#x27;</td></tr>
+<tr><td>dma</td><td>dma_ram.v</td><td>30</td><td>Signal is not used: &#x27;s_awburst&#x27;</td></tr>
+<tr><td>dma</td><td>dma_ram.v</td><td>49</td><td>Signal is not used: &#x27;s_arsize&#x27;</td></tr>
+<tr><td>dma</td><td>dma_ram.v</td><td>50</td><td>Signal is not used: &#x27;s_arburst&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_ram.v</td><td>29</td><td>Signal is not used: &#x27;s_awsize&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_ram.v</td><td>30</td><td>Signal is not used: &#x27;s_awburst&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_ram.v</td><td>49</td><td>Signal is not used: &#x27;s_arsize&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_ram.v</td><td>50</td><td>Signal is not used: &#x27;s_arburst&#x27;</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>benign-unused-status-signal <span class="count">5</span></summary>
+<p class="note">A busy/done status wire from the instantiated sub-block; the consuming FSM only needs the done pulse (busy is informational only, safe to leave unread).</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>aes</td><td>aes_chain.v</td><td>78</td><td>Signal is not used: &#x27;core_busy&#x27;</td></tr>
+<tr><td>dma</td><td>aes_chain.v</td><td>78</td><td>Signal is not used: &#x27;core_busy&#x27;</td></tr>
+<tr><td>dma</td><td>dma_engine.v</td><td>117</td><td>Signal is not used: &#x27;chain_busy&#x27;</td></tr>
+<tr><td>soc_top</td><td>aes_chain.v</td><td>78</td><td>Signal is not used: &#x27;core_busy&#x27;</td></tr>
+<tr><td>soc_top</td><td>dma_engine.v</td><td>117</td><td>Signal is not used: &#x27;chain_busy&#x27;</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>benign-readonly-ignores-write <span class="count">4</span></summary>
+<p class="note">boot_rom is read-only (writes are rejected with SLVERR) -- it never needs the write address or data at all, not even partially.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>boot_rom</td><td>boot_rom.v</td><td>15</td><td>Signal is not used: &#x27;s_awaddr&#x27;</td></tr>
+<tr><td>boot_rom</td><td>boot_rom.v</td><td>16</td><td>Signal is not used: &#x27;s_wdata&#x27;</td></tr>
+<tr><td>soc_top</td><td>boot_rom.v</td><td>15</td><td>Signal is not used: &#x27;s_awaddr&#x27;</td></tr>
+<tr><td>soc_top</td><td>boot_rom.v</td><td>16</td><td>Signal is not used: &#x27;s_wdata&#x27;</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>benign-documentation-constant <span class="count">3</span></summary>
+<p class="note">MODE_ECB documents aes_chain&#x27;s mode encoding for aes.v&#x27;s register interface; ECB itself is handled as the implicit default (not CBC, not CTR), so the constant is never directly compared.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>aes</td><td>aes_chain.v</td><td>47</td><td>Parameter is not used: &#x27;MODE_ECB&#x27;</td></tr>
+<tr><td>dma</td><td>aes_chain.v</td><td>47</td><td>Parameter is not used: &#x27;MODE_ECB&#x27;</td></tr>
+<tr><td>soc_top</td><td>aes_chain.v</td><td>47</td><td>Parameter is not used: &#x27;MODE_ECB&#x27;</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>benign-decode-function <span class="count">2</span></summary>
+<p class="note">The crossbar&#x27;s decode_addr() function only inspects the specific bit ranges needed for region/peripheral selection.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>axi_lite_xbar</td><td>axi_lite_xbar.v</td><td>159</td><td>Bits of function variable are not used: &#x27;addr&#x27;[27:16,11:0]</td></tr>
+<tr><td>soc_top</td><td>axi_lite_xbar.v</td><td>159</td><td>Bits of function variable are not used: &#x27;addr&#x27;[27:16,11:0]</td></tr>
+</tbody></table></details>
+<details class="cat">
+<summary>benign-narrow-register-width <span class="count">2</span></summary>
+<p class="note">TXDATA is an 8-bit register (one UART byte) -- the upper 24 bits of a 32-bit AXI word are never meaningful here.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>soc_top</td><td>uart.v</td><td>22</td><td>Bits of signal are not used: &#x27;s_wdata&#x27;[31:8]</td></tr>
+<tr><td>uart</td><td>uart.v</td><td>22</td><td>Bits of signal are not used: &#x27;s_wdata&#x27;[31:8]</td></tr>
+</tbody></table></details>
+</div>
+<div class="lint-bucket">
+<h3><span class="dot vendor"></span>Vendored PicoRV32 (not this project&#x27;s RTL) <span class="count">17</span></h3>
+<details class="cat">
+<summary>vendored-picorv32-style <span class="count">17</span></summary>
+<p class="note">PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project&#x27;s RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture.</p>
+<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
+<tr><td>soc_top</td><td>picorv32.v</td><td>181</td><td>Signal is not used: &#x27;dbg_insn_addr&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>183</td><td>Signal is not used: &#x27;dbg_mem_valid&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>184</td><td>Signal is not used: &#x27;dbg_mem_instr&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>185</td><td>Signal is not used: &#x27;dbg_mem_ready&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>186</td><td>Signal is not used: &#x27;dbg_mem_addr&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>187</td><td>Signal is not used: &#x27;dbg_mem_wdata&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>188</td><td>Signal is not used: &#x27;dbg_mem_wstrb&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>189</td><td>Signal is not used: &#x27;dbg_mem_rdata&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>375</td><td>Signal is not used: &#x27;mem_busy&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>696</td><td>Signal is not used: &#x27;dbg_rs1val&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>697</td><td>Signal is not used: &#x27;dbg_rs2val&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>698</td><td>Signal is not used: &#x27;dbg_rs1val_valid&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>699</td><td>Signal is not used: &#x27;dbg_rs2val_valid&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>769</td><td>Signal is not used: &#x27;dbg_valid_insn&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>1184</td><td>Signal is not used: &#x27;dbg_ascii_state&#x27;</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>2204</td><td>Bits of signal are not used: &#x27;pcpi_insn&#x27;[24:15,11:7]</td></tr>
+<tr><td>soc_top</td><td>picorv32.v</td><td>2424</td><td>Bits of signal are not used: &#x27;pcpi_insn&#x27;[24:15,11:7]</td></tr>
+</tbody></table></details>
+</div>
+  </section>
+
+  <footer>
+    RISCV_SOC &middot; <a href="https://github.com/HsiangTW1031/RISCV_SOC">github.com/HsiangTW1031/RISCV_SOC</a>
+  </footer>
+</main>

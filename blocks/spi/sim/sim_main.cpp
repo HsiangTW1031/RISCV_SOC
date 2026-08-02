@@ -3,6 +3,9 @@
 // behavior, and that a START while busy is ignored (no queue).
 #include "Vspi_testtop.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include "axi_lite_bfm.h"
 #include <cstdio>
 
@@ -101,6 +104,9 @@ int main(int argc, char** argv) {
   check("slave received the ORIGINAL byte (0x22), not the one written mid-transfer (0x99)",
         dut->slave_received == 0x22);
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 

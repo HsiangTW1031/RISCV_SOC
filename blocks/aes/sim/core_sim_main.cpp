@@ -5,6 +5,9 @@
 // register interface in aes_sim_main.cpp.
 #include "Vaes_core.h"
 #include "verilated.h"
+#if VM_COVERAGE
+#include "verilated_cov.h"
+#endif
 #include <cstdio>
 #include <cstring>
 #include <cstdint>
@@ -109,6 +112,9 @@ int main(int argc, char** argv) {
     printf("App.C.1 decrypt: got %s expected %s\n", pt2.c_str(), pt);
   }
 
+#if VM_COVERAGE
+  VerilatedCov::write("coverage.dat");
+#endif
   delete dut;
   delete ctx;
 
