@@ -83,7 +83,7 @@ risks: see [`docs/phase_plan.md`](docs/phase_plan.md).
       SCL is still high) and was aborting every transfer instantly. See
       `blocks/i2c/rtl/i2c_master.v`'s header comment.
 
-**Phase 4 (AES-128 accelerator, résumé-focus module) — done:**
+**Phase 4 (AES-128 accelerator) — done:**
 - [x] `aes_pkg.vh` — S-box, inverse S-box, and the GF(2^8)
       multiply-by-constant helpers MixColumns/InvMixColumns need, derived
       from first principles (multiplicative inverse + the FIPS-197 affine
