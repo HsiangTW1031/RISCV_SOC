@@ -23,14 +23,14 @@ watchdog           OK
 
 === Merging coverage data ===
 Coverage Summary:
-  line      : 47.2% ( 3156/ 6686)
-  toggle    : 58.1% (43169/74290)
-  branch    : 77.4% ( 1504/ 1944)
+  line      : 48.0% ( 3210/ 6686)
+  toggle    : 65.0% (48316/74290)
+  branch    : 79.8% ( 1551/ 1944)
   expr      : 0.0% (    0/    0)
   fsm_state : 0.0% (    0/    0)
   fsm_arc   : 0.0% (    0/    0)
 Annotation Summary:
-  lines with all attached points covered : 34.00%  (1264/3652)
+  lines with all attached points covered : 35.00%  (1281/3652)
 See lines with '%00' in /Users/shunghsiangwu/AI_agent/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/annotated
 Merged coverage data: /Users/shunghsiangwu/AI_agent/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/merged.dat
 LCOV info:            /Users/shunghsiangwu/AI_agent/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/coverage.info

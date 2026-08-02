@@ -22,6 +22,14 @@
 
 這兩次的根本模式完全一樣:**當某個訊號「只在特定的那一個 edge 才有意義」,卻去讀一個用 nonblocking assignment、要等到下一拍才更新的暫存器**,就會讀到舊值。修法也是同一套:改成直接從「當下」真正即時的訊號(input port,或組合邏輯)算,而不是從會延遲一拍才更新的 register 算。
 
+### 錯誤模式 C：用「原值 + bitwise complement」兩個值想補滿 toggle coverage,結果只補到一半
+
+在把 toggle coverage 從 80.1% 推到 90%+ 的過程中(見 `docs/coverage_waiver_report.md` 第 5 節),同一個邏輯錯誤連續踩了三次,分別在 DMA 的 `key_reg`/`iv_reg`、`axi_lite_xbar` 每個 slave port 自己的 rdata mirror、以及透過 JTAG poke `soc_top.v` 的 top-level mirror wire。
+
+三次都是同一個想法:「這個暫存器原本只寫過一個固定值 V1,要讓每個 bit 都雙向 toggle 過,寫一次 `~V1`(bitwise complement)應該就夠了」。實際推演發現不對:假設暫存器 reset 值是 0,依序寫入 V1 再寫入 `~V1`——**V1 裡是 1 的 bit** 會經歷 `0→1(寫V1)→0(寫~V1)`,兩個方向都覆蓋到;但 **V1 裡是 0 的 bit** 只會經歷 `0→0(寫V1,沒變化)→1(寫~V1)`,只有單一方向,序列在這裡就結束,永遠補不到「1→0」。如果 V1 剛好 1-bit 很少(例如 `axi_lite_xbar` 測試裡 Timer 用的 `0x11110004`,32 bit 裡只有 5 個 1),兩值法實際上只補得到不到 1/6 的 bit,遠低於預期。
+
+三次都是先照「兩值法」做、實測 coverage 數字幾乎沒動,才回頭發現這個推演漏洞。修法是同一套:**用兩個極值(全 0、全 1)取代「原值+complement」**,或是在兩值法後面多加第三步「寫回原值」,讓每個 bit 都至少經歷一次完整的雙向 transition。往後任何想靠「寫一兩個值」補 toggle coverage 的場合,先手算一次每個 bit 實際會不會雙向 transition,不要假設「值不一樣」就等於「雙向都補到」。
+
 ---
 
 ## Phase 0：專案骨架
@@ -334,3 +342,26 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 - Multi-corner STA 補上 `set_false_path -from [get_ports rst]` 之後,hold 恢復乾淨。
 - LEC(`docs/lec_report.md`)soc_top 數字更新為 60.1%,並補上 `async2sync` pass。
 - Coverage/dashboard 數字微幅變動(多了 4 個新增正反器對應的 toggle 檢查點),`docs/coverage_waiver_report.md`、`docs/verification_summary.md` 都同步更新成新數字。
+
+### 再往下一層:把 deduped toggle coverage 從 80.1% 推到 92.2%
+
+`docs/coverage_waiver_report.md` 第 5 節的 residual gap(1966 bits)列出來之後,一直是「已知、刻意留著」的狀態。這次回頭挑幾項低成本的補起來,目標抓 90%。
+
+#### 起手:先做兩項低成本的,結果只到 81.9%
+
+第一輪只做了 i2c/spi 的 `divider_reg`(直接寫暫存器,幾乎零成本)跟 DMA 加一組不同的 key/IV(重用 `aes_core` 已經驗證過的 FIPS-197 Appendix B 向量)。做完重新量測,80.1%→81.9%,進步有限。回頭重新拆解 residual gap 才發現:原本規劃「不夠 90% 再做的第四項」(`soc_top` 層級的 SPI/I2C loopback 整合測試)只佔 42 bits,就算整個補滿也只能再推 0.4 個百分點——真正擋在 90% 前面的是 `*_rdata`/`*_wdata` 這些 bus mirror 暫存器資料多樣性不足的問題(合計超過 1300 bits),不是原本以為的第四項。跟 Levi 確認後改打這一塊。
+
+#### 兩值法的陷阱(見上方錯誤模式 C)
+
+改打 bus mirror 之後,第一版做法是「原值 + bitwise complement」兩個值,想說值不一樣總該補到雙向 toggle。`axi_lite_xbar` 補完重測,發現 `timer_rdata` 這類 signal 幾乎沒有進步——回頭手算才發現這個兩值法的漏洞:reset 值是 0 的情況下,「原值裡是 1」的 bit 才會經歷完整的雙向 transition,「原值裡是 0」的 bit 序列在 complement 那一步就結束了,只補到單向。Timer 原本測試用的 `0x11110004` 只有 5 個 1-bit,難怪幾乎沒效果。同一個坑後來在 DMA 的 key/iv 窮舉、以及透過 JTAG poke `soc_top.v` 自己的 mirror wire 時又各踩了一次,都是先看到「改了但數字沒動」才回頭發現。改成「全 0 → 全 1 → 全 0」兩極值(或「原值→complement→原值」三段)之後,才真的補滿。
+
+#### `soc_top.v` 自己的 mirror wire 是獨立的 coverage 檢查點,補別的地方不會連帶補到
+
+`axi_lite_xbar.v` 內部的 per-slave rdata mirror,跟 `soc_top.v` 自己宣告的同名 top-level wire(`timer_rdata`、`wdt_rdata` 等),雖然電氣上接在一起、名字也一樣,但因為在不同檔案,toggle coverage 是以 `(file, line, signal)` 當 key 去重複的兩個完全獨立的檢查點——把 `axi_lite_xbar` 測試補好,`soc_top.v` 自己的份完全不會連帶被補到。得另外透過 `soc_top` 測試裡本來就有的 JTAG debug bridge 路徑,直接對 Timer 等幾個確認過的「直接寫入」暫存器做讀寫,才能補到這一層。這一項是這一輪影響最大的一步,單這裡就貢獻了從 89.8% 到 92.2% 的最後一段。
+
+#### 最後的結果
+
+- Deduped toggle coverage(waive 後):80.1%(7926/9892)→ **92.2%**(9153/9925),residual gap 從 1966 bits 降到 772 bits。
+- 過程中沒有修改任何 RTL——全部是在既有 testbench 裡加測試向量(i2c/spi divider、DMA 第二組 key/IV + 窮舉暫存器覆蓋、`axi_lite_xbar`/JTAG bridge 的第三組資料值、`soc_top` 透過 JTAG 對其餘周邊的窮舉 poke)。
+- 19 個 regression targets、135 個 lint finding、chip area(129847.1)、Fmax(91.2MHz)全部沒變——純粹是驗證廣度的提升,不影響任何功能或時序數字。
+- 還剩的 772 bits 主要是 DMA 內部的搬移進度計數器(`cur_src`/`cur_dst`/`blocks_left`,需要真的跑一次不同長度/位址的搬移才能補)跟 `soc_top` 層級的 SPI/I2C 整合測試(原本規劃的第四項,42 bits,優先度較低沒動),詳見 `docs/coverage_waiver_report.md` 第 5 節。

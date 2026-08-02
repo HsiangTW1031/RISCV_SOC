@@ -10,15 +10,15 @@ Dashboard 呈現:`reports/sign_off/dashboard.html` 的「Toggle Coverage Waivers
 
 | 統計方式 | Toggle coverage | 說明 |
 |---|---|---|
-| Raw aggregate(`verilator_coverage --report summary`) | **58.1%**(43169/74290) | 沿用至今的舊數字。同一個 source-level toggle point,只要被多個 hierarchy instance 引用(例如 `aes_core.v` 在合併後的測試套件中被 5 個不同路徑實例化),就會被重複計數,分母被灌水但沒有對應的多樣性增加。 |
-| Deduped per-bit,**waive 前** | **69.5%**(7926/11405 bits) | 直接 parse `merged.dat` 原始資料,以 (file, line, signal) 去重複,每個實際存在的 bit 只算一次(任一 instance 有覆蓋就算覆蓋)。比 raw aggregate 更誠實,單純修正重複計數的問題,還沒套用任何 waiver。 |
-| Deduped per-bit,**waive 後** | **80.1%**(7926/9892 bits) | 套用 36 條 waiver rule,排除 1513 個「結構上不可能 toggle」的 bit(從分子分母同時移除)之後的最終 sign-off 數字。 |
+| Raw aggregate(`verilator_coverage --report summary`) | **65.0%**(48316/74290) | 沿用至今的舊數字。同一個 source-level toggle point,只要被多個 hierarchy instance 引用(例如 `aes_core.v` 在合併後的測試套件中被 5 個不同路徑實例化),就會被重複計數,分母被灌水但沒有對應的多樣性增加。 |
+| Deduped per-bit,**waive 前** | **80.3%**(9153/11405 bits) | 直接 parse `merged.dat` 原始資料,以 (file, line, signal) 去重複,每個實際存在的 bit 只算一次(任一 instance 有覆蓋就算覆蓋)。比 raw aggregate 更誠實,單純修正重複計數的問題,還沒套用任何 waiver。 |
+| Deduped per-bit,**waive 後** | **92.2%**(9153/9925 bits) | 套用 36 條 waiver rule,排除 1480 個「結構上不可能 toggle」的 bit(從分子分母同時移除)之後的最終 sign-off 數字。 |
 
-**waive 前後對照:69.5% → 80.1%,+10.6 個百分點,分母從 11405 bits 縮減到 9892 bits(移除 1513 bits)。**
+**waive 前後對照:80.3% → 92.2%,+11.9 個百分點,分母從 11405 bits 縮減到 9925 bits(移除 1480 bits)。**
 
-covered bit 數(7926)本身完全沒變——waiver 不會讓任何東西「變成 covered」,純粹是把「本來就不該被拿來衡量」的 bit 移出評分範圍。
+（這是加測試向量、把 residual gap 從 1966 bits 補到 772 bits 之後的數字——見第 5 節「加測試向量把 residual gap 從 80.1% 推到 92.2%」。covered bit 數在那一輪從 7926 上升到 9153；waiver 本身邏輯不變，waive 不會讓任何東西「變成 covered」，純粹是把「本來就不該被拿來衡量」的 bit 移出評分範圍——waived bit 數從 1513 降到 1480，是因為部分先前「未覆蓋但符合 waiver 規則」的 bit 現在被新測試直接覆蓋了，不再需要被 waive。）
 
-(這幾個數字比最初版本多了 4 個 bit,是後來在 `soc_top.v` 加了 reset synchronizer 新增的 4 個正反器,見 `docs/cdc_report.md`——多出來的 bit 全部落在 soc_top 自己的分類裡,不影響任何一條 waiver rule 或其他 block 的數字。)
+（這幾個數字比最初版本多了 4 個 bit，是後來在 `soc_top.v` 加了 reset synchronizer 新增的 4 個正反器，見 `docs/cdc_report.md`——多出來的 bit 全部落在 soc_top 自己的分類裡，不影響任何一條 waiver rule 或其他 block 的數字。）
 
 ## 2. 為什麼採用「deduped per-bit」而不是直接在 raw aggregate 上套 waiver
 
@@ -42,30 +42,46 @@ Verilator 內建的 `--report summary,hier` 是以 hierarchy instance 為單位�
 
 | Block | Waive 前 | Waive 後 | 變化 |
 |---|---:|---:|---:|
-| aes | 3871/3928 (98.5%) | 3871/3890 (99.5%) | +1.0pp |
-| axi_lite_xbar | 1145/1923 (59.5%) | 1145/1447 (79.1%) | +19.6pp |
-| boot_rom | 117/162 (72.2%) | 117/124 (94.4%) | +22.2pp |
-| dma | 767/1403 (54.7%) | 767/1208 (63.5%) | +8.8pp |
-| i2c | 126/289 (43.6%) | 126/251 (50.2%) | +6.6pp |
-| jtag | 394/671 (58.7%) | 394/609 (64.7%) | +6.0pp |
-| soc_top | 831/1933 (43.0%) | 831/1457 (57.0%) | +14.0pp |
-| spi | 140/274 (51.1%) | 140/236 (59.3%) | +8.2pp |
+| aes | 3873/3928 (98.6%) | 3873/3890 (99.6%) | +1.0pp |
+| axi_lite_xbar | 1411/1923 (73.4%) | 1411/1459 (96.7%) | +23.3pp |
+| boot_rom | 124/162 (76.5%) | 124/124 (100.0%) | +23.5pp |
+| dma | 1054/1403 (75.1%) | 1054/1209 (87.2%) | +12.1pp |
+| i2c | 211/289 (73.0%) | 211/251 (84.1%) | +11.1pp |
+| jtag | 513/671 (76.5%) | 513/617 (83.1%) | +6.6pp |
+| soc_top | 1137/1933 (58.8%) | 1137/1469 (77.4%) | +18.6pp |
+| spi | 216/274 (78.8%) | 216/236 (91.5%) | +12.7pp |
 | sram | 134/178 (75.3%) | 134/140 (95.7%) | +20.4pp |
-| timer | 148/226 (65.5%) | 148/188 (78.7%) | +13.2pp |
-| uart | 102/188 (54.3%) | 102/150 (68.0%) | +13.7pp |
-| watchdog | 151/230 (65.7%) | 151/192 (78.6%) | +12.9pp |
+| timer | 184/226 (81.4%) | 184/188 (97.9%) | +16.5pp |
+| uart | 109/188 (58.0%) | 109/150 (72.7%) | +14.7pp |
+| watchdog | 187/230 (81.3%) | 187/192 (97.4%) | +16.1pp |
 
-`axi_lite_xbar`、`boot_rom`、`sram` 提升最明顯,因為這三個 block 的缺口幾乎全是位址匯流排高位元跟 always-ready 訊號,完全落在 waiver 分類裡。`dma`、`i2c`、`soc_top` 提升幅度較小,是因為這幾個 block 剩下的缺口大多是下一節的 residual gap(真正的測試向量多樣性不足),而不是結構性缺口。
+`boot_rom` 現在 waive 後 100%。`axi_lite_xbar`、`sram` 也都推到 95%+。這一版數字已經包含第 5 節新增的測試向量(crossbar per-slave bitwise-complement 三輪值、DMA/JTAG/i2c 的窮舉暫存器覆蓋等),不是單純 waiver 分類的結果——單靠 waiver 分類已經打過的低垂果實在前一版就摘完了,這一輪的提升主要來自「補測試向量」而不是「重新分類」。
 
-## 5. Residual gap(刻意不 waive,留待未來加測試向量)
+## 5. 加測試向量把 residual gap 從 80.1% 推到 92.2%
 
-總計 1966 bits,分布在下列幾種模式——每一種都是「這個 register 理論上可以是任何值,只是目前測試剛好只用了少數幾組向量」,跟前面的「結構上不可能」是不同性質,所以刻意不 waive:
+上一版(見下方「舊版 residual gap」)列出的缺口全部是「這個 register 理論上可以是任何值,只是目前測試剛好只用了少數幾組向量」,不是硬體限制,所以理論上補測試向量就能補起來,不需要 RTL 改動。這一節記錄實際動手補的過程和結果。
 
-- **`dma_engine.v` 的 `key_reg`(128 bit)、`iv_reg`(64 bit)**:DMA 路徑的每一組測試都固定用同一組 NIST 官方測試金鑰/IV,這個 register 從沒被載入過第二組不同的值。風險偏低——AES 資料路徑本身已經透過 `aes_diff` 測試用 500 組隨機金鑰單獨驗證過,這裡缺的只是 DMA 自己這份 register 的搬運路徑沒有額外驗證,不是核心加解密邏輯沒驗證。
-- **`i2c_master.v`/`spi_master.v` 的 `divider_reg`/`div_cnt`**:32-bit 的除頻常數 register,但實際測試只用過幾組偏小的除頻值,高位元從沒被設過——一個合理但還沒補的加分項(測一組刻意選大的除頻值即可補齊)。
+**起點**:80.1%(7926/9892 bits),residual gap 1966 bits。**目標**:先做低成本項目看能到多少,不到 90% 再做整合測試,結果最後全部靠補測試向量做到 **92.2%**(9153/9925 bits),沒有動到整合測試那一項。
+
+補的方式,按實際做的順序:
+
+1. **i2c/spi 的 `divider_reg`/`div_cnt`**:`divider_reg` 是直接寫入的暫存器,寫一次全 1 再寫回小值,兩次操作就能把 32 個 bit 都雙向 toggle 過一次,幾乎零成本。`div_cnt` 只有在交易真的進行中才會數,所以另外配一個較大(但不誇張,~70000 cycle 內跑得完)的 divider 值,啟動一次交易讓它實際數上去一段,不等交易做完(結果不檢查,只要 toggle 有發生)。
+2. **DMA 的 `key_reg`/`iv_reg`/`len_reg`/`src_addr_reg`/`dst_addr_reg`**:這幾個也是直接寫入的暫存器(見 `dma_engine.v`),不需要真的觸發一次搬移就能補滿——加一組完全不同、獨立驗證過的 key(FIPS-197 Appendix B,`aes_core` 測試已經驗證過)重新跑一次 ECB 單 block 搬移(補上 mode=0 這個之前沒人測過的值),再加一段純粹寫 register 的窮舉序列(全 1 → 全 0)補滿其餘 bit。**關鍵教訓**:兩個值(原值 + complement)只能讓「原值裡是 1」的 bit 拿到雙向 toggle,「原值裡是 0」的 bit 只會拿到單向——第一次用這個手法時漏了這點,只做了「原值→complement」兩步,實測效果比預期差很多;後來全部改成「全 1 → 全 0」兩極值,才真的補滿。
+3. **`axi_lite_xbar` 每個 slave port 自己的 rdata mirror register**:crossbar 內部對每個 peripheral 各自維護一份 read-data mirror,原本每個 slave 只測過一組固定資料值。同樣踩到上面那個「兩值只夠單向」的坑——第一次只加了「原值→complement」,再測發現大部分 bit 還是沒補到;改成「原值→complement→原值」三段(讓兩個方向都至少發生一次)才真正補滿。
+4. **`jtag_axi_bridge`/`jtag_dtm` 的 rdata/addr CDC pipeline register**:原本只測過 2 組不同的位址/資料組合,加第三組(位址範圍另一端 + 資料 complement)。
+5. **`soc_top.v` 自己的 `*_rdata`/`*_wdata` top-level mirror wire**(Timer/WDT/UART/I2C/SPI/AES 各自到 crossbar 的連接線):這是這一輪影響最大的一項。這些 wire 是 soc_top.v 自己宣告的,跟 `axi_lite_xbar.v`/各 peripheral 自己的同名 signal 是不同的 (file, line, signal) key,補了 3、4 都不會連帶補到這裡,得另外處理。透過 soc_top 測試裡本來就有的 JTAG debug bridge 路徑,對 Timer 的 REG_RELOAD 等幾個確認過的「直接寫入」暫存器做「寫全 1 讀回 → 寫全 0 讀回」,同時補到暫存器本身、`axi_lite_xbar.v` 的 per-slave mirror、跟 soc_top.v 自己的 top-level mirror 三層。第一版只寫一組任意值(例如 `0x5A5A5A5A`)+ 讀回,幾乎沒有效果——原因就是上面第 2、3 點同樣的坑,單一任意值不夠,換成「全 1/全 0」兩極值才真的補滿。
+
+**還沒補、刻意留著的**(772 bits residual,主要是這兩類):
+- **DMA 的 `cur_src`/`cur_dst`/`blocks_left`**:這幾個是搬移進行中才會變化的內部進度計數器,不像 `key_reg` 那樣可以直接寫,需要真的跑一次不同長度/位址的搬移才能補,還沒做。
+- **`soc_top.v` 自己的 SPI/I2C 實體 pin**(`spi_sclk`/`spi_mosi`/`spi_miso`/`spi_cs_n`/`i2c_scl`/`i2c_sda`)以及對應的 crossbar-facing mirror:`spi`/`i2c` 各自的獨立測試已經測得很完整,但 `soc_top` 整合測試沒有真的跑一次完整 SoC 路徑的 SPI/I2C transaction——這是本來規劃的「補測試」四個選項之一,這次沒動到,因為單獨這塊只值 42 bits(不到 0.5 個百分點),優先度排在後面,真正推過 90% 的是上面 1-5 點。
+
+### 舊版 residual gap(補測試向量之前,僅供對照)
+
+- **`dma_engine.v` 的 `key_reg`(128 bit)、`iv_reg`(64 bit)**:DMA 路徑的每一組測試都固定用同一組 NIST 官方測試金鑰/IV,這個 register 從沒被載入過第二組不同的值。
+- **`i2c_master.v`/`spi_master.v` 的 `divider_reg`/`div_cnt`**:32-bit 的除頻常數 register,但實際測試只用過幾組偏小的除頻值,高位元從沒被設過。
 - **各 block 自己的 `s_rdata`/`m_rdata`(24-32 bit 未覆蓋)**:反映目前固定測試向量的 bit pattern 剛好沒有讓每個 bit 都出現過 0 跟 1 兩種值,不是暫存器寬度用不到。
-- **`jtag_axi_bridge.v`/`jtag_dtm.v`/`i2c_master.v` 的 `addr_reg`/`addr_tck`**:一開始誤判為跟位址匯流排高位元同一類「結構性」問題(細節見下方除錯記錄),但重新檢視後發現這幾個 register 的值真的會被下游邏輯拿來用(驅動實際 AXI 位址、決定 I2C target),只是每個測試選的位址/target 種類不夠多——已從 waiver file 移除,留在這裡當 residual。
-- **`soc_top.v` 自己的 SPI/I2C 實體 pin(`spi_sclk`/`spi_mosi`/`spi_miso`/`spi_cs_n`/`i2c_scl`/`i2c_sda`)以及對應的 crossbar-facing 匯流排 mirror**:這幾個 block 各自的獨立測試(`spi`/`i2c` regression target)已經很完整地測過,但 `soc_top` 自己這個整合測試只有功能性驗證 Timer/UART/JTAG/DMA register poke,沒有真的透過完整 SoC 路徑跑一次 SPI/I2C transaction——是一個真實但風險偏低的整合層級缺口,適合之後加一個 `soc_top` 層級的 SPI/I2C loopback 測試來補。
+- **`jtag_axi_bridge.v`/`jtag_dtm.v`/`i2c_master.v` 的 `addr_reg`/`addr_tck`**:一開始誤判為跟位址匯流排高位元同一類「結構性」問題(細節見下方除錯記錄),但重新檢視後發現這幾個 register 的值真的會被下游邏輯拿來用,只是每個測試選的位址/target 種類不夠多。
+- **`soc_top.v` 自己的 SPI/I2C 實體 pin**以及對應的 crossbar-facing 匯流排 mirror。
 
 ## 6. 過程中抓到的一個自己的誤判(值得記錄)
 
@@ -76,7 +92,7 @@ Verilator 內建的 `--report summary,hier` 是以 hierarchy instance 為單位�
 ## 7. 如何重跑
 
 ```bash
-scripts/run_coverage.sh                 # 重新收集全部 18 個測試的 coverage,merge 成 merged.dat
+scripts/run_coverage.sh                 # 重新收集每個 block/dv/testlist.sh 自動註冊的測試的 coverage,merge 成 merged.dat
 python3 scripts/analyze_coverage.py     # 重新 parse + 套用 waiver,寫出 reports/sign_off/dashboard_data.json
 python3 scripts/build_dashboard.py      # 重新產生 reports/sign_off/dashboard.html
 ```

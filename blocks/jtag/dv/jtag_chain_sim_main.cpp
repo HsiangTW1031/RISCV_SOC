@@ -122,6 +122,18 @@ int main(int argc, char** argv) {
   rd = axi_read(0x4);
   check("first word unaffected by the second write", rd == 0xCAFEF00D);
 
+  // ---- extra address/data diversity for the bridge's rdata/addr CDC
+  // pipeline registers (rdata_reg/rdata_tck/rdata_sync1/rdata_sync2,
+  // addr_reg/addr_tck -- see docs/coverage_waiver_report.md section 5):
+  // the two words above leave some bits of these registers never
+  // toggling the other way. A third word at the opposite end of the
+  // address range fake_axi_lite_slave decodes (addr[5:2], 16 words),
+  // with the bitwise complement of the first value, gives both the
+  // address and data pipelines a maximally different pattern cheaply.
+  axi_write(0x3C, ~0xCAFEF00Du);
+  rd = axi_read(0x3C);
+  check("third word (high address, complementary data) JTAG read-back matches", rd == (~0xCAFEF00Du));
+
   // ---- BYPASS: 1-bit passthrough, one tck of latency ----
   ir_scan(IR_BYPASS);
   tap_edge(1, 0); // -> SELECT_DR_SCAN

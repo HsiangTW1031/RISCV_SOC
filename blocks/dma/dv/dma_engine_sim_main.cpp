@@ -183,6 +183,63 @@ int main(int argc, char** argv) {
     }
   }
 
+  // ---- extra key/IV/length/address coverage (see docs/coverage_waiver_report.md
+  // section 5) ----
+  // Every test above shares the same NIST SP800-38A key and a length of 4
+  // blocks -- key_reg/iv_reg/len_reg only ever see that one key's bit
+  // pattern and that one length, so any bit the key/length happen to
+  // leave at 0 (or 1) never toggles the other way. This uses a
+  // completely different, independently-trusted key (FIPS-197 Appendix B,
+  // already validated standalone in aes_core's own tests), a single-block
+  // ECB transfer (mode=0, exercising a mode value the tests above never
+  // use), and different src/dst addresses, to get key_reg/iv_reg/len_reg/
+  // addr_reg bit diversity the fixed-vector tests above can't provide.
+  {
+    const uint32_t SRC = 0x500, DST = 0x600;
+    const char* key2 = "000102030405060708090a0b0c0d0e0f"; // FIPS-197 Appendix B key
+    const char* pt2_hex = "00112233445566778899aabbccddeeff";
+    const char* expected_ct2 = "69c4e0d86a7b0430d8cdb78070b4c55a";
+    write_block_to_ram(SRC, pt2_hex);
+    bool ok = run_dma(SRC, DST, 1, key2, "ffffffffffffffffffffffffffffffff", 0, 0 /*ECB*/);
+    check("DMA ECB single-block (different key/IV/length) completes", ok);
+    check("DMA ECB single-block matches FIPS-197 Appendix B vector", read_block_hex(DST) == expected_ct2);
+  }
+
+  // ---- exhaustive key_reg/iv_reg bit coverage ----
+  // key_reg/iv_reg are directly word-loaded registers (see dma_engine.v),
+  // so full bit coverage doesn't need a real DMA operation -- just enough
+  // raw register writes to guarantee every bit sees both directions.
+  // Reset is all-zero, so any bit that's 1 in EITHER key used above (or
+  // its bitwise complement here) already got its 0->1 transition; a
+  // final all-zero write here guarantees every one of those bits also
+  // gets a 1->0 transition, which the fixed-vector tests above never
+  // provided (they never write back to zero).
+  {
+    uint32_t rd; uint8_t resp;
+    const uint32_t key_compl[4] = {0xFFFEFDFCu, 0xFBFAF9F8u, 0xF7F6F5F4u, 0xF3F2F1F0u}; // ~(FIPS-197 App B key)
+    for (int w = 0; w < 4; w++) bfm.write(0x14 + 4*w, key_compl[w], 0xF, &resp);
+    for (int w = 0; w < 4; w++) bfm.write(0x24 + 4*w, 0x00000000u, 0xF, &resp);
+    for (int w = 0; w < 4; w++) bfm.write(0x14 + 4*w, 0x00000000u, 0xF, &resp);
+    for (int w = 0; w < 4; w++) bfm.write(0x24 + 4*w, 0xFFFFFFFFu, 0xF, &resp);
+    for (int w = 0; w < 4; w++) bfm.write(0x24 + 4*w, 0x00000000u, 0xF, &resp);
+  }
+
+  // ---- exhaustive src_addr_reg/dst_addr_reg/len_reg bit coverage ----
+  // Same reasoning as key_reg/iv_reg above: these are directly-loaded
+  // registers (see dma_engine.v), so a 0 -> all-ones -> 0 sequence
+  // guarantees every bit sees both transitions without needing a real
+  // DMA operation to run. Every test above used len=1 or len=4 and
+  // addresses under 0x700 -- these bits never moved.
+  {
+    uint32_t rd; uint8_t resp;
+    bfm.write(0x08, 0xFFFFFFFFu, 0xF, &resp); // SRC_ADDR
+    bfm.write(0x0C, 0xFFFFFFFFu, 0xF, &resp); // DST_ADDR
+    bfm.write(0x10, 0xFFFFFFFFu, 0xF, &resp); // LEN
+    bfm.write(0x08, 0x00000000u, 0xF, &resp);
+    bfm.write(0x0C, 0x00000000u, 0xF, &resp);
+    bfm.write(0x10, 0x00000000u, 0xF, &resp);
+  }
+
 #if VM_COVERAGE
   VerilatedCov::write("coverage.dat");
 #endif

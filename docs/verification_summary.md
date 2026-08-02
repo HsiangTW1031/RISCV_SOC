@@ -35,15 +35,15 @@
 
 ## 3. 量化的 coverage 數據
 
-`scripts/run_coverage.sh` + `scripts/analyze_coverage.py`,完整方法論見 `docs/project_retrospective.md`。跑完全部 18 個 regression 測試(`--coverage-line --coverage-toggle`)合併後:
+`scripts/run_coverage.sh` + `scripts/analyze_coverage.py`,完整方法論見 `docs/project_retrospective.md`。跑完全部 19 個 regression 測試(`--coverage-line --coverage-toggle`)合併後:
 
 | 指標 | 結果 |
 |---|---|
-| Line coverage(這個專案自己寫的 RTL,不含 vendored PicoRV32) | **96.1%** |
-| Toggle coverage,raw aggregate(`verilator_coverage --report summary`) | 58.1%(43169/74290 points)——這個數字把同一個 source-level toggle point 依 hierarchy instance 重複計數(例如 `aes_core.v` 被 5 個不同路徑實例化),分母被灌水,詳見下方 |
-| Toggle coverage,deduped per-bit,**waive 前** | **69.5%**(7926/11405 bits) |
-| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1513 個結構上不可能 toggle 的 bit) | **80.1%**(7926/9892 bits) |
-| Branch coverage(全專案合併) | 77.4%(1504/1944 points) |
+| Line coverage(這個專案自己寫的 RTL,不含 vendored PicoRV32) | **96.7%** |
+| Toggle coverage,raw aggregate(`verilator_coverage --report summary`) | 65.0%(48316/74290 points)——這個數字把同一個 source-level toggle point 依 hierarchy instance 重複計數(例如 `aes_core.v` 被 5 個不同路徑實例化),分母被灌水,詳見下方 |
+| Toggle coverage,deduped per-bit,**waive 前** | **80.3%**(9153/11405 bits) |
+| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1480 個結構上不可能 toggle 的 bit) | **92.2%**(9153/9925 bits) |
+| Branch coverage(全專案合併) | 79.8%(1551/1944 points) |
 | **FSM state coverage**（11 個 FSM:spi_master、i2c_master、uart、jtag_tap、aes_core、aes_chain、axi_lite_xbar 讀/寫、dma_ram 讀/寫、dma_engine) | **100%**(全部狀態都至少被進入過一次) |
 
 Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、waive 前後每個 block 的量化對照、以及刻意不 waive 的 residual gap 清單:`docs/coverage_waiver_report.md`。

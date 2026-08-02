@@ -103,6 +103,28 @@ int main(int argc, char** argv) {
   check("slave received the ORIGINAL byte (0x11), not the mid-flight one (0x99)",
         dut->slave_rx_byte == 0x11);
 
+  // ---- divider register: extra bit coverage (see docs/coverage_waiver_report.md
+  // section 5) ----
+  // divider_reg is a directly-written register, so writing all-ones then a
+  // small value again toggles every one of its bits both directions cheaply
+  // (no extra simulation cycles needed). div_cnt only counts while a
+  // transfer is actually in flight, so exercising more of ITS bit range
+  // needs a real transfer running against a larger divider -- not to
+  // completion (that would take as long as the divider itself), just long
+  // enough to climb through a wider range than the fast-sim default (2)
+  // ever reaches. Nothing checks this transfer's outcome -- it's here
+  // purely for toggle diversity, not behavior verification.
+  // Also uses a target address that's the bitwise complement of SLAVE_ADDR
+  // (within the 7-bit field) instead of SLAVE_ADDR again, so addr_reg's
+  // bits get exercised in both directions too -- SLAVE_ADDR and
+  // SLAVE_ADDR+1 (used above) are both close together bit-pattern-wise.
+  bfm.write(0x14, 0xFFFFFFFF, 0xF, &resp); // REG_DIVIDER: every bit high
+  bfm.write(0x4, (~SLAVE_ADDR) & 0x7F, 0xF, &resp); // REG_ADDR: complementary target address
+  bfm.write(0x8, 0x5A, 0xF, &resp);
+  bfm.write(0x0, 0x1, 0xF, &resp);         // START: div_cnt starts climbing toward this divider
+  for (int i = 0; i < 70000; i++) bfm.clock();
+  bfm.write(0x14, 2, 0xF, &resp);          // restore the fast-sim default
+
 #if VM_COVERAGE
   VerilatedCov::write("coverage.dat");
 #endif

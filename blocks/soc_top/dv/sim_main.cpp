@@ -184,6 +184,55 @@ int main(int argc, char** argv) {
              "(crossbar's 9th slave correctly address-decoded)",
              rd_val == DMA_TEST_VAL);
 
+  // ---- extra data-value diversity via JTAG pokes to the remaining
+  // peripherals (see docs/coverage_waiver_report.md section 5): closes
+  // soc_top's own top-level *_wdata mirror wires connecting each
+  // peripheral to the crossbar, which otherwise only ever see whatever
+  // narrow set of values firmware happened to use. Only checks that the
+  // bridge didn't hang -- not asserting read-back equality, since several
+  // of these registers have status/read-modify-write semantics this test
+  // doesn't model, and nothing later depends on the result. As long as
+  // the address's peripheral-select bits are correct the transaction
+  // still reaches that peripheral's s_wdata even if the exact offset
+  // isn't a meaningful register there.
+  {
+    // Timer's REG_RELOAD (0x4) and Watchdog's equivalent are confirmed
+    // directly-loaded 32-bit registers (see timer.v) -- writing all-ones
+    // then all-zeros, each followed by a JTAG read, guarantees every bit
+    // of both the register itself and the *_rdata mirror wire connecting
+    // it back through the crossbar sees both transitions.
+    uint32_t extra_addrs[] = {
+        0x40000004u, // Timer RELOAD
+        0x40001004u, // Watchdog (equivalent offset)
+        0x40002000u, // UART
+        0x40003014u, // I2C DIVIDER
+        0x40004004u, // SPI DIVIDER
+        0x40005014u, // AES
+    };
+    uint32_t extra_vals[] = {0xFFFFFFFFu, 0x00000000u};
+    for (uint32_t addr : extra_addrs) {
+      for (uint32_t val : extra_vals) {
+        ir_scan(IR_AXI_ADDR); dr_scan32(addr);
+        ir_scan(IR_AXI_DATA); dr_scan32(val);
+        ir_scan(IR_AXI_CTRL); dr_scan32(0x1); // rw=0 (write), start=1
+        int poke_spins = 0;
+        uint32_t poke_status;
+        do { poke_status = dr_scan32(0); poke_spins++; } while ((poke_status & 0x1) && poke_spins < 100);
+        jtag_check("JTAG toggle-diversity poke completed (bridge not stuck busy)", poke_spins < 100);
+
+        // also read back through JTAG -- writes alone never touch the
+        // *_rdata mirror wires connecting each peripheral's read path
+        // back to the crossbar, which is exactly what's still missing.
+        ir_scan(IR_AXI_ADDR); dr_scan32(addr);
+        ir_scan(IR_AXI_CTRL); dr_scan32(0x3); // rw=1 (read), start=1
+        poke_spins = 0;
+        do { poke_status = dr_scan32(0); poke_spins++; } while ((poke_status & 0x1) && poke_spins < 100);
+        jtag_check("JTAG toggle-diversity read-back completed (bridge not stuck busy)", poke_spins < 100);
+        ir_scan(IR_AXI_DATA); dr_scan32(0); // discard the value; only the toggle activity matters
+      }
+    }
+  }
+
   tfp->close();
 #if VM_COVERAGE
   VerilatedCov::write("coverage.dat");

@@ -164,6 +164,56 @@ int main(int argc, char** argv) {
   ok = bfm.read(0x10000000, &rd, &resp);
   check("post-arbitration: RAM holds s1's contended write", ok && rd == 0xBBBB2222);
 
+  // ---- extra data-value diversity for per-slave wdata/rdata mirrors
+  // (see docs/coverage_waiver_report.md section 5) ----
+  // Every slave above only ever saw ONE specific 32-bit value, so any bit
+  // that happened to be 0 (or 1) in that one value never toggled the
+  // other way in the crossbar's own per-slave rdata mirror registers (or
+  // s1's wdata mirror, only exercised once above in the arbitration
+  // test). Bitwise-complementing every value already used gives maximum
+  // bit-flip coverage with the fewest extra transactions -- this isn't
+  // testing new routing behavior (already proven above), purely toggle
+  // diversity.
+  struct { uint32_t addr; uint32_t val; } second_pass[] = {
+      {0x40000000, ~0x11110004u}, // Timer
+      {0x40001000, ~0x22220005u}, // WDT
+      {0x40002000, ~0xCCCC0003u}, // UART
+      {0x40003000, ~0x33330006u}, // I2C
+      {0x40004000, ~0x44440007u}, // SPI
+      {0x40005000, ~0x55550008u}, // AES
+      {0x40006000, ~0x66660009u}, // DMA
+  };
+  // A 2-value scheme (original V1, then complement V2=~V1) only gives
+  // BOTH directions to bits that are 1 in V1 (0->1 arriving at V1, then
+  // 1->0 arriving at V2); bits that are 0 in V1 only ever see 0->1
+  // (arriving at V2) and never transition back, since the sequence ends
+  // there. Writing V1 back a third time completes exactly those bits'
+  // missing 1->0 transition -- necessary here since several of the
+  // original values (e.g. Timer's 0x11110004) have very few 1-bits, so
+  // most of that register's bits would otherwise stay one-directional.
+  for (auto& t : second_pass) {
+    ok = bfm.write(t.addr, t.val, 0xF, &resp);
+    check("second-value write ok (toggle diversity)", ok && resp == RESP_OKAY);
+    ok = bfm.read(t.addr, &rd, &resp);
+    check("second-value read matches (toggle diversity)", ok && rd == t.val);
+    ok = bfm.write(t.addr, ~t.val, 0xF, &resp); // back to the original value
+    check("third-value write ok (toggle diversity)", ok && resp == RESP_OKAY);
+    ok = bfm.read(t.addr, &rd, &resp);
+    check("third-value read matches (toggle diversity)", ok && rd == (~t.val));
+  }
+
+  // s1 (JTAG) wdata mirror: only exercised once above (0xBBBB2222) -- one
+  // more write through the raw s1 port with a very different value.
+  {
+    dut->s1_awvalid = 1; dut->s1_awaddr = 0x10000004; dut->s1_wvalid = 1;
+    dut->s1_wdata = 0x5555DDDD; dut->s1_wstrb = 0xF; dut->s1_bready = 1;
+    int spins = 0;
+    while (!dut->s1_bvalid && spins < 200) { clk_edge(); spins++; }
+    check("s1 second-value write completes (toggle diversity)", dut->s1_bvalid == 1 && spins < 200);
+    clk_edge();
+    dut->s1_awvalid = 0; dut->s1_wvalid = 0;
+  }
+
 #if VM_COVERAGE
   VerilatedCov::write("coverage.dat");
 #endif
