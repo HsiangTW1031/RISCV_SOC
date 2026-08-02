@@ -4,6 +4,54 @@ Maps each git tag to what changed and why. Commit messages have the "what";
 `docs/project_retrospective.md` has the full bug-by-bug story behind most of
 these — this file is the short index between the two.
 
+## [Unreleased]
+
+Convention-over-configuration for lint/regression/coverage: every block now
+owns its own `dv/testlist.sh` (regression+coverage targets) and
+`lint/lintlist.sh` (lint-only tops), sourced by generic drivers
+(`run_regression.sh`/`run_coverage.sh`/`run_lint.sh`) instead of three
+central scripts hand-listing every block's file set. Adding a block means
+adding its manifest files, not editing shared scripts.
+
+### Added
+- `scripts/lib_verilator_targets.sh` / `scripts/lib_lint_targets.sh`:
+  shared `run_target`/`lint_target` functions each block's manifest calls
+- `scripts/coverage_config.py`: the project-specific knowledge
+  `analyze_coverage.py` needs (FSM state tables, lint-finding triage
+  rules, vendored-file overrides) -- pulled out of the engine itself
+- `scripts/project_config.sh`: project name, repo URL, and which block is
+  the whole-chip top level (`TOP_BLOCK`), read by
+  `collect_soc_reports.sh`/`build_dashboard.py`/`build_firmware.sh`
+  instead of a hardcoded `soc_top`/`RISCV_SOC` string in each
+
+### Changed
+- `analyze_coverage.py` auto-discovers which `.v` file belongs to which
+  block by scanning `blocks/*/rtl/` (skipping symlinks) instead of a
+  hardcoded filename→block dict that would go stale as blocks are added
+- `build_dashboard.py` reads project name/URL/tagline from env vars
+  (set by `collect_soc_reports.sh` from `project_config.sh`) instead of
+  hardcoding "RISCV_SOC" and its GitHub URL in three places
+
+### Fixed
+- `soc_top`'s regression/coverage manifest referenced shared RTL through
+  its own `rtl/` symlink farm; since coverage dedupes toggle points by
+  file path, a symlink's different path string caused every shared
+  module's toggle coverage to be double-counted against its owning
+  block's own numbers. Switched to canonical per-block paths -- toggle
+  coverage now matches the pre-refactor numbers exactly (69.5%/80.1%
+  before/after waivers, not the ~43%/51% the bug produced)
+- The dashboard's "Regression" KPI tile has shown **"0/0 PASS" since it
+  was introduced** (predates this refactor, only caught while validating
+  it): the target-count logic assumed each regression-summary row starts
+  with `PASS:`/`FAIL:`, but rows actually start with the target's own
+  name -- the result is the 2nd column. Now correctly shows the real
+  pass count (`19/19 PASS`), and would show a partial count in red if a
+  future run actually had failures instead of silently reading zero
+
+Verified regression (19/19 PASS), lint (135 findings, identical
+per-block counts), coverage (line/branch/toggle before+after waivers),
+and synthesis chip area all match the pre-refactor numbers exactly.
+
 ## [v1.1.0] - 2026-08-02
 
 Local reproducibility: a fresh clone on another machine can now run the
