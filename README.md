@@ -7,7 +7,8 @@ JTAG). Simulation-based sign-off (Verilator + Yosys/Nangate45 + OpenSTA) —
 no FPGA or ASIC tape-out target.
 
 Full project plan, phase-by-phase breakdown, architecture rationale, and open
-risks: see [`docs/phase_plan.md`](docs/phase_plan.md).
+risks: see [`docs/phase_plan.md`](docs/phase_plan.md). For what changed in
+each tagged release and why, see [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Status
 
