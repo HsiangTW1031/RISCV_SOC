@@ -13,6 +13,7 @@
 # handle their absence gracefully.
 set -u
 
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TOOLCHAIN_PREFIX="${TOOLCHAIN_PREFIX:-riscv-none-elf-}"
 missing_required=0
 missing_optional=0
@@ -58,7 +59,11 @@ check_env_file() {
 echo "=== Required for lint / regression / coverage / dashboard ==="
 check_required "Verilator" verilator "verilator --version"
 check_required "Python 3" python3 "python3 --version"
-check_required "${TOOLCHAIN_PREFIX}gcc" "${TOOLCHAIN_PREFIX}gcc" "${TOOLCHAIN_PREFIX}gcc --version"
+# Only required if this project has an embedded CPU that boots firmware
+# (scripts/build_firmware.sh only exists for such projects).
+if [ -x "$ROOT/scripts/build_firmware.sh" ]; then
+  check_required "${TOOLCHAIN_PREFIX}gcc" "${TOOLCHAIN_PREFIX}gcc" "${TOOLCHAIN_PREFIX}gcc --version"
+fi
 
 echo
 echo "=== Optional: needed only for synthesis / STA / formal LEC ==="
