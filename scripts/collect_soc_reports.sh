@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs the whole-SoC sign-off checks (simulation regression, lint,
-# synthesis, STA) and collects the results into reports/soc_top/ as a
+# synthesis, STA) and collects the results into reports/sign_off/ as a
 # single, committed snapshot -- so the final numbers (Fmax, area, which
 # tests pass, lint findings) are readable straight from the repo without
 # needing Verilator/Yosys/OpenSTA installed to regenerate them.
@@ -14,7 +14,7 @@
 set -u
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUT="$ROOT/reports/soc_top"
+OUT="$ROOT/reports/sign_off"
 mkdir -p "$OUT"
 
 echo "=== 1/6: full regression (scripts/run_regression.sh) ==="

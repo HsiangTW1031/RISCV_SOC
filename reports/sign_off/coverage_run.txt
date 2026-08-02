@@ -1,0 +1,37 @@
+=== Coverage collection: rebuilding + running every block's testbench with --coverage ===
+
+
+TEST               STATUS
+timer              OK
+watchdog           OK
+uart               OK
+sram               OK
+boot_rom           OK
+i2c                OK
+spi                OK
+jtag_tap           OK
+jtag_chain         OK
+aes_key_expand     OK
+aes_core           OK
+aes_chain          OK
+aes_axi_wrapper    OK
+aes_diff           OK
+axi_lite_xbar      OK
+dma_ram            OK
+dma_engine         OK
+soc_top            OK
+
+=== Merging coverage data ===
+Coverage Summary:
+  line      : 47.2% ( 3153/ 6684)
+  toggle    : 58.1% (43157/74282)
+  branch    : 77.3% ( 1500/ 1940)
+  expr      : 0.0% (    0/    0)
+  fsm_state : 0.0% (    0/    0)
+  fsm_arc   : 0.0% (    0/    0)
+Annotation Summary:
+  lines with all attached points covered : 36.00%  (1310/3636)
+See lines with '%00' in /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/annotated
+Merged coverage data: /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/merged.dat
+LCOV info:            /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/coverage.info
+Annotated source:      /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/annotated/

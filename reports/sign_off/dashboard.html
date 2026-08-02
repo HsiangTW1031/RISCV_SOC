@@ -133,7 +133,7 @@ a { color: var(--accent); }
 
 <header class="top">
   <h1>RISCV_SOC &mdash; Sign-off Dashboard</h1>
-  <div class="sub">Generated 2026-08-02 12:08 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
+  <div class="sub">Generated 2026-08-02 14:08 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
 </header>
 
 <main>
@@ -235,40 +235,40 @@ flowchart TB
 <div class="fsm-head"><span class="fsm-name">i2c_master</span><span class="fsm-file">i2c_master.v</span><span class="fsm-pct good">9/9 states</span></div>
 <div class="fsm-states">
 <span class="state-chip good" title="17517 hits">ST_IDLE</span>
-<span class="state-chip good" title="16 hits">ST_START</span>
-<span class="state-chip good" title="128 hits">ST_ADDR</span>
-<span class="state-chip good" title="16 hits">ST_ADDR_ACK</span>
-<span class="state-chip good" title="64 hits">ST_WDATA</span>
-<span class="state-chip good" title="8 hits">ST_WDATA_ACK</span>
-<span class="state-chip good" title="32 hits">ST_RDATA</span>
-<span class="state-chip good" title="4 hits">ST_RDATA_ACK</span>
-<span class="state-chip good" title="24 hits">ST_STOP</span>
+<span class="state-chip good" title="32 hits">ST_START</span>
+<span class="state-chip good" title="256 hits">ST_ADDR</span>
+<span class="state-chip good" title="32 hits">ST_ADDR_ACK</span>
+<span class="state-chip good" title="128 hits">ST_WDATA</span>
+<span class="state-chip good" title="16 hits">ST_WDATA_ACK</span>
+<span class="state-chip good" title="64 hits">ST_RDATA</span>
+<span class="state-chip good" title="8 hits">ST_RDATA_ACK</span>
+<span class="state-chip good" title="48 hits">ST_STOP</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">spi_master</span><span class="fsm-file">spi_master.v</span><span class="fsm-pct good">2/2 states</span></div>
 <div class="fsm-states">
 <span class="state-chip good" title="17517 hits">IDLE</span>
-<span class="state-chip good" title="340 hits">RUN</span>
+<span class="state-chip good" title="680 hits">RUN</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">jtag_tap</span><span class="fsm-file">jtag_tap.v</span><span class="fsm-pct good">16/16 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="489 hits">TEST_LOGIC_RESET</span>
-<span class="state-chip good" title="876 hits">RUN_TEST_IDLE</span>
-<span class="state-chip good" title="661 hits">SELECT_DR_SCAN</span>
-<span class="state-chip good" title="306 hits">CAPTURE_DR</span>
-<span class="state-chip good" title="834 hits">SHIFT_DR</span>
-<span class="state-chip good" title="397 hits">EXIT1_DR</span>
-<span class="state-chip good" title="403 hits">PAUSE_DR</span>
-<span class="state-chip good" title="201 hits">EXIT2_DR</span>
-<span class="state-chip good" title="306 hits">UPDATE_DR</span>
-<span class="state-chip good" title="355 hits">SELECT_IR_SCAN</span>
-<span class="state-chip good" title="148 hits">CAPTURE_IR</span>
-<span class="state-chip good" title="250 hits">SHIFT_IR</span>
-<span class="state-chip good" title="201 hits">EXIT1_IR</span>
-<span class="state-chip good" title="240 hits">PAUSE_IR</span>
-<span class="state-chip good" title="115 hits">EXIT2_IR</span>
-<span class="state-chip good" title="147 hits">UPDATE_IR</span>
+<span class="state-chip good" title="978 hits">TEST_LOGIC_RESET</span>
+<span class="state-chip good" title="1752 hits">RUN_TEST_IDLE</span>
+<span class="state-chip good" title="1322 hits">SELECT_DR_SCAN</span>
+<span class="state-chip good" title="612 hits">CAPTURE_DR</span>
+<span class="state-chip good" title="1668 hits">SHIFT_DR</span>
+<span class="state-chip good" title="794 hits">EXIT1_DR</span>
+<span class="state-chip good" title="806 hits">PAUSE_DR</span>
+<span class="state-chip good" title="402 hits">EXIT2_DR</span>
+<span class="state-chip good" title="612 hits">UPDATE_DR</span>
+<span class="state-chip good" title="710 hits">SELECT_IR_SCAN</span>
+<span class="state-chip good" title="296 hits">CAPTURE_IR</span>
+<span class="state-chip good" title="500 hits">SHIFT_IR</span>
+<span class="state-chip good" title="402 hits">EXIT1_IR</span>
+<span class="state-chip good" title="480 hits">PAUSE_IR</span>
+<span class="state-chip good" title="230 hits">EXIT2_IR</span>
+<span class="state-chip good" title="294 hits">UPDATE_IR</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">aes_core</span><span class="fsm-file">aes_core.v</span><span class="fsm-pct good">4/4 states</span></div>

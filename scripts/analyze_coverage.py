@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-COV_DIR = ROOT / "reports/soc_top/coverage"
+COV_DIR = ROOT / "reports/sign_off/coverage"
 ANNOTATED = COV_DIR / "annotated"
 
 # ---- FSM state tables (state name -> as it appears as "NAME: begin" or

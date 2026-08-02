@@ -1,5 +1,5 @@
 # Timing constraints for the whole-SoC synthesis/STA run (Phase 7
-# sign-off). Same convention as blocks/aes/sdc/aes_core.sdc: a single
+# sign-off). Same convention as blocks/aes/constraints/aes_core.sdc: a single
 # clock domain, zero I/O delay budget on every port (every AXI/JTAG
 # input and output in this design is already registered right at the
 # module boundary, so the reported critical path is the SoC's genuine

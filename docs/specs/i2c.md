@@ -58,7 +58,7 @@ Reset 預設值：`CTRL/ADDR/TXDATA=0`、`STATUS=0`、`DIVIDER=4`。
 
 ## 5. Verification
 
-`blocks/i2c/sim/sim_main.cpp` + `tb/common/fake_i2c_slave.v`（behavioral-only、非 synthesizable 的假 I2C slave，掛在同一組 `scl`/`sda`，帶 `pullup` 模擬真實 bus 的上拉電阻）：
+`blocks/i2c/dv/sim_main.cpp` + `tb/common/fake_i2c_slave.v`（behavioral-only、非 synthesizable 的假 I2C slave，掛在同一組 `scl`/`sda`，帶 `pullup` 模擬真實 bus 的上拉電阻）：
 
 - 驗證重點：
   - Write 交易：正確位址、正確 ACK、slave 收到正確的 byte

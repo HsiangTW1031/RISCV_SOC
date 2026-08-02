@@ -57,7 +57,7 @@ Byte order：DATA0/RESULT0/KEY0 放 128-bit block 最高位的 4 個 bytes（FIP
 
 四層驗證，一層比一層廣：
 
-1. **`aes_key_expand` 單元測試**（`blocks/aes/sim/key_expand_sim_main.cpp`）——11 組 round key 逐一比對 FIPS-197 Appendix A.1 的官方金鑰展開範例。
+1. **`aes_key_expand` 單元測試**（`blocks/aes/dv/key_expand_sim_main.cpp`）——11 組 round key 逐一比對 FIPS-197 Appendix A.1 的官方金鑰展開範例。
 2. **`aes_core` 直接測試**（`core_sim_main.cpp`，跳過 AXI，直接打 core 的訊號）——FIPS-197 Appendix B 與 Appendix C.1 的官方測試向量，encrypt 和 decrypt 兩個方向都驗證。
 3. **AXI-Lite 介面測試**（`sim_main.cpp`）——同樣兩組官方向量,但這次透過真正的 AXI4-Lite 暫存器讀寫,額外驗證 KEY 暫存器唯讀、busy/no-queue 行為。
 4. **Differential test**（`diff_sim_main.cpp`）——500 組隨機明文/金鑰,同時跑過 RTL（透過 Verilator）和一個獨立、從零寫的 C++ AES-128 軟體參考模型（S-box/Rcon table 用另一套完全獨立的程式碼路徑,在程式啟動時現算,不是抄同一份表),比對兩邊的密文是否一致,並確認 decrypt(encrypt(pt)) == pt。這個軟體模型自己也先過了 FIPS-197 官方向量才會被信任當作 oracle。

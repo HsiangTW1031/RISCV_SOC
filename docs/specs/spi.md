@@ -65,7 +65,7 @@ Reset 預設值：`CTRL=0`、`DIVIDER=2`、`TXDATA=0`、`STATUS=0`。
 
 ## 5. Verification
 
-`blocks/spi/sim/sim_main.cpp` + `tb/common/fake_spi_slave.v`（behavioral-only 的假 SPI slave，CPOL/CPHA 做成 runtime input 而非 compile-time parameter，一次 build 就能涵蓋全部 4 種模式）：
+`blocks/spi/dv/sim_main.cpp` + `tb/common/fake_spi_slave.v`（behavioral-only 的假 SPI slave，CPOL/CPHA 做成 runtime input 而非 compile-time parameter，一次 build 就能涵蓋全部 4 種模式）：
 
 - 驗證重點：
   - 全部 4 組 CPOL/CPHA 組合，master↔slave 雙向 byte-accurate loopback（master 送出的 byte slave 收到的值、slave 送出的 byte master 收到的值，兩個方向都比對）

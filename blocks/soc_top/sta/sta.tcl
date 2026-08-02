@@ -12,7 +12,7 @@ read_verilog ../syn/mem_blackboxes.v
 read_verilog ../syn/soc_top_out.v
 link_design soc_top
 
-read_sdc ../sdc/soc_top.sdc
+read_sdc ../constraints/soc_top.sdc
 
 report_checks -path_delay max -fields {slew cap input_pins} -digits 3
 puts ""

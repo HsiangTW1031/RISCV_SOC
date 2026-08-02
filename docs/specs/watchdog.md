@@ -60,7 +60,7 @@ Reset 預設值：`CTRL.EN=0`、`TIMEOUT=COUNT=0xFFFF_FFFF`、`STATUS=0`。
 
 ## 5. Verification
 
-`blocks/watchdog/sim/sim_main.cpp`，同樣是針對裸 RTL 的 cycle-accurate directed test（透過 `AxiLiteBfm`，不經過 CPU）：
+`blocks/watchdog/dv/sim_main.cpp`，同樣是針對裸 RTL 的 cycle-accurate directed test（透過 `AxiLiteBfm`，不經過 CPU）：
 
 - C++ 行為模型逐 cycle 同步推進，包含 WARNING/RESET_REQ 的 pulse/level 語意都各自模擬
 - 驗證重點：

@@ -68,7 +68,7 @@ flowchart LR
 
 ## 5. Verification
 
-- **TAP FSM**（`blocks/jtag/sim/tap_sim_main.cpp`）：拿一份獨立的 C++ 轉移表模型,對 RTL 跑 5000 步隨機 TMS walk 交叉驗證,外加「從任何狀態連續 5 個 TMS=1 一定回到 Test-Logic-Reset」這個 IEEE 1149.1 安全機制的明確測試。
+- **TAP FSM**（`blocks/jtag/dv/tap_sim_main.cpp`）：拿一份獨立的 C++ 轉移表模型,對 RTL 跑 5000 步隨機 TMS walk 交叉驗證,外加「從任何狀態連續 5 個 TMS=1 一定回到 Test-Logic-Reset」這個 IEEE 1149.1 安全機制的明確測試。
 - **DTM + bridge + CDC**（`jtag_chain_sim_main.cpp`）：TAP+DTM+bridge 串起來接到一個真的 AXI-Lite slave,`tck` 刻意設成比 `clk`慢很多(每個 tck 半週期跑 10 個 clk 週期),驗證 IDCODE、BYPASS、以及透過真正 AXI4-Lite 交易做 write 再 read-back。
 - **soc_top 整合測試**：JTAG 透過真正的 soc_top(crossbar 仲裁 + 真正的 sram.v,不是假 slave)寫入一個 RAM scratch word 再讀回,證明整條 JTAG→bridge→crossbar→SRAM 路徑在完整系統裡真的能動,而且不影響既有的 CPU firmware 回歸測試(Hello World + 5 次 Timer 中斷結果不變)。
 

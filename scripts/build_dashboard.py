@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Renders reports/soc_top/dashboard_data.json (see analyze_coverage.py)
-plus the other reports/soc_top/*.txt sign-off artifacts into a single
-static HTML dashboard: reports/soc_top/dashboard.html.
+"""Renders reports/sign_off/dashboard_data.json (see analyze_coverage.py)
+plus the other reports/sign_off/*.txt sign-off artifacts into a single
+static HTML dashboard: reports/sign_off/dashboard.html.
 
 Run from the repo root, after scripts/run_coverage.sh and
 scripts/analyze_coverage.py:
@@ -14,7 +14,7 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-REPORTS = ROOT / "reports/soc_top"
+REPORTS = ROOT / "reports/sign_off"
 
 data = json.loads((REPORTS / "dashboard_data.json").read_text())
 

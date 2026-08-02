@@ -5,7 +5,7 @@ read_liberty /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typic
 read_verilog ../syn/aes_core_out.v
 link_design aes_core
 
-read_sdc ../sdc/aes_core.sdc
+read_sdc ../constraints/aes_core.sdc
 
 report_checks -path_delay max -fields {slew cap input_pins} -digits 3
 puts ""

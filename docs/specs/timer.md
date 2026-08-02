@@ -62,7 +62,7 @@ PicoRV32 的 `LATCHED_IRQ` 機制每個 clock cycle 都會把 `irq` 輸入 OR �
 
 ## 5. Verification
 
-`blocks/timer/sim/sim_main.cpp`，透過共用的 `AxiLiteBfm`（`tb/common/axi_lite_bfm.h`）直接對 `timer.v` 做 cycle-accurate 的 directed test，不經過 CPU：
+`blocks/timer/dv/sim_main.cpp`，透過共用的 `AxiLiteBfm`（`tb/common/axi_lite_bfm.h`）直接對 `timer.v` 做 cycle-accurate 的 directed test，不經過 CPU：
 
 - 維護一份純 C++ 的 timer 行為模型，每呼叫一次 BFM 就同步 advance 一次，逐 cycle 跟 RTL 的 COUNT/STATUS 讀值比對（並非只驗證最終值）
 - 驗證重點：

@@ -192,7 +192,7 @@ risks: see [`docs/phase_plan.md`](docs/phase_plan.md).
       debugging story): **96.3% line coverage on this project's own RTL,
       100% FSM state coverage (11/11 state machines)**
 - [x] An HTML sign-off dashboard (`scripts/build_dashboard.py` →
-      `reports/soc_top/dashboard.html`) — coverage bars, an FSM
+      `reports/sign_off/dashboard.html`) — coverage bars, an FSM
       state-coverage checklist, and all 135 lint findings triaged into
       categories (documented limitation / benign-by-design / vendored
       PicoRV32 style), instead of raw text reports. Committed to the repo
@@ -234,10 +234,10 @@ lint + synthesis + STA + coverage + an HTML dashboard) into one place:
 ./scripts/collect_soc_reports.sh
 ```
 
-This writes into `reports/soc_top/` — unlike the per-block `syn`/`sta`/`lint`
+This writes into `reports/sign_off/` — unlike the per-block `syn`/`sta`/`lint`
 scratch output (gitignored, regenerable), `reports/` **is** committed: it's
 the sign-off snapshot, readable straight from the repo without needing the
-toolchain installed. Open `reports/soc_top/dashboard.html` directly in a
+toolchain installed. Open `reports/sign_off/dashboard.html` directly in a
 browser for a graphical view (coverage bars, an FSM state-coverage
 checklist for all 11 state machines, and the 135 lint findings triaged
 into categories) instead of reading raw text reports — see
@@ -252,7 +252,7 @@ the architecture has settled). For now those are run directly, e.g.:
 
 ```bash
 # full-SoC smoke test (rebuilds + runs; firmware.hex must already be built)
-cd blocks/soc_top/sim
+cd blocks/soc_top/dv
 verilator -Wall -Wno-UNUSEDSIGNAL -Wno-UNUSEDPARAM -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC \
   -Wno-BLKSEQ -Wno-DECLFILENAME -Wno-GENUNNAMED -Wno-PINCONNECTEMPTY \
   --cc --exe --build --trace --top-module soc_top \
@@ -271,7 +271,7 @@ cd blocks/soc_top/syn && yosys synth.ys
 cd ../sta && sta sta.tcl
 
 # rebuild firmware after editing fw/main.c or fw/start.S
-cd fw && make && cp firmware.hex ../blocks/soc_top/sim/firmware.hex
+cd fw && make && cp firmware.hex ../blocks/soc_top/dv/firmware.hex
 ```
 
 The `-Wno-BLKSEQ -Wno-DECLFILENAME -Wno-GENUNNAMED` flags silence lint
@@ -280,17 +280,19 @@ style, not from this project's RTL.
 
 ## Layout
 
-Each block under `blocks/` has its own `rtl/lint/sim`. Only `aes` and
-`soc_top` also have `sdc/syn/sta` — every other block is small enough that
-a standalone synthesis/STA run wasn't worth doing on its own; their real
+Each block under `blocks/` has its own `rtl/lint/dv` (`dv` = design
+verification, i.e. the testbench — matches common ASIC-industry naming
+more closely than a bare `sim`). Only `aes` and `soc_top` also have
+`constraints/syn/sta` — every other block is small enough that a
+standalone synthesis/STA run wasn't worth doing on its own; their real
 timing signoff happens once, for real, as part of the whole-SoC synthesis
 (see `blocks/soc_top/syn/synth.ys` and `blocks/soc_top/sta/sta.tcl`, or
 `blocks/aes/syn/synth.ys` / `blocks/aes/sta/sta.tcl` for the standalone AES
-core numbers cited in `docs/aes_report.md`). Empty, never-used `sdc/syn/sta`
-scaffold directories for the other blocks (plus a fully-empty leftover
-`blocks/jtag_tap/` from before `blocks/jtag/` existed) were removed —
-`git status` showed no change from deleting them, confirming git never
-tracked empty directories in the first place.
+core numbers cited in `docs/aes_report.md`). Empty, never-used
+`sdc/syn/sta` scaffold directories for the other blocks (plus a
+fully-empty leftover `blocks/jtag_tap/` from before `blocks/jtag/`
+existed) were removed — `git status` showed no change from deleting them,
+confirming git never tracked empty directories in the first place.
 `soc_top`'s `rtl/` is a set of symlinks into every other block's canonical
 source, so there's exactly one copy of each module. See
 `docs/phase_plan.md` for the full rationale.

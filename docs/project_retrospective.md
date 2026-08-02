@@ -120,7 +120,7 @@ Nangate45 合成+STA(僅 `aes_core`,不含 AXI wrapper):Fmax ≈ 98.5MHz,關鍵�
 
 ### 真實 bug：`scripts/run_regression.sh` 第一次跑,就抓到一個潛伏的 watchdog 測試 bug
 
-在把每個 block 的測試整合進同一支 regression 腳本、確保每一個都是**乾淨重新編譯**(不是沿用可能已經過時的 build 產物)之後,`watchdog` 測試意外地失敗了 2 個 check——但目錄裡舊的、還沒被清掉的 `wdt_sim` binary 卻是綠的。追下去發現:`blocks/watchdog/sim/sim_main.cpp` 裡寫死的 `WARN_MARGIN = 3`,跟 `watchdog.v` 實際的 default parameter `WARN_MARGIN = 4` 對不上——而且 `watchdog.v` 的這個 default 值從 Phase 2 第一次 commit 開始就一直是 4,`docs/specs/watchdog.md` 裡也一直寫著「預設 4」,兩邊唯一不一致的地方就是這個測試裡寫死的常數。也就是說:**這個測試常數從一開始就是錯的**,只是舊的 `wdt_sim` binary 剛好是在某次意外用對數字的情況下建出來的,之後這個常數被改錯、卻沒人重新乾淨編譯過,binary 就一直「看起來是綠的」,實際上早就跟原始碼脫鉤了。
+在把每個 block 的測試整合進同一支 regression 腳本、確保每一個都是**乾淨重新編譯**(不是沿用可能已經過時的 build 產物)之後,`watchdog` 測試意外地失敗了 2 個 check——但目錄裡舊的、還沒被清掉的 `wdt_sim` binary 卻是綠的。追下去發現:`blocks/watchdog/dv/sim_main.cpp` 裡寫死的 `WARN_MARGIN = 3`,跟 `watchdog.v` 實際的 default parameter `WARN_MARGIN = 4` 對不上——而且 `watchdog.v` 的這個 default 值從 Phase 2 第一次 commit 開始就一直是 4,`docs/specs/watchdog.md` 裡也一直寫著「預設 4」,兩邊唯一不一致的地方就是這個測試裡寫死的常數。也就是說:**這個測試常數從一開始就是錯的**,只是舊的 `wdt_sim` binary 剛好是在某次意外用對數字的情況下建出來的,之後這個常數被改錯、卻沒人重新乾淨編譯過,binary 就一直「看起來是綠的」,實際上早就跟原始碼脫鉤了。
 
 這正是「維護一支能一次性乾淨重跑全部測試的 regression 腳本」存在的意義:它抓到的不是「這次改動引入的新 bug」,而是「原始碼其實已經跟已建置的驗證結果不一致、只是沒人重新跑過驗證」這種悄悄發生的腐化(rot)。修法很單純:把測試常數改成 4,重新編譯,全綠。
 
@@ -129,7 +129,7 @@ Nangate45 合成+STA(僅 `aes_core`,不含 AXI wrapper):Fmax ≈ 98.5MHz,關鍵�
 Phase 7 的效能數據(`docs/performance.md`)全部來自**真正跑起來的量測**,不是估算:
 - Fmax 來自對整顆 SoC(記憶體陣列以 blackbox 處理)做真正的 Yosys 合成 + OpenSTA timing analysis,不是只合成單一模組後外推。
 - DMA 的 cycles/block 數字來自在 C++ testbench 裡對 `tick_half` 呼叫次數做精確計數,不是理論值。
-- 中斷延遲(3-14 cycles,平均 8.6)是直接寫一支 scope-aware 的 VCD parser,對 `blocks/soc_top/sim/wave.vcd` 這份已經存在的完整波形做後處理量出來的——過程中也踩到一個小坑:一開始猜測需要透過 Verilator 的內部 hierarchy signal 存取 PicoRV32 深層的 `irq_active` 暫存器,但 Verilator 預設不會把這類內部訊號暴露成可以直接存取的 C++ member,與其冒險用 `--public` 之類的旗標重新編譯、或用不穩定的內部命名去猜 C++ member 名稱,不如**直接解析既有的 VCD 波形檔**——`soc_top_sim` 本來就已經用 `--trace` 深度 99 產生完整波形,VCD 格式本身很單純(`$scope`/`$var`/`$upscope` 定義 hierarchy,後面是逐拍的訊號變化),不需要額外的 Python 套件也能寫出一支可靠的最小化 parser。
+- 中斷延遲(3-14 cycles,平均 8.6)是直接寫一支 scope-aware 的 VCD parser,對 `blocks/soc_top/dv/wave.vcd` 這份已經存在的完整波形做後處理量出來的——過程中也踩到一個小坑:一開始猜測需要透過 Verilator 的內部 hierarchy signal 存取 PicoRV32 深層的 `irq_active` 暫存器,但 Verilator 預設不會把這類內部訊號暴露成可以直接存取的 C++ member,與其冒險用 `--public` 之類的旗標重新編譯、或用不穩定的內部命名去猜 C++ member 名稱,不如**直接解析既有的 VCD 波形檔**——`soc_top_sim` 本來就已經用 `--trace` 深度 99 產生完整波形,VCD 格式本身很單純(`$scope`/`$var`/`$upscope` 定義 hierarchy,後面是逐拍的訊號變化),不需要額外的 Python 套件也能寫出一支可靠的最小化 parser。
 
 ## Phase 7 後續補強:補上獨立的 lint pass,抓到真正的 dead code
 
@@ -163,9 +163,9 @@ Phase 7 完成、簽核之後,原本的判斷是「整顆 SoC 都合成得出來
 
 **它做不到的事,比它能做到的事更值得記住**:這個專案目前為止踩過、修過的真正功能性 bug——`aes_chain` 用了還沒更新的 `mode_reg`、`dma_engine` 的 `wlast` 差一拍、SPI CPHA 的 `edge_cnt==0` 特例、I2C 的 START condition 時序、crossbar 仲裁 grant 被中途偷走——**沒有一個是 lint 能抓到的**,全部都是靠 cycle-accurate 的模擬、逐拍跟軟體參考模型比對才抓到的。Lint 只能回答「這裡有沒有東西宣告了沒用、case 有沒有漏、寬度有沒有兜不齊」,回答不了「這個訊號在這一拍讀到的到底是不是你以為的那個值」——這正是為什麼這個專案從 Phase 1 開始就把驗證重心放在 cycle-accurate simulation + 獨立軟體模型比對,lint 只是這次才補上的、範圍窄很多的第二道防線,補的是「死碼/風格」這一層,不是「邏輯正確性」那一層。
 
-### 新增:`reports/soc_top/` 一站式 sign-off 報告快照
+### 新增:`reports/sign_off/` 一站式 sign-off 報告快照
 
-`scripts/collect_soc_reports.sh` 一次跑完整個 SoC 層級的 simulation regression、lint、synthesis、STA,把結果收斂進 `reports/soc_top/`(這個資料夾**會**進版控,是刻意留下的簽核快照,跟 `blocks/*/syn`、`blocks/*/sta` 那些隨時可重新產生、故意不進版控的 scratch log 不同)。合成產生的完整 Yosys log 動輒幾十 MB(每一輪 PicoRV32 hierarchy 的中間優化 pass 都會印出來),不值得進版控,所以只保留最後的面積/cell 統計摘要;完整版留在本地的 `blocks/soc_top/syn/synth_log.txt`(已在 `.gitignore`)。
+`scripts/collect_soc_reports.sh` 一次跑完整個 SoC 層級的 simulation regression、lint、synthesis、STA,把結果收斂進 `reports/sign_off/`(這個資料夾**會**進版控,是刻意留下的簽核快照,跟 `blocks/*/syn`、`blocks/*/sta` 那些隨時可重新產生、故意不進版控的 scratch log 不同)。合成產生的完整 Yosys log 動輒幾十 MB(每一輪 PicoRV32 hierarchy 的中間優化 pass 都會印出來),不值得進版控,所以只保留最後的面積/cell 統計摘要;完整版留在本地的 `blocks/soc_top/syn/synth_log.txt`(已在 `.gitignore`)。
 
 ### 再往下一層:量化的 coverage(line/toggle/branch/FSM)+ 圖像化的 sign-off dashboard
 
@@ -208,4 +208,4 @@ lint 抓到「有沒有死碼」,但沒辦法回答「測試到底覆蓋了多�
 - 這個專案自己寫的 RTL,line coverage **96.3%**
 - 全部 **11 個 FSM,狀態 coverage 100%**(每個狀態都至少被進入過一次)
 - 135 筆 lint 發現全部分類完畢(文件記錄過的限制 / 刻意的設計 / vendored PicoRV32 風格),沒有一筆是「不知道算什麼」
-- `scripts/build_dashboard.py` 把以上全部數據 + 架構圖,渲染成一個單一的靜態 HTML(`reports/soc_top/dashboard.html`),取代原本純文字的 report——這個檔案本身也進版控,是刻意留下的快照,不是每次都要重新產生才能看的東西。
+- `scripts/build_dashboard.py` 把以上全部數據 + 架構圖,渲染成一個單一的靜態 HTML(`reports/sign_off/dashboard.html`),取代原本純文字的 report——這個檔案本身也進版控,是刻意留下的快照,不是每次都要重新產生才能看的東西。

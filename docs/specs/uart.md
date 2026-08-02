@@ -45,7 +45,7 @@ Parameter：`CLKS_PER_BIT`（預設 4，模擬用）——決定一個 bit perio
 
 ## 5. Verification
 
-`blocks/uart/sim/sim_main.cpp`，這個測試刻意**不信任 STATUS**，而是直接解碼 `tx` 這條實體序列線（start bit → 8 個 data bit，LSB-first → stop bit），模擬真實的序列埠接收端會看到的行為：
+`blocks/uart/dv/sim_main.cpp`，這個測試刻意**不信任 STATUS**，而是直接解碼 `tx` 這條實體序列線（start bit → 8 個 data bit，LSB-first → stop bit），模擬真實的序列埠接收端會看到的行為：
 
 - 驗證重點：
   - 基本收發：寫入 `0x41`('A')，從線路上解碼回來確認是 `0x41`、stop bit 正確為高

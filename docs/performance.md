@@ -28,7 +28,7 @@
 
 ## 3. DMA 吞吐量(含 burst overhead)
 
-在 `blocks/dma/sim/dma_engine_sim_main.cpp` 裡直接量測:每次 `run_dma()` 呼叫,從 CTRL.START 寫入到觀察到 STATUS.DONE 為止,實際經過幾個 cycle(透過對 `tick_half` 呼叫次數計數,精確到 cycle,不是估計)。CBC encrypt/CTR/CBC decrypt 三組操作,每組 4 個 block,量到的結果一致:
+在 `blocks/dma/dv/dma_engine_sim_main.cpp` 裡直接量測:每次 `run_dma()` 呼叫,從 CTRL.START 寫入到觀察到 STATUS.DONE 為止,實際經過幾個 cycle(透過對 `tick_half` 呼叫次數計數,精確到 cycle,不是估計)。CBC encrypt/CTR/CBC decrypt 三組操作,每組 4 個 block,量到的結果一致:
 
 - **156 cycles / 4 blocks = 39.0 cycles/block**(平均,含 burst 讀 4 拍 + AES 21 cycles + burst 寫 4 拍 + 狀態機切換 overhead + 軟體 polling STATUS 暫存器本身的 bus cycle)
 
@@ -41,7 +41,7 @@
 
 ## 4. 中斷延遲(實測)
 
-方法:直接從 `blocks/soc_top/sim/wave.vcd`(已有的完整波形,`--trace` 深度 99)量測 `soc_top.timer_irq` 訊號拉起,到 PicoRV32 內部 `irq_active` 暫存器(真正進入 ISR 的那一拍)拉起之間的 cycle 數,橫跨整個 soc_top regression 裡 5 次真實觸發的 Timer 中斷全部量過,不是只看一次:
+方法:直接從 `blocks/soc_top/dv/wave.vcd`(已有的完整波形,`--trace` 深度 99)量測 `soc_top.timer_irq` 訊號拉起,到 PicoRV32 內部 `irq_active` 暫存器(真正進入 ISR 的那一拍)拉起之間的 cycle 數,橫跨整個 soc_top regression 裡 5 次真實觸發的 Timer 中斷全部量過,不是只看一次:
 
 | 事件 # | 延遲(cycles) |
 |---|---|
@@ -57,7 +57,7 @@
 
 ## 5. 典型迴圈週期數
 
-`blocks/soc_top/sim/sim_main.cpp` 的完整 regression(reset → boot firmware → 5 次真實 Timer 中斷,每次間隔 firmware 設定的 `TIMER_PERIOD=1000` cycles → 把 "Hello World\nTimer IRQs: 5\n" 全部經由 bit-banged UART 送完為止),總共:
+`blocks/soc_top/dv/sim_main.cpp` 的完整 regression(reset → boot firmware → 5 次真實 Timer 中斷,每次間隔 firmware 設定的 `TIMER_PERIOD=1000` cycles → 把 "Hello World\nTimer IRQs: 5\n" 全部經由 bit-banged UART 送完為止),總共:
 
 **8907 cycles**
 
@@ -68,5 +68,5 @@
 
 ## 6. 方法論註記
 
-- STA 的 SDC 假設所有輸入/輸出的 I/O delay 是 0(見 `blocks/soc_top/sdc/soc_top.sdc`)——這個專案裡每個模組的 AXI 訊號在邊界都已經是暫存器輸出,所以量到的關鍵路徑是這個 SoC 真正的內部邏輯路徑,不是任意的 I/O budget 假設。
+- STA 的 SDC 假設所有輸入/輸出的 I/O delay 是 0(見 `blocks/soc_top/constraints/soc_top.sdc`)——這個專案裡每個模組的 AXI 訊號在邊界都已經是暫存器輸出,所以量到的關鍵路徑是這個 SoC 真正的內部邏輯路徑,不是任意的 I/O budget 假設。
 - 中斷延遲跟 DMA cycle count 都是從**真正跑起來的模擬**直接量測(VCD 波形分析、C++ testbench 裡的 cycle counter),不是從 RTL 推算或假設。

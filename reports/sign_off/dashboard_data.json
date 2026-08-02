@@ -190,42 +190,42 @@
         },
         {
           "name": "ST_START",
-          "hits": 16,
-          "visited": true
-        },
-        {
-          "name": "ST_ADDR",
-          "hits": 128,
-          "visited": true
-        },
-        {
-          "name": "ST_ADDR_ACK",
-          "hits": 16,
-          "visited": true
-        },
-        {
-          "name": "ST_WDATA",
-          "hits": 64,
-          "visited": true
-        },
-        {
-          "name": "ST_WDATA_ACK",
-          "hits": 8,
-          "visited": true
-        },
-        {
-          "name": "ST_RDATA",
           "hits": 32,
           "visited": true
         },
         {
+          "name": "ST_ADDR",
+          "hits": 256,
+          "visited": true
+        },
+        {
+          "name": "ST_ADDR_ACK",
+          "hits": 32,
+          "visited": true
+        },
+        {
+          "name": "ST_WDATA",
+          "hits": 128,
+          "visited": true
+        },
+        {
+          "name": "ST_WDATA_ACK",
+          "hits": 16,
+          "visited": true
+        },
+        {
+          "name": "ST_RDATA",
+          "hits": 64,
+          "visited": true
+        },
+        {
           "name": "ST_RDATA_ACK",
-          "hits": 4,
+          "hits": 8,
           "visited": true
         },
         {
           "name": "ST_STOP",
-          "hits": 24,
+          "hits": 48,
           "visited": true
         }
       ],
@@ -243,7 +243,7 @@
         },
         {
           "name": "RUN",
-          "hits": 340,
+          "hits": 680,
           "visited": true
         }
       ],
@@ -256,82 +256,82 @@
       "states": [
         {
           "name": "TEST_LOGIC_RESET",
-          "hits": 489,
+          "hits": 978,
           "visited": true
         },
         {
           "name": "RUN_TEST_IDLE",
-          "hits": 876,
+          "hits": 1752,
           "visited": true
         },
         {
           "name": "SELECT_DR_SCAN",
-          "hits": 661,
+          "hits": 1322,
           "visited": true
         },
         {
           "name": "CAPTURE_DR",
-          "hits": 306,
+          "hits": 612,
           "visited": true
         },
         {
           "name": "SHIFT_DR",
-          "hits": 834,
+          "hits": 1668,
           "visited": true
         },
         {
           "name": "EXIT1_DR",
-          "hits": 397,
+          "hits": 794,
           "visited": true
         },
         {
           "name": "PAUSE_DR",
-          "hits": 403,
+          "hits": 806,
           "visited": true
         },
         {
           "name": "EXIT2_DR",
-          "hits": 201,
+          "hits": 402,
           "visited": true
         },
         {
           "name": "UPDATE_DR",
-          "hits": 306,
+          "hits": 612,
           "visited": true
         },
         {
           "name": "SELECT_IR_SCAN",
-          "hits": 355,
+          "hits": 710,
           "visited": true
         },
         {
           "name": "CAPTURE_IR",
-          "hits": 148,
+          "hits": 296,
           "visited": true
         },
         {
           "name": "SHIFT_IR",
-          "hits": 250,
+          "hits": 500,
           "visited": true
         },
         {
           "name": "EXIT1_IR",
-          "hits": 201,
+          "hits": 402,
           "visited": true
         },
         {
           "name": "PAUSE_IR",
-          "hits": 240,
+          "hits": 480,
           "visited": true
         },
         {
           "name": "EXIT2_IR",
-          "hits": 115,
+          "hits": 230,
           "visited": true
         },
         {
           "name": "UPDATE_IR",
-          "hits": 147,
+          "hits": 294,
           "visited": true
         }
       ],

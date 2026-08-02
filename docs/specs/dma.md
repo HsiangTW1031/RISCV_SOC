@@ -22,7 +22,7 @@ Phase 6（選配延伸）：讓 DMA 直接把整段訊息從記憶體搬過 AES�
 - 一個 AXI4-**Lite** slave 控制埠（CTRL/STATUS/SRC/DST/LEN/KEY/IV 暫存器),接進主 crossbar,跟其他周邊平起平坐,firmware 用一般的 MMIO 讀寫。
 - 一個 AXI4（完整版,支援 burst)**master** 埠,直接點對點接到 `dma_ram.v`——一塊只有 DMA 自己能碰、專用的 8KB scratch RAM,完全不經過 crossbar。
 
-代價：`dma_ram.v` 目前在真正的 `soc_top` 裡，CPU（或 JTAG）沒有其他路徑可以預先把明文塞進去、或事後把密文讀出來——這塊記憶體的內容只有 DMA engine 自己看得到、動得了。這個 phase 是選配延伸,決定不為了「讓 CPU 也能存取這塊記憶體」再多蓋一層 arbiter/adapter；`blocks/dma/sim/dma_engine_sim_main.cpp` 用一個測試專用的 AXI4 burst 埠（`dma_engine_testtop.v`,不是可合成的交付物)直接戳 `dma_ram.v` 來預載/驗證資料,`soc_top` 這層的整合測試則只驗證 DMA 控制埠透過真正的 crossbar 可以正確定址（見下方 Verification）。
+代價：`dma_ram.v` 目前在真正的 `soc_top` 裡，CPU（或 JTAG）沒有其他路徑可以預先把明文塞進去、或事後把密文讀出來——這塊記憶體的內容只有 DMA engine 自己看得到、動得了。這個 phase 是選配延伸,決定不為了「讓 CPU 也能存取這塊記憶體」再多蓋一層 arbiter/adapter；`blocks/dma/dv/dma_engine_sim_main.cpp` 用一個測試專用的 AXI4 burst 埠（`dma_engine_testtop.v`,不是可合成的交付物)直接戳 `dma_ram.v` 來預載/驗證資料,`soc_top` 這層的整合測試則只驗證 DMA 控制埠透過真正的 crossbar 可以正確定址（見下方 Verification）。
 
 ## 2. Block Diagram
 
@@ -76,10 +76,10 @@ flowchart LR
 
 三層驗證：
 
-1. **`aes_chain` 單元測試**（`blocks/aes/sim/chain_sim_main.cpp`)——直接打 `aes_chain` 的訊號（不經 AXI），驗證 CBC 和 CTR 兩個方向都符合 NIST SP 800-38A Appendix F.2/F.5 官方向量。
-2. **`aes.v` 透過 AXI-Lite 的 CBC/CTR 測試**（`blocks/aes/sim/sim_main.cpp` 新增段落)——同樣的向量,這次透過真正的暫存器介面（MODE/LOAD_IV/IV0-3),確認 register map 擴充沒有破壞既有的 ECB 路徑。
-3. **`dma_ram` 的 AXI4 burst 單元測試**（`blocks/dma/sim/dma_ram_sim_main.cpp`)——4-beat 讀寫、byte strobe 部分寫入、單拍 burst、連續 burst 之間互不干擾。
-4. **`dma_engine` 端到端測試**（`blocks/dma/sim/dma_engine_sim_main.cpp`,透過 `dma_engine_testtop.v` 測試專用 harness)——CBC encrypt 4 blocks、CTR 4 blocks、CBC decrypt 4 blocks（把 test 1 產生的密文解回明文),全部透過真正的 AXI4-Lite 控制埠 + AXI4 burst 資料路徑,比對 NIST SP 800-38A 向量,CPU 全程不碰任何一個 128-bit block。15/15 checks all green。
-5. **`soc_top` 整合測試**（`blocks/soc_top/sim/sim_main.cpp`)——JTAG 橋接透過真正的 2-master crossbar 寫入/讀回 DMA 的 `SRC_ADDR` 暫存器,驗證位址解碼把 `0x4000_6000` 正確路由到 crossbar 第 9 個 slave。`dma_ram` 本來就不接在 crossbar 上（見上方架構決定),所以完整的多 block DMA+AES 操作只在 block 層驗證,這裡只驗證控制埠的接線正確。
+1. **`aes_chain` 單元測試**（`blocks/aes/dv/chain_sim_main.cpp`)——直接打 `aes_chain` 的訊號（不經 AXI），驗證 CBC 和 CTR 兩個方向都符合 NIST SP 800-38A Appendix F.2/F.5 官方向量。
+2. **`aes.v` 透過 AXI-Lite 的 CBC/CTR 測試**（`blocks/aes/dv/sim_main.cpp` 新增段落)——同樣的向量,這次透過真正的暫存器介面（MODE/LOAD_IV/IV0-3),確認 register map 擴充沒有破壞既有的 ECB 路徑。
+3. **`dma_ram` 的 AXI4 burst 單元測試**（`blocks/dma/dv/dma_ram_sim_main.cpp`)——4-beat 讀寫、byte strobe 部分寫入、單拍 burst、連續 burst 之間互不干擾。
+4. **`dma_engine` 端到端測試**（`blocks/dma/dv/dma_engine_sim_main.cpp`,透過 `dma_engine_testtop.v` 測試專用 harness)——CBC encrypt 4 blocks、CTR 4 blocks、CBC decrypt 4 blocks（把 test 1 產生的密文解回明文),全部透過真正的 AXI4-Lite 控制埠 + AXI4 burst 資料路徑,比對 NIST SP 800-38A 向量,CPU 全程不碰任何一個 128-bit block。15/15 checks all green。
+5. **`soc_top` 整合測試**（`blocks/soc_top/dv/sim_main.cpp`)——JTAG 橋接透過真正的 2-master crossbar 寫入/讀回 DMA 的 `SRC_ADDR` 暫存器,驗證位址解碼把 `0x4000_6000` 正確路由到 crossbar 第 9 個 slave。`dma_ram` 本來就不接在 crossbar 上（見上方架構決定),所以完整的多 block DMA+AES 操作只在 block 層驗證,這裡只驗證控制埠的接線正確。
 
 實作過程中抓到的幾個真實 bug（同一類「用還沒更新的 register 算同一拍的組合邏輯」錯誤,在這個專案裡重複出現超過一次——AES chain 和 SPI CPHA 都踩過同一個坑),詳細的 root-cause 與除錯過程見 `docs/project_retrospective.md`。
