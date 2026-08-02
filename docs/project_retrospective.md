@@ -209,3 +209,32 @@ lint 抓到「有沒有死碼」,但沒辦法回答「測試到底覆蓋了多�
 - 全部 **11 個 FSM,狀態 coverage 100%**(每個狀態都至少被進入過一次)
 - 135 筆 lint 發現全部分類完畢(文件記錄過的限制 / 刻意的設計 / vendored PicoRV32 風格),沒有一筆是「不知道算什麼」
 - `scripts/build_dashboard.py` 把以上全部數據 + 架構圖,渲染成一個單一的靜態 HTML(`reports/sign_off/dashboard.html`),取代原本純文字的 report——這個檔案本身也進版控,是刻意留下的快照,不是每次都要重新產生才能看的東西。
+
+### 再往下一層:toggle coverage 的 waiver 流程
+
+58.1% 這個 toggle coverage 數字掛在 dashboard 上一陣子後,回頭認真想「這個數字到底準不準、要不要花力氣去拉高」——結論是不用建 UVM(這個專案從 Phase 0 開始就是純 Verilog-2001,不用 SystemVerilog,UVM 需要 SystemVerilog,前提就不成立;而且大部分的缺口一看就是結構性的,不是 constrained-random 能解決的多樣性問題),改用業界常見的方式:逐條 review、把「結構上就是不可能 toggle」的訊號明確 waive 掉。這一段記錄實際做這件事時踩到的坑。
+
+#### 第一個坑:raw aggregate 的 58.1%,其實是被 hierarchy instance 重複計數灌水過的數字
+
+想先確認到底有哪些 signal 是缺口,直接拿 `verilator_coverage --report summary,hier` 的輸出來看每個 module 的明細,才發現同一份 RTL 只要在合併後的測試套件裡被多個不同路徑實例化,就會被算好幾次——`aes_core.v` 就同時出現在 `TOP.aes`、`TOP.aes_chain.u_core`、`TOP.aes_core`、`TOP.dma_engine_testtop.u_engine.u_chain.u_core`、`TOP.soc_top.u_aes.u_chain.u_core` 這 5 個路徑下。如果直接在這個聚合數字上動手套 waiver,同一個 bit 的 waiver 理由會被計算 5 次,waiver 對最終數字的實際影響會被嚴重放大,數字沒有意義。於是決定不用 `verilator_coverage` 內建的 report,改成直接讀 `merged.dat` 原始資料自己做 per-bit 去重複。
+
+#### 第二個坑:兩次嘗試都解析失敗(0 match),原因是沒認出格式裡藏著的控制字元
+
+第一版 parser 用一般的正規表示式去抓檔案路徑欄位,想法是用 `[^l]+` 排除到下一個 `l` 開頭的欄位為止——結果完全抓不到任何東西(matched=0)。原因是這個專案的絕對路徑裡本身就重複出現字母 `l`(`Levi-agent`、`blocks` 都有),`[^l]+` 在真正的欄位分隔符出現之前,老早就被路徑裡的某個 `l` 截斷。第二版嘗試換個角度,把所有「看起來像雜訊」的控制字元(`ord(ch) < 0x20`)整個濾掉再解析——結果一樣是 0 match,因為這些字元根本不是雜訊,是欄位之間真正的結構性分隔符,濾掉之後欄位全部黏在一起,更沒辦法分割。兩次都失敗後,回到最基本的作法:用 `open(path, 'rb')` 直接印出原始 bytes,不透過任何字串處理去猜——這才看清楚真正的格式是 `C '\x01f\x02<file>\x01l\x02<line>\x01t\x02toggle\x01o\x02<signal>:<0->1|1->0>\x01...' <count>`,`\x01` 分隔每個欄位、`\x02` 分隔 key 跟 value,而且 key 可以是多字元(例如 `page`,不是只有 `f`/`l`/`t`/`o` 這種單一字母)。改用正確的欄位切法後才一次解析成功(matched=59110、去重複後 unique bits=11401)。這個坑本質上跟前面「annotated 檔案格式被 `grep -n` 混淆」是同一類教訓的第二次出現:先看原始 bytes,不要用猜的。
+
+#### 修正後的數字:69.5%(waive 前),不是 58.1%
+
+去重複、per-bit 重新統計後,waive 前的 toggle coverage 是 **69.5%(7923/11401 bits)**,比 raw aggregate 的 58.1% 高了 11.4 個百分點——差距完全來自去除重複計數,還沒套用任何一條 waiver。
+
+#### 逐條 review 訊號、寫 waiver rule 時,自己也犯了一次跟 waiver 本身精神矛盾的錯
+
+review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫死的 handshake、AXI response 編碼只用到 OKAY/SLVERR、peripheral 層級寫死 OKAY 的 bresp/rresp、從沒被讀取的 wstrb、AXI4 burst-subset 欄位)之後,第一版 waiver file 把 JTAG bridge 的 `addr_reg`(儲存 JTAG shift 進來的目標位址)也歸進「位址高位元,上游已解碼、跟這裡無關」這一類,套用理由是「JTAG 測試只探測幾個具代表性的位址,不是全位址空間」。跑出結果後才發現這條 rule 沒有限定檔案,結果同時誤中了 `jtag_axi_bridge.v`、`jtag_dtm.v` 之外,還誤中了完全不相關的 `i2c_master.v:316`(一個 7-bit 的 I2C target 位址暫存器)。
+
+回頭重新檢查才意識到問題不在「這個 signal 叫不叫 addr」,而在於這個 signal 的值**有沒有真的被下游拿去用**:`s_awaddr` 的高位元是 crossbar 已經解碼完、slave 確定用不到的部分,waive 掉沒問題;但 `addr_reg` 是一個真的會驅動實際 AXI 交易位址、或決定 I2C target 的完整值,沒有任何一個 bit 是結構上不可能變化的,純粹是目前的測試只選了少數幾個具代表性的位址/target 去測——跟前面決定不 waive 的 `mode_reg`(AES 模式暫存器,因為測試順序只造成單方向 toggle)、`key_reg`(DMA 只用過一組固定金鑰)是同一種性質的缺口:測試向量多樣性不足,不是硬體限制。已把這條 rule 從 waiver file 移除,改列進 residual gap,留待未來用更多樣的位址/target 補測試。
+
+#### 最後的結果
+
+- Toggle coverage:raw aggregate 58.1% → deduped per-bit(waive 前)69.5% → deduped per-bit(waive 後,36 條 rule、1513 bits 被排除)**80.1%**
+- 每一條 waiver rule 都附上對應的 RTL 行號實證(不是憑感覺套 pattern),寫在 `reports/sign_off/coverage/toggle_waivers.txt`
+- 1965 bits 刻意不 waive、留作 residual gap(主要是 `dma_engine.v` 的 `key_reg`/`iv_reg` 只測過一組固定金鑰、`divider_reg` 只測過偏小的除頻值、部分 `s_rdata`/`m_rdata` 高位元、以及 `soc_top` 自己還沒有端到端測過 SPI/I2C)——這些留在 `docs/coverage_waiver_report.md`,不是消失掉,是明確標記成「之後可以加測試補的項目」
+- 完整量化的 waive 前後對照(含每個 block 的細分)獨立寫在 `docs/coverage_waiver_report.md`,`reports/sign_off/dashboard.html` 也新增對應的區塊呈現同一份數據。

@@ -133,6 +133,60 @@ def render_fsm_section():
     return "\n".join(out)
 
 
+twr = data["toggle_waiver_report"]
+
+
+def render_toggle_waiver_section():
+    out = []
+    out.append('<div class="overall-bars">')
+    out.append(f'<div class="metric"><div class="name">Before waivers (deduped per-bit)</div>'
+                f'{bar(twr["before"]["pct"], "warn" if twr["before"]["pct"] < 85 else "good")}'
+                f'<div class="cov-frac">{twr["before"]["covered"]}/{twr["before"]["total"]} bits</div></div>')
+    out.append(f'<div class="metric"><div class="name">After {twr["waiver_rule_count"]} waiver rules '
+                f'({twr["waived_bit_count"]} bits waived)</div>'
+                f'{bar(twr["after"]["pct"], "good" if twr["after"]["pct"] >= 85 else "warn")}'
+                f'<div class="cov-frac">{twr["after"]["covered"]}/{twr["after"]["total"]} bits</div></div>')
+    out.append('</div>')
+    out.append('<p style="color:var(--text-dim);font-size:0.85rem">"Deduped per-bit" parses '
+                '<code>merged.dat</code> directly and counts each source-level toggle bit once, '
+                'regardless of how many hierarchy instances share the same underlying module '
+                '(unlike the raw aggregate above, which counts a shared sub-module once per '
+                'instantiation). A waived bit is removed from both the numerator and the '
+                'denominator; it is not counted as covered. Rules + rationale: '
+                '<code>reports/sign_off/coverage/toggle_waivers.txt</code>. Full report: '
+                '<code>docs/coverage_waiver_report.md</code>.</p>')
+
+    out.append('<details class="cat"><summary>Waiver rules applied '
+                f'<span class="count">{len(twr["by_reason"])} reasons, {twr["waived_bit_count"]} bits</span></summary>')
+    out.append('<table class="mini"><thead><tr><th>Bits waived</th><th>Reason</th><th>Example</th></tr></thead><tbody>')
+    for r in twr["by_reason"]:
+        example = esc(r["examples"][0]) if r["examples"] else ""
+        out.append(f'<tr><td>{r["count"]}</td><td>{esc(r["reason"])}</td><td class="mono">{example}</td></tr>')
+    out.append('</tbody></table></details>')
+
+    residual_grouped = defaultdict(lambda: {"count": 0, "line": None})
+    for g in twr["residual_gaps"]:
+        base = re.sub(r"\[\d+\]$", "", g["signal"])
+        key = (g["block"], g["file"], base)
+        residual_grouped[key]["count"] += 1
+        if residual_grouped[key]["line"] is None:
+            residual_grouped[key]["line"] = g["line"]
+
+    out.append('<details class="cat"><summary>Residual gaps (not waived, still open) '
+                f'<span class="count">{len(twr["residual_gaps"])} bits across '
+                f'{len(residual_grouped)} signals</span></summary>')
+    out.append('<p class="note">Not structurally impossible &mdash; each reflects limited test-vector '
+                'diversity (e.g. one fixed AES key, a handful of probed addresses, small divider '
+                'values) rather than hardware that cannot toggle. Left open deliberately rather '
+                'than waived away; see docs/coverage_waiver_report.md for the reasoning per group.</p>')
+    out.append('<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Signal</th><th>Bits uncovered</th></tr></thead><tbody>')
+    for (block, file, base), v in sorted(residual_grouped.items(), key=lambda kv: -kv[1]["count"]):
+        out.append(f'<tr><td>{esc(block)}</td><td class="mono">{esc(file)}</td><td>{v["line"]}</td>'
+                    f'<td class="mono">{esc(base)}</td><td>{v["count"]}</td></tr>')
+    out.append('</tbody></table></details>')
+    return "\n".join(out)
+
+
 def render_file_table():
     out = ['<table class="filecov"><thead><tr><th>Block</th><th>File</th><th>Line coverage</th></tr></thead><tbody>']
     for f in files_cov:
@@ -349,6 +403,11 @@ flowchart TB
     </div>
     <p style="color:var(--text-dim);font-size:0.85rem">Aggregate numbers above are diluted by shared sub-modules counted once per instantiating test (e.g. aes_core is exercised by 5 different tests) &mdash; the per-file table below is the more meaningful "was this actual source file exercised" view.</p>
     {render_file_table()}
+  </section>
+
+  <section id="toggle-waivers">
+    <h2>Toggle Coverage Waivers</h2>
+    {render_toggle_waiver_section()}
   </section>
 
   <section id="fsm">

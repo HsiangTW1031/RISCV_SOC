@@ -39,11 +39,15 @@
 | 指標 | 結果 |
 |---|---|
 | Line coverage(這個專案自己寫的 RTL,不含 vendored PicoRV32) | **96.3%** |
-| Toggle coverage(全專案合併) | 58.1%(43157/74282 points) |
+| Toggle coverage,raw aggregate(`verilator_coverage --report summary`) | 58.1%(43157/74282 points)——這個數字把同一個 source-level toggle point 依 hierarchy instance 重複計數(例如 `aes_core.v` 被 5 個不同路徑實例化),分母被灌水,詳見下方 |
+| Toggle coverage,deduped per-bit,**waive 前** | **69.5%**(7923/11401 bits) |
+| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1513 個結構上不可能 toggle 的 bit) | **80.1%**(7923/9888 bits) |
 | Branch coverage(全專案合併) | 77.3%(1500/1940 points) |
 | **FSM state coverage**（11 個 FSM:spi_master、i2c_master、uart、jtag_tap、aes_core、aes_chain、axi_lite_xbar 讀/寫、dma_ram 讀/寫、dma_engine) | **100%**(全部狀態都至少被進入過一次) |
 
-圖像化的 sign-off dashboard(coverage bar chart、每個 FSM 的狀態 checklist、135 筆 lint 發現分類後的 summary、架構圖)：`reports/sign_off/dashboard.html`,可以直接用瀏覽器打開,不需要額外工具。
+Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、waive 前後每個 block 的量化對照、以及刻意不 waive 的 residual gap 清單:`docs/coverage_waiver_report.md`。
+
+圖像化的 sign-off dashboard(coverage bar chart、toggle waiver 摘要、每個 FSM 的狀態 checklist、135 筆 lint 發現分類後的 summary、架構圖)：`reports/sign_off/dashboard.html`,可以直接用瀏覽器打開,不需要額外工具。
 
 ## 4. 這次 Phase 7 regression 抓到的一個真實 bug
 

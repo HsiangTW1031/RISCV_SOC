@@ -279,12 +279,172 @@ def per_file_line_coverage():
     return sorted(results, key=lambda r: (r["block"], r["file"]))
 
 
+TOGGLE_WAIVERS_FILE = COV_DIR / "toggle_waivers.txt"
+MERGED_DAT = COV_DIR / "merged.dat"
+
+# The same substring filter as EXCLUDE_FILES/EXCLUDE_PATH_SUBSTR above, but
+# matched against the full path recorded in merged.dat (vendored PicoRV32 and
+# test-only harnesses are excluded from this project's own toggle numbers).
+TOGGLE_EXCLUDE_PATH_SUBSTR = ["picorv32.v", "testtop.v", "fake_", "aes_pkg.vh"]
+
+OUTER_RE = re.compile(r"^C '(.*)' (\d+)\s*$")
+
+
+def load_toggle_waivers():
+    """Reads reports/sign_off/coverage/toggle_waivers.txt: one rule per
+    non-comment line, '<signal-regex><TAB><reason>'. Each rule is tested
+    against both the bit-indexed signal name (e.g. 's_bresp[0]') and the
+    base name with the index stripped (e.g. 's_bresp'), so a single file
+    can hold both whole-signal rules and single-bit rules."""
+    rules = []
+    if not TOGGLE_WAIVERS_FILE.exists():
+        return rules
+    for raw in TOGGLE_WAIVERS_FILE.read_text(errors="replace").splitlines():
+        line = raw.rstrip("\n")
+        if not line.strip() or line.lstrip().startswith("#") or "\t" not in line:
+            continue
+        pattern, reason = line.split("\t", 1)
+        rules.append((re.compile(pattern.strip()), reason.strip()))
+    return rules
+
+
+def base_signal_name(sig):
+    return re.sub(r"\[\d+\]$", "", sig)
+
+
+def match_waiver(rules, full_signal, base_signal):
+    for pattern, reason in rules:
+        if pattern.match(full_signal) or pattern.match(base_signal):
+            return reason
+    return None
+
+
+def parse_toggle_bits():
+    """Parses merged.dat directly instead of relying on verilator_coverage's
+    own --report summary: that report counts the same underlying source-code
+    toggle point once per hierarchy instantiation of a shared sub-module
+    (e.g. aes_core.v is instantiated in 5 different places across the merged
+    suite), inflating the denominator without inflating actual stimulus
+    diversity. This reads every raw toggle point, keyed by (file, line,
+    signal), and keeps the max hit count seen for each 0->1/1->0 direction
+    across ALL instances -- a bit counts as covered if ANY instance ever
+    exercised both directions.
+
+    merged.dat encodes each point as:
+      C '\\x01<key1>\\x02<value1>\\x01<key2>\\x02<value2>...' <count>
+    with keys possibly multi-character (e.g. 'page', not just 'f'/'l'/'t').
+    """
+    points = {}
+    if not MERGED_DAT.exists():
+        return points
+    with open(MERGED_DAT, "rb") as f:
+        for raw in f:
+            line = raw.decode("utf-8", errors="replace")
+            if not line.startswith("C '"):
+                continue
+            m = OUTER_RE.match(line.rstrip("\n"))
+            if not m:
+                continue
+            body, count_s = m.group(1), m.group(2)
+            count = int(count_s)
+            fields = {}
+            for chunk in body.split("\x01"):
+                if not chunk or "\x02" not in chunk:
+                    continue
+                key, val = chunk.split("\x02", 1)
+                fields[key] = val
+            if fields.get("t") != "toggle":
+                continue
+            file = fields.get("f", "")
+            if any(s in file for s in TOGGLE_EXCLUDE_PATH_SUBSTR):
+                continue
+            lineno = int(fields.get("l", "0"))
+            o = fields.get("o", "")
+            if ":" not in o:
+                continue
+            signal, dirn = o.rsplit(":", 1)
+            key = (file, lineno, signal)
+            d = points.setdefault(key, {"0->1": 0, "1->0": 0})
+            d[dirn] = max(d[dirn], count)
+    return points
+
+
+def build_toggle_waiver_report():
+    """Computes deduplicated per-bit toggle coverage before and after
+    applying reports/sign_off/coverage/toggle_waivers.txt. A waived bit is
+    removed from BOTH numerator and denominator (it neither helps nor hurts
+    the score) -- distinct from a plain uncovered bit, which still counts
+    against the denominator and shows up in 'residual_gaps' for follow-up."""
+    rules = load_toggle_waivers()
+    bits = parse_toggle_bits()
+
+    before_total = len(bits)
+    before_covered = sum(1 for d in bits.values() if d["0->1"] > 0 and d["1->0"] > 0)
+
+    waived_count = 0
+    after_covered = 0
+    after_total = 0
+    by_reason = {}
+    by_block_before = {}
+    by_block_after = {}
+    residual = []
+
+    for (file, line, signal), d in bits.items():
+        rel = file.split("RISCV_SOC/")[-1] if "RISCV_SOC/" in file else file
+        fname = Path(rel).name
+        block = FILE_TO_BLOCK.get(fname, fname)
+        covered = d["0->1"] > 0 and d["1->0"] > 0
+
+        bb = by_block_before.setdefault(block, {"covered": 0, "total": 0})
+        bb["total"] += 1
+        if covered:
+            bb["covered"] += 1
+
+        reason = None if covered else match_waiver(rules, signal, base_signal_name(signal))
+
+        if reason:
+            waived_count += 1
+            entry = by_reason.setdefault(reason, {"count": 0, "examples": []})
+            entry["count"] += 1
+            if len(entry["examples"]) < 3:
+                entry["examples"].append(f"{rel}:{line} {signal}")
+            continue
+
+        after_total += 1
+        ab = by_block_after.setdefault(block, {"covered": 0, "total": 0})
+        ab["total"] += 1
+        if covered:
+            after_covered += 1
+            ab["covered"] += 1
+        else:
+            residual.append({"file": rel, "line": line, "signal": signal, "block": block,
+                              "hit_0to1": d["0->1"], "hit_1to0": d["1->0"]})
+
+    def pct(c, t):
+        return round(100.0 * c / t, 1) if t else 0.0
+
+    return {
+        "before": {"covered": before_covered, "total": before_total, "pct": pct(before_covered, before_total)},
+        "after": {"covered": after_covered, "total": after_total, "pct": pct(after_covered, after_total)},
+        "waived_bit_count": waived_count,
+        "waiver_rule_count": len(rules),
+        "by_reason": [
+            {"reason": reason, "count": v["count"], "examples": v["examples"]}
+            for reason, v in sorted(by_reason.items(), key=lambda kv: -kv[1]["count"])
+        ],
+        "by_block_before": {k: {**v, "pct": pct(v["covered"], v["total"])} for k, v in by_block_before.items()},
+        "by_block_after": {k: {**v, "pct": pct(v["covered"], v["total"])} for k, v in by_block_after.items()},
+        "residual_gaps": sorted(residual, key=lambda r: (r["block"], r["file"], r["line"])),
+    }
+
+
 def main():
     summary = {}
     summary["coverage_overall"] = parse_hier_report().get("TOP", {})
     summary["coverage_by_file"] = per_file_line_coverage()
     summary["fsm_coverage"] = build_fsm_coverage()
     summary["lint_findings"] = parse_lint_reports()
+    summary["toggle_waiver_report"] = build_toggle_waiver_report()
 
     own_rtl = [f for f in summary["coverage_by_file"] if f["block"] != "picorv32 (vendored)"]
     covered = sum(f["covered"] for f in own_rtl)
@@ -297,6 +457,12 @@ def main():
     print(f"  overall line/toggle/branch: {summary['coverage_overall']}")
     print(f"  FSMs analyzed: {len(summary['fsm_coverage'])}")
     print(f"  lint findings: {len(summary['lint_findings'])}")
+    twr = summary["toggle_waiver_report"]
+    print(f"  toggle (deduped, before waivers): {twr['before']['pct']}% "
+          f"({twr['before']['covered']}/{twr['before']['total']} bits)")
+    print(f"  toggle (deduped, after {twr['waiver_rule_count']} waiver rules, "
+          f"{twr['waived_bit_count']} bits waived): {twr['after']['pct']}% "
+          f"({twr['after']['covered']}/{twr['after']['total']} bits)")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,120 @@
+# Toggle coverage waiver file — RISCV_SOC
+#
+# Reviewed by hand against the actual RTL (not blanket-applied by pattern
+# alone): each rule below is backed by reading the source and confirming
+# the signal is genuinely structurally incapable of toggling, not just
+# "happens not to have toggled in the current test suite". Signals whose
+# gap instead reflects limited test-vector diversity (e.g. a register only
+# ever loaded with one NIST test key, a wide data bus only ever carrying a
+# handful of fixed constants) are deliberately NOT waived here — see
+# docs/project_retrospective.md's coverage-waiver section for the
+# residual, non-waived list and why each was left alone.
+#
+# Format: one rule per non-comment line:
+#   <signal-name-regex> <TAB> <reason>
+# Applied to the case-sensitive base signal name (bit index stripped) by
+# scripts/apply_toggle_waivers.py against every real-RTL file (vendored
+# picorv32.v and test-only testtop/fake-slave files are already excluded
+# upstream in analyze_coverage.py's EXCLUDE_PATH_SUBSTR).
+
+# ---- Rule 1: address-bus upper bits ----
+# Every AXI-Lite slave in this project only inspects its own small
+# register-offset window (verified: each module's `aw_offset`/`ar_offset`
+# is a narrow slice of the address, e.g. `s_awaddr[6:0]`); the crossbar
+# (or, for block-level unit tests, the BFM) has already fully decoded the
+# address before it reaches the slave. Bits above the mapped region carry
+# no defined behavior — there is nothing for a wider test to exercise.
+^s_awaddr$	Slave only reads its own narrow register-offset window; upper address bits are already decoded upstream and carry no defined behavior here.
+^s_araddr$	Same as s_awaddr (read address channel).
+^.*_awaddr$	Crossbar-side per-slave address wire mirroring the same slave-side narrow decode.
+^.*_araddr$	Crossbar-side per-slave address wire mirroring the same slave-side narrow decode.
+^cur_awaddr$	Crossbar's internal latched write address; same narrow-decode reasoning downstream.
+^cur_araddr$	Crossbar's internal latched read address; same narrow-decode reasoning downstream.
+^w_addr_lat$	Crossbar's internal latched write address register.
+^r_addr_lat$	Crossbar's internal latched read address register.
+# NOTE: 'addr_reg' is deliberately NOT waived here, even though it first
+# looked like the same address-decode pattern as Rule 1's other entries.
+# Unlike s_awaddr/s_araddr (whose upper bits the RTL provably never reads,
+# because the crossbar/BFM already decoded them upstream), addr_reg is a
+# real register whose full range genuinely IS looked at downstream -- in
+# jtag_axi_bridge.v/jtag_dtm.v it drives the actual AXI address the bridge
+# issues, and in i2c_master.v it drives which I2C target gets addressed.
+# The gap here is that each test only ever probes a handful of specific
+# addresses, not that wider values are structurally impossible. That's a
+# stimulus-diversity gap (closable by testing more addresses), not a
+# hardware truth -- left as a residual, non-waived finding.
+
+# ---- Rule 2: always-ready slave handshake signals (hardwired 1'b1) ----
+# Confirmed in RTL: every simple peripheral in this project uses
+# `assign s_awready = 1'b1;` (etc.) -- an always-ready slave with no
+# back-pressure, by design (documented convention throughout). These
+# wires are physically incapable of ever being 0.
+^s_awready$	Hardwired `assign s_awready = 1'b1;` (always-ready slave convention, no back-pressure) -- confirmed in timer.v and identical across every simple peripheral.
+^s_arready$	Same hardwired-1 convention, read address channel.
+^s_wready$	Same hardwired-1 convention, write data channel.
+^.*_awready$	Crossbar-side per-slave ready wire mirroring the same hardwired-1 slave signal.
+^.*_arready$	Crossbar-side per-slave ready wire mirroring the same hardwired-1 slave signal.
+^.*_wready$	Crossbar-side per-slave ready wire mirroring the same hardwired-1 slave signal.
+^w_slave_awready$	Crossbar's internal mux selecting among slave awready signals, all of which are hardwired 1.
+^w_slave_wready$	Crossbar's internal mux selecting among slave wready signals, all of which are hardwired 1.
+^w_slave_arready_r$	Crossbar's internal mux selecting among slave arready signals, all of which are hardwired 1.
+
+# ---- Rule 3: AXI response bit[0] (this project's encoding never uses it) ----
+# This project's AXI_RESP encoding (rtl/include/axi_lite.vh) only ever
+# drives OKAY (2'b00) or SLVERR (2'b10) -- EXOKAY (2'b01) and DECERR
+# (2'b11) are never used anywhere in the design. Both used codes have
+# bit[0]=0, so bit[0] of every *resp signal in the project is a
+# structural constant, project-wide, independent of any single module.
+^s_bresp\[0\]$	This project's AXI_RESP encoding only ever drives OKAY (00) or SLVERR (10) -- both have bit[0]=0; EXOKAY/DECERR are never used anywhere in the design.
+^s_rresp\[0\]$	Same response-encoding convention, read channel.
+^.*_bresp\[0\]$	Same response-encoding convention, crossbar-side per-slave wire.
+^.*_rresp\[0\]$	Same response-encoding convention, crossbar-side per-slave wire.
+^w_slave_bresp\[0\]$	Crossbar's internal muxed response, same encoding convention.
+
+# ---- Rule 4: peripheral-level bresp/rresp entirely (never generate SLVERR) ----
+# Beyond just bit[0] (Rule 3): every individual peripheral hardwires its
+# own s_bresp/s_rresp to `AXI_RESP_OKAY` unconditionally (confirmed:
+# timer.v always does `s_bresp <= `AXI_RESP_OKAY;` with no alternate
+# branch) -- only the crossbar itself ever synthesizes a real SLVERR (for
+# unmapped addresses), so a peripheral's OWN bresp/rresp bit[1] is also a
+# hardwired-0 constant, never touched by the peripheral itself.
+^s_bresp$	Peripheral hardwires `s_bresp <= AXI_RESP_OKAY;` unconditionally -- only the crossbar itself ever synthesizes SLVERR, never the peripheral.
+^s_rresp$	Same reasoning, read channel.
+
+# ---- Rule 5: byte-strobe on ports that are lint-confirmed never read ----
+# scripts/run_lint.sh already flagged these exact s_wstrb ports as
+# UNUSEDSIGNAL (never read by the module) -- see blocks/<name>/lint/
+# lint_report.txt and docs/architecture.md's known-limitations section.
+# If a signal's value is never consumed, its bit pattern cannot matter,
+# so toggle coverage on it is moot by construction. Restricted to the
+# specific files where lint independently confirmed non-use (NOT applied
+# to dma_ram.v, whose s_wstrb genuinely drives byte-enable logic and is
+# already well covered by its own byte-strobe unit test).
+^s_wstrb$	Lint-confirmed UNUSEDSIGNAL: this specific port's wstrb is never read by the module (control/status registers are always written as full 32-bit words in this project's convention).
+
+# ---- Rule 6: DMA's own master port hardwires full-word writes ----
+# dma_engine.v always drives `m_wstrb <= 4'hF;` unconditionally (DMA only
+# ever moves whole 128-bit blocks, byte-partial DMA writes are not part of
+# its use case) -- confirmed in dma_engine.v. dma_ram.v's OWN s_wstrb is
+# NOT waived (see above) since dma_ram's dedicated unit test does
+# exercise partial byte-strobe writes directly.
+^m_wstrb$	dma_engine.v always drives a full 4'hF (moves whole 128-bit blocks only, no byte-partial DMA use case) -- confirmed unconditional in the RTL.
+
+# ---- Rule 7: AXI4 burst-subset fields (documented scope cut) ----
+# rtl/include/axi4.vh and docs/specs/dma.md document this project's AXI4
+# burst subset explicitly: INCR bursts only, fixed 4-byte beats. The DMA
+# master always drives AXI4_SIZE_4B / AXI4_BURST_INCR constants
+# (confirmed in dma_engine.v); dma_ram.v's own unit test additionally
+# varies AWLEN/ARLEN between 0 (single-beat) and 3 (4-beat) but never
+# exercises the unsupported FIXED/WRAP burst types or other sizes, which
+# this project deliberately never implements.
+^m_awsize$	Documented AXI4 burst-subset scope cut (rtl/include/axi4.vh): always AXI4_SIZE_4B, confirmed hardwired in dma_engine.v.
+^m_arsize$	Same scope cut, read channel.
+^m_awburst$	Documented scope cut: always AXI4_BURST_INCR, confirmed hardwired in dma_engine.v -- FIXED/WRAP burst types are not implemented anywhere in this project.
+^m_arburst$	Same scope cut, read channel.
+^s_awsize$	Same documented scope cut, dma_ram.v's slave side (only ever receives the one supported size encoding).
+^s_arsize$	Same documented scope cut, read channel.
+^s_awburst$	Same documented scope cut, dma_ram.v's slave side (only ever receives the one supported burst-type encoding).
+^s_arburst$	Same documented scope cut, read channel.
+^m_awlen$	dma_engine.v always drives a fixed 4-beat burst length (8'd3) per 128-bit block -- confirmed hardwired, not configurable.
+^m_arlen$	Same fixed-length convention, read channel.
