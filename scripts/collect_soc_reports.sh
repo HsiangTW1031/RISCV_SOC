@@ -98,7 +98,7 @@ dashboard_rc=$?
   echo
   echo "| Check | Result | File |"
   echo "|---|---|---|"
-  echo "| Simulation regression (18 targets) | $([ $regr_rc -eq 0 ] && echo PASS || echo FAIL) | \`simulation_regression.txt\` |"
+  echo "| Simulation regression (19 targets) | $([ $regr_rc -eq 0 ] && echo PASS || echo FAIL) | \`simulation_regression.txt\` |"
   echo "| Lint (per-block, lint-only) | $([ $lint_rc -eq 0 ] && echo CLEAN || echo "warnings present") | \`lint_summary.txt\`, \`soc_top_lint_full.txt\` |"
   echo "| Synthesis (Yosys, Nangate45) | $([ $synth_rc -eq 0 ] && echo OK || echo FAIL) | \`synthesis_area.txt\` |"
   echo "| STA (OpenSTA) | $([ $sta_rc -eq 0 ] && echo OK || echo FAIL) | \`timing_sta.txt\` |"

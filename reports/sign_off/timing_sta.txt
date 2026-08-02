@@ -5,6 +5,35 @@ This is free software, and you are free to change and redistribute it
 under certain conditions; type `show_copying' for details. 
 This program comes with ABSOLUTELY NO WARRANTY; for details type `show_warranty'.
 Warning 441: soc_top.sdc line 14, set_input_delay relative to a clock defined on the same port/pin not allowed.
+Startpoint: rst (input port clocked by clk)
+Endpoint: _13_ (recovery check against rising-edge clock clk)
+Path Group: asynchronous
+Path Type: max
+
+     Cap     Slew    Delay     Time   Description
+---------------------------------------------------------------------------
+            0.000    0.000    0.000   clock clk (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+                     0.000    0.000 v input external delay
+   6.197    0.000    0.000    0.000 v rst (in)
+            0.000    0.000    0.000 v _07_/A (INV_X1)
+   1.356    0.006    0.008    0.008 ^ _07_/ZN (INV_X1)
+            0.006    0.000    0.008 ^ _13_/SN (DFFS_X1)
+                              0.008   data arrival time
+
+            0.000    2.000    2.000   clock clk (rise edge)
+                     0.000    2.000   clock network delay (ideal)
+                     0.000    2.000   clock reconvergence pessimism
+                              2.000 ^ _13_/CK (DFFS_X1)
+                     0.042    2.042   library recovery time
+                              2.042   data required time
+---------------------------------------------------------------------------
+                              2.042   data required time
+                             -0.008   data arrival time
+---------------------------------------------------------------------------
+                              2.034   slack (MET)
+
+
 Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
             (rising edge-triggered flip-flop clocked by clk)
 Endpoint: u_aes/u_chain/u_core/u_key_expand/_15429_
@@ -40,9 +69,102 @@ Path Type: max
                              -9.017   slack (VIOLATED)
 
 
+Startpoint: u_jtag_dtm/_816_ (rising edge-triggered flip-flop clocked by tck)
+Endpoint: u_jtag_dtm/_749_ (rising edge-triggered flip-flop clocked by tck)
+Path Group: tck
+Path Type: max
+
+     Cap     Slew    Delay     Time   Description
+---------------------------------------------------------------------------
+            0.000    0.000    0.000   clock tck (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+            0.000    0.000    0.000 ^ u_jtag_dtm/_816_/CK (DFF_X1)
+   4.990    0.015    0.092    0.092 ^ u_jtag_dtm/_816_/Q (DFF_X1)
+            0.015    0.000    0.092 ^ u_jtag_dtm/_434_/A (INV_X1)
+   5.277    0.008    0.015    0.107 v u_jtag_dtm/_434_/ZN (INV_X1)
+            0.008    0.000    0.107 v u_jtag_dtm/_444_/A3 (NOR4_X1)
+  55.422    0.552    0.651    0.758 ^ u_jtag_dtm/_444_/ZN (NOR4_X1)
+            0.552    0.000    0.758 ^ u_jtag_dtm/_446_/A2 (NAND3_X1)
+  59.223    0.176    0.380    1.138 v u_jtag_dtm/_446_/ZN (NAND3_X1)
+            0.176    0.000    1.138 v u_jtag_dtm/_449_/B1 (AOI21_X1)
+  61.438    0.299    0.420    1.558 ^ u_jtag_dtm/_449_/ZN (AOI21_X1)
+            0.299    0.000    1.558 ^ u_jtag_dtm/_747_/S (MUX2_X1)
+   1.062    0.013    0.060    1.617 v u_jtag_dtm/_747_/Z (MUX2_X1)
+            0.013    0.000    1.617 v u_jtag_dtm/_749_/D (DFF_X1)
+                              1.617   data arrival time
+
+            0.000   20.000   20.000   clock tck (rise edge)
+                     0.000   20.000   clock network delay (ideal)
+                     0.000   20.000   clock reconvergence pessimism
+                             20.000 ^ u_jtag_dtm/_749_/CK (DFF_X1)
+                    -0.042   19.958   library setup time
+                             19.958   data required time
+---------------------------------------------------------------------------
+                             19.958   data required time
+                             -1.617   data arrival time
+---------------------------------------------------------------------------
+                             18.340   slack (MET)
+
+
 
 wns max -9.02
-tns max -27316.75
+tns max -33161.76
+
+Startpoint: rst (input port clocked by clk)
+Endpoint: _13_ (recovery check against rising-edge clock clk)
+Path Group: asynchronous
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock clk (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 v input external delay
+   0.000    0.000 v rst (in)
+   0.008    0.008 ^ _07_/ZN (INV_X1)
+   0.000    0.008 ^ _13_/SN (DFFS_X1)
+            0.008   data arrival time
+
+   2.000    2.000   clock clk (rise edge)
+   0.000    2.000   clock network delay (ideal)
+   0.000    2.000   clock reconvergence pessimism
+            2.000 ^ _13_/CK (DFFS_X1)
+   0.042    2.042   library recovery time
+            2.042   data required time
+-----------------------------------------------------------
+            2.042   data required time
+           -0.008   data arrival time
+-----------------------------------------------------------
+            2.034   slack (MET)
+
+
+Startpoint: rst (input port clocked by clk)
+Endpoint: _14_ (recovery check against rising-edge clock clk)
+Path Group: asynchronous
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock clk (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 v input external delay
+   0.000    0.000 v rst (in)
+   0.008    0.008 ^ _09_/ZN (INV_X1)
+   0.000    0.008 ^ _14_/SN (DFFS_X1)
+            0.008   data arrival time
+
+   2.000    2.000   clock clk (rise edge)
+   0.000    2.000   clock network delay (ideal)
+   0.000    2.000   clock reconvergence pessimism
+            2.000 ^ _14_/CK (DFFS_X1)
+   0.042    2.042   library recovery time
+            2.042   data required time
+-----------------------------------------------------------
+            2.042   data required time
+           -0.008   data arrival time
+-----------------------------------------------------------
+            2.034   slack (MET)
+
 
 Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
             (rising edge-triggered flip-flop clocked by clk)
@@ -202,5 +324,165 @@ Path Type: max
           -10.966   data arrival time
 -----------------------------------------------------------
            -9.017   slack (VIOLATED)
+
+
+Startpoint: u_jtag_dtm/_816_ (rising edge-triggered flip-flop clocked by tck)
+Endpoint: u_jtag_dtm/_749_ (rising edge-triggered flip-flop clocked by tck)
+Path Group: tck
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock tck (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_jtag_dtm/_816_/CK (DFF_X1)
+   0.092    0.092 ^ u_jtag_dtm/_816_/Q (DFF_X1)
+   0.015    0.107 v u_jtag_dtm/_434_/ZN (INV_X1)
+   0.651    0.758 ^ u_jtag_dtm/_444_/ZN (NOR4_X1)
+   0.380    1.138 v u_jtag_dtm/_446_/ZN (NAND3_X1)
+   0.420    1.558 ^ u_jtag_dtm/_449_/ZN (AOI21_X1)
+   0.060    1.617 v u_jtag_dtm/_747_/Z (MUX2_X1)
+   0.000    1.617 v u_jtag_dtm/_749_/D (DFF_X1)
+            1.617   data arrival time
+
+  20.000   20.000   clock tck (rise edge)
+   0.000   20.000   clock network delay (ideal)
+   0.000   20.000   clock reconvergence pessimism
+           20.000 ^ u_jtag_dtm/_749_/CK (DFF_X1)
+  -0.042   19.958   library setup time
+           19.958   data required time
+-----------------------------------------------------------
+           19.958   data required time
+           -1.617   data arrival time
+-----------------------------------------------------------
+           18.340   slack (MET)
+
+
+Startpoint: u_jtag_dtm/_816_ (rising edge-triggered flip-flop clocked by tck)
+Endpoint: u_jtag_dtm/_750_ (rising edge-triggered flip-flop clocked by tck)
+Path Group: tck
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock tck (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_jtag_dtm/_816_/CK (DFF_X1)
+   0.092    0.092 ^ u_jtag_dtm/_816_/Q (DFF_X1)
+   0.015    0.107 v u_jtag_dtm/_434_/ZN (INV_X1)
+   0.651    0.758 ^ u_jtag_dtm/_444_/ZN (NOR4_X1)
+   0.380    1.138 v u_jtag_dtm/_446_/ZN (NAND3_X1)
+   0.420    1.558 ^ u_jtag_dtm/_449_/ZN (AOI21_X1)
+   0.060    1.617 v u_jtag_dtm/_744_/Z (MUX2_X1)
+   0.000    1.617 v u_jtag_dtm/_750_/D (DFF_X1)
+            1.617   data arrival time
+
+  20.000   20.000   clock tck (rise edge)
+   0.000   20.000   clock network delay (ideal)
+   0.000   20.000   clock reconvergence pessimism
+           20.000 ^ u_jtag_dtm/_750_/CK (DFF_X1)
+  -0.042   19.958   library setup time
+           19.958   data required time
+-----------------------------------------------------------
+           19.958   data required time
+           -1.617   data arrival time
+-----------------------------------------------------------
+           18.340   slack (MET)
+
+
+Startpoint: u_jtag_dtm/_816_ (rising edge-triggered flip-flop clocked by tck)
+Endpoint: u_jtag_dtm/_751_ (rising edge-triggered flip-flop clocked by tck)
+Path Group: tck
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock tck (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_jtag_dtm/_816_/CK (DFF_X1)
+   0.092    0.092 ^ u_jtag_dtm/_816_/Q (DFF_X1)
+   0.015    0.107 v u_jtag_dtm/_434_/ZN (INV_X1)
+   0.651    0.758 ^ u_jtag_dtm/_444_/ZN (NOR4_X1)
+   0.380    1.138 v u_jtag_dtm/_446_/ZN (NAND3_X1)
+   0.420    1.558 ^ u_jtag_dtm/_449_/ZN (AOI21_X1)
+   0.060    1.617 v u_jtag_dtm/_741_/Z (MUX2_X1)
+   0.000    1.617 v u_jtag_dtm/_751_/D (DFF_X1)
+            1.617   data arrival time
+
+  20.000   20.000   clock tck (rise edge)
+   0.000   20.000   clock network delay (ideal)
+   0.000   20.000   clock reconvergence pessimism
+           20.000 ^ u_jtag_dtm/_751_/CK (DFF_X1)
+  -0.042   19.958   library setup time
+           19.958   data required time
+-----------------------------------------------------------
+           19.958   data required time
+           -1.617   data arrival time
+-----------------------------------------------------------
+           18.340   slack (MET)
+
+
+Startpoint: u_jtag_dtm/_816_ (rising edge-triggered flip-flop clocked by tck)
+Endpoint: u_jtag_dtm/_752_ (rising edge-triggered flip-flop clocked by tck)
+Path Group: tck
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock tck (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_jtag_dtm/_816_/CK (DFF_X1)
+   0.092    0.092 ^ u_jtag_dtm/_816_/Q (DFF_X1)
+   0.015    0.107 v u_jtag_dtm/_434_/ZN (INV_X1)
+   0.651    0.758 ^ u_jtag_dtm/_444_/ZN (NOR4_X1)
+   0.380    1.138 v u_jtag_dtm/_446_/ZN (NAND3_X1)
+   0.420    1.558 ^ u_jtag_dtm/_449_/ZN (AOI21_X1)
+   0.060    1.617 v u_jtag_dtm/_738_/Z (MUX2_X1)
+   0.000    1.617 v u_jtag_dtm/_752_/D (DFF_X1)
+            1.617   data arrival time
+
+  20.000   20.000   clock tck (rise edge)
+   0.000   20.000   clock network delay (ideal)
+   0.000   20.000   clock reconvergence pessimism
+           20.000 ^ u_jtag_dtm/_752_/CK (DFF_X1)
+  -0.042   19.958   library setup time
+           19.958   data required time
+-----------------------------------------------------------
+           19.958   data required time
+           -1.617   data arrival time
+-----------------------------------------------------------
+           18.340   slack (MET)
+
+
+Startpoint: u_jtag_dtm/_816_ (rising edge-triggered flip-flop clocked by tck)
+Endpoint: u_jtag_dtm/_753_ (rising edge-triggered flip-flop clocked by tck)
+Path Group: tck
+Path Type: max
+
+   Delay     Time   Description
+-----------------------------------------------------------
+   0.000    0.000   clock tck (rise edge)
+   0.000    0.000   clock network delay (ideal)
+   0.000    0.000 ^ u_jtag_dtm/_816_/CK (DFF_X1)
+   0.092    0.092 ^ u_jtag_dtm/_816_/Q (DFF_X1)
+   0.015    0.107 v u_jtag_dtm/_434_/ZN (INV_X1)
+   0.651    0.758 ^ u_jtag_dtm/_444_/ZN (NOR4_X1)
+   0.380    1.138 v u_jtag_dtm/_446_/ZN (NAND3_X1)
+   0.420    1.558 ^ u_jtag_dtm/_449_/ZN (AOI21_X1)
+   0.060    1.617 v u_jtag_dtm/_735_/Z (MUX2_X1)
+   0.000    1.617 v u_jtag_dtm/_753_/D (DFF_X1)
+            1.617   data arrival time
+
+  20.000   20.000   clock tck (rise edge)
+   0.000   20.000   clock network delay (ideal)
+   0.000   20.000   clock reconvergence pessimism
+           20.000 ^ u_jtag_dtm/_753_/CK (DFF_X1)
+  -0.042   19.958   library setup time
+           19.958   data required time
+-----------------------------------------------------------
+           19.958   data required time
+           -1.617   data arrival time
+-----------------------------------------------------------
+           18.340   slack (MET)
 
 

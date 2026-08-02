@@ -48,3 +48,21 @@ set_output_delay 0.0 -clock tck [get_ports tdo]
 # can't do that); see docs/cdc_report.md for the structural review that
 # actually checks synchronizer depth and topology.
 set_clock_groups -asynchronous -group {clk} -group {tck}
+
+# `rst` itself is the async input to the two reset synchronizers in
+# soc_top.v (rst_clk_meta/rst_clk_sync, rst_tck_meta/rst_tck_sync) -- by
+# design, both flops in each synchronizer have their asynchronous set
+# driven directly by this raw, genuinely-async port (see soc_top.v's
+# header comment), which is exactly what lets reset assert immediately
+# rather than waiting on a clock edge. That same property means STA's
+# recovery/removal check against `rst` (confirmed: reported as "removal
+# check against rising-edge clock clk", -0.08ns at the fast corner) is
+# inherent to any reset synchronizer's first stage, not a real timing
+# bug -- there is no way to guarantee a genuinely-asynchronous signal
+# never transitions within a clock period's removal window, and that's
+# precisely the metastability risk the synchronizer's second stage
+# exists to absorb. `rst` fans out to nothing else in this design
+# (verified: its only remaining reader anywhere is these two always
+# blocks), so exempting every path starting at this port is precise, not
+# a broad workaround.
+set_false_path -from [get_ports rst]

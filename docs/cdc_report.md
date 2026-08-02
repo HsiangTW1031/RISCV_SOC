@@ -90,6 +90,33 @@ end
 
 **注意**:這個改動只動了 `soc_top.v` 這個整合層級的檔案,單一 block 的獨立測試(`timer`/`watchdog`/...)都是直接 instantiate 各自的 RTL、自己驅動 `rst`,不經過 `soc_top.v` 的這層同步器,所以完全不受影響——這也是為什麼可以直接在頂層加,不用去動每個周邊自己的 RTL。
 
+### 重新跑 multi-corner STA 之後,真的抓到一個新的 hold(準確講是 removal check)違規
+
+改完 RTL 之後,重新跑過 `sta_mcmm.tcl` 確認沒有壞掉時,fast corner 的 hold 檢查從原本乾淨的 `wns min 0.00` 變成 `wns min -0.08`,查了實際違規的路徑:
+
+```
+Startpoint: rst (input port clocked by clk)
+Endpoint: _13_ (removal check against rising-edge clock clk)
+Path Group: asynchronous
+                              0.086   data required time
+                             -0.004   data arrival time
+                             -0.082   slack (VIOLATED)
+```
+
+這不是 hold check,是 **removal check**——正反器有非同步 SET/RESET 腳位時,STA 會額外檢查「非同步訊號 de-assert 之後,要在下一個 clock edge 之前穩定至少 removal time,不能太晚才放開」,這是 hold time 在非同步控制腳位上的對應版本。違規的路徑起點正是 `rst` 這個 port,終點是 reset synchronizer 自己那兩顆正反器(`rst_clk_meta`/`rst_clk_sync`)之一——這正是這一整節一開始就在講的「reset 訊號本身是非同步」的必然結果:`rst` 什麼時候變化,相對於 `clk` 的任意一個 edge 完全沒有保證,對一個真正的非同步訊號做 removal/recovery 分析,本來就不可能保證每次都有 0.086ns 的餘裕——這跟前面 CDC 資料訊號跨 domain 需要 `set_clock_groups -asynchronous` 排除誤判是同一個道理,只是這次的訊號是 reset 本身,不是資料。
+
+確認過 `rst` 這個 port 在整個設計裡**只剩**這兩個 reset synchronizer 的非同步 sensitivity 在用(其他地方全部改吃 `rst_clk_sync`/`rst_tck_sync` 了),於是在 `blocks/soc_top/constraints/soc_top.sdc` 加上:
+
+```tcl
+set_false_path -from [get_ports rst]
+```
+
+精準地只排除「以 `rst` 為起點」的路徑,不會誤傷其他東西。加完重跑,hold 恢復乾淨(`wns min 0.00`),setup 的數字完全沒變。這個發現本身很值得記錄:**做完 CDC/RDC 的 RTL 修正之後,一定要重新跑一次 STA 確認,不能假設「邏輯上加對了就沒事」**——這次如果沒有重跑 multi-corner STA,這個 removal check 違規會一直藏在報告裡沒被發現。
+
+### LEC 也需要對應補一個 pass
+
+`blocks/soc_top/syn/lec.ys` 重跑時,`equiv_simple` 直接報錯:「No SAT model available for async FF cell ... Consider running `async2sync`」——原因很直接:LEC 的 SAT 流程原本假設整個設計只有 synchronous reset 的正反器,新加的 reset synchronizer 正反器是這個設計裡**唯一**真正非同步 reset 的正反器,SAT 沒有現成的模型可以處理。照錯誤訊息的建議,在 gold/gate 兩邊的 `prep -flatten` 之後都加上 `async2sync`(Yosys 內建的 pass,把非同步 FF 輸入轉換成行為等價的同步電路)解決,加完之後 LEC 正常跑完,不影響其餘證明結果。
+
 ## 7. 如何重跑
 
 ```bash

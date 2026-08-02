@@ -39,11 +39,11 @@
 
 | 指標 | 結果 |
 |---|---|
-| Line coverage(這個專案自己寫的 RTL,不含 vendored PicoRV32) | **96.3%** |
-| Toggle coverage,raw aggregate(`verilator_coverage --report summary`) | 58.1%(43157/74282 points)——這個數字把同一個 source-level toggle point 依 hierarchy instance 重複計數(例如 `aes_core.v` 被 5 個不同路徑實例化),分母被灌水,詳見下方 |
-| Toggle coverage,deduped per-bit,**waive 前** | **69.5%**(7923/11401 bits) |
-| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1513 個結構上不可能 toggle 的 bit) | **80.1%**(7923/9888 bits) |
-| Branch coverage(全專案合併) | 77.3%(1500/1940 points) |
+| Line coverage(這個專案自己寫的 RTL,不含 vendored PicoRV32) | **96.1%** |
+| Toggle coverage,raw aggregate(`verilator_coverage --report summary`) | 58.1%(43169/74290 points)——這個數字把同一個 source-level toggle point 依 hierarchy instance 重複計數(例如 `aes_core.v` 被 5 個不同路徑實例化),分母被灌水,詳見下方 |
+| Toggle coverage,deduped per-bit,**waive 前** | **69.5%**(7926/11405 bits) |
+| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1513 個結構上不可能 toggle 的 bit) | **80.1%**(7926/9892 bits) |
+| Branch coverage(全專案合併) | 77.4%(1504/1944 points) |
 | **FSM state coverage**（11 個 FSM:spi_master、i2c_master、uart、jtag_tap、aes_core、aes_chain、axi_lite_xbar 讀/寫、dma_ram 讀/寫、dma_engine) | **100%**(全部狀態都至少被進入過一次) |
 
 Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、waive 前後每個 block 的量化對照、以及刻意不 waive 的 residual gap 清單:`docs/coverage_waiver_report.md`。
@@ -55,7 +55,7 @@ Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、wai
 範圍限定在 `aes` + `soc_top`(跟現有 per-block synthesis/STA 的既有範圍一致):
 
 - **Multi-corner STA**(`blocks/{aes,soc_top}/sta/sta_mcmm.tcl`):第 1 節、`docs/performance.md` 引用的 Fmax 是單一 typical corner 的數字,這裡補上 setup(slow corner)+ hold(fast corner)。soc_top 在 slow corner 下真實關鍵路徑 43.128ns(**slow-corner Fmax ≈ 23.2MHz**),fast corner 下 hold 完全乾淨(0 個違規)。完整數字見 `docs/performance.md` 第 7 節。
-- **Formal equivalence check(LEC)**(`blocks/{aes,soc_top}/syn/lec.ys`):用 Yosys 的 `equiv_make`/`equiv_simple`/`equiv_induct` 形式化證明「synthesis 出來的 gate-level netlist」邏輯上等價於 RTL。aes_core 完整跑完,97.7% 證明完成;soc_top 因為含整顆 CPU、規模差兩個數量級,刻意只跑不含 sequential induction 的部分驗證(60.2%),改用下面的 gate-level simulation 補足整顆 SoC 的驗證——完整理由跟數字見 `docs/lec_report.md`。
+- **Formal equivalence check(LEC)**(`blocks/{aes,soc_top}/syn/lec.ys`):用 Yosys 的 `equiv_make`/`equiv_simple`/`equiv_induct` 形式化證明「synthesis 出來的 gate-level netlist」邏輯上等價於 RTL。aes_core 完整跑完,97.7% 證明完成;soc_top 因為含整顆 CPU、規模差兩個數量級,刻意只跑不含 sequential induction 的部分驗證(60.1%),改用下面的 gate-level simulation 補足整顆 SoC 的驗證——完整理由跟數字見 `docs/lec_report.md`。
 - **Gate-level simulation**(`scripts/run_gatelevel_sim.sh`):拿現有的 regression testbench,直接對 Yosys 合成後的 netlist(而非 RTL)跑一次,驗證 synthesis 本身沒有改變行為。aes_core、soc_top(含真實開機、5 次 Timer 中斷、UART 輸出、JTAG 讀寫 RAM、DMA 控制埠)兩個都 **PASS**。
 - **Signoff 範圍界限**:這個專案的 signoff 停在「gate-level netlist,邏輯跟時序都驗證過」——不含 place & route、DRC/LVS、DFT、power signoff,理由見 `docs/performance.md` 第 8 節(刻意的取捨,不是漏掉)。
 

@@ -23,14 +23,14 @@ soc_top            OK
 
 === Merging coverage data ===
 Coverage Summary:
-  line      : 47.2% ( 3153/ 6684)
-  toggle    : 58.1% (43157/74282)
-  branch    : 77.3% ( 1500/ 1940)
+  line      : 47.2% ( 3156/ 6686)
+  toggle    : 58.1% (43169/74290)
+  branch    : 77.4% ( 1504/ 1944)
   expr      : 0.0% (    0/    0)
   fsm_state : 0.0% (    0/    0)
   fsm_arc   : 0.0% (    0/    0)
 Annotation Summary:
-  lines with all attached points covered : 36.00%  (1310/3636)
+  lines with all attached points covered : 34.00%  (1264/3652)
 See lines with '%00' in /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/annotated
 Merged coverage data: /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/merged.dat
 LCOV info:            /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/coverage.info

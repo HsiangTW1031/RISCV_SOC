@@ -133,16 +133,16 @@ a { color: var(--accent); }
 
 <header class="top">
   <h1>RISCV_SOC &mdash; Sign-off Dashboard</h1>
-  <div class="sub">Generated 2026-08-02 14:38 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
+  <div class="sub">Generated 2026-08-02 17:27 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
 </header>
 
 <main>
   <div class="kpi-row">
     <div class="kpi"><div class="label">Regression</div><div class="value good">0/0 PASS</div></div>
-    <div class="kpi"><div class="label">Own-RTL line coverage</div><div class="value good">96.3%</div></div>
+    <div class="kpi"><div class="label">Own-RTL line coverage</div><div class="value good">96.1%</div></div>
     <div class="kpi"><div class="label">FSM state coverage</div><div class="value good">11/11 FSMs @ 100%</div></div>
-    <div class="kpi"><div class="label">Whole-SoC Fmax</div><div class="value accent">91.2 MHz</div></div>
-    <div class="kpi"><div class="label">Gate count (NAND2-eq)</div><div class="value accent">162,687</div></div>
+    <div class="kpi"><div class="label">Whole-SoC Fmax</div><div class="value accent">125000.0 MHz</div></div>
+    <div class="kpi"><div class="label">Gate count (NAND2-eq)</div><div class="value accent">162,716</div></div>
     <div class="kpi"><div class="label">Lint findings</div><div class="value">135 <span style="font-size:0.5em;color:var(--text-dim)">(all triaged)</span></div></div>
   </div>
 
@@ -191,9 +191,9 @@ flowchart TB
   <section id="coverage">
     <h2>Coverage</h2>
     <div class="overall-bars">
-      <div class="metric"><div class="name">Line (all merged tests)</div><div class="bar"><div class="bar-fill warn" style="width:47.2%"></div><span class="bar-label">47.2%</span></div><div class="cov-frac">3153/6684 points</div></div>
-      <div class="metric"><div class="name">Toggle</div><div class="bar"><div class="bar-fill warn" style="width:58.1%"></div><span class="bar-label">58.1%</span></div><div class="cov-frac">43157/74282 points</div></div>
-      <div class="metric"><div class="name">Branch</div><div class="bar"><div class="bar-fill good" style="width:77.3%"></div><span class="bar-label">77.3%</span></div><div class="cov-frac">1500/1940 points</div></div>
+      <div class="metric"><div class="name">Line (all merged tests)</div><div class="bar"><div class="bar-fill warn" style="width:47.2%"></div><span class="bar-label">47.2%</span></div><div class="cov-frac">3156/6686 points</div></div>
+      <div class="metric"><div class="name">Toggle</div><div class="bar"><div class="bar-fill warn" style="width:58.1%"></div><span class="bar-label">58.1%</span></div><div class="cov-frac">43169/74290 points</div></div>
+      <div class="metric"><div class="name">Branch</div><div class="bar"><div class="bar-fill good" style="width:77.4%"></div><span class="bar-label">77.4%</span></div><div class="cov-frac">1504/1944 points</div></div>
     </div>
     <p style="color:var(--text-dim);font-size:0.85rem">Aggregate numbers above are diluted by shared sub-modules counted once per instantiating test (e.g. aes_core is exercised by 5 different tests) &mdash; the per-file table below is the more meaningful "was this actual source file exercised" view.</p>
     <table class="filecov"><thead><tr><th>Block</th><th>File</th><th>Line coverage</th></tr></thead><tbody>
@@ -209,8 +209,8 @@ flowchart TB
 <tr><td>jtag</td><td class="mono">jtag_axi_bridge.v</td><td><div class="bar"><div class="bar-fill good" style="width:98.7%"></div><span class="bar-label">98.7%</span></div> <span class="cov-frac">78/79</span></td></tr>
 <tr><td>jtag</td><td class="mono">jtag_dtm.v</td><td><div class="bar"><div class="bar-fill good" style="width:100.0%"></div><span class="bar-label">100.0%</span></div> <span class="cov-frac">51/51</span></td></tr>
 <tr><td>jtag</td><td class="mono">jtag_tap.v</td><td><div class="bar"><div class="bar-fill good" style="width:97.7%"></div><span class="bar-label">97.7%</span></div> <span class="cov-frac">43/44</span></td></tr>
-<tr><td>picorv32 (vendored)</td><td class="mono">picorv32.v</td><td><div class="bar"><div class="bar-fill info" style="width:80.2%"></div><span class="bar-label">80.2%</span></div> <span class="cov-frac">1136/1417</span></td></tr>
-<tr><td>soc_top</td><td class="mono">soc_top.v</td><td><div class="bar"><div class="bar-fill warn" style="width:80.7%"></div><span class="bar-label">80.7%</span></div> <span class="cov-frac">71/88</span></td></tr>
+<tr><td>picorv32 (vendored)</td><td class="mono">picorv32.v</td><td><div class="bar"><div class="bar-fill info" style="width:80.7%"></div><span class="bar-label">80.7%</span></div> <span class="cov-frac">1144/1417</span></td></tr>
+<tr><td>soc_top</td><td class="mono">soc_top.v</td><td><div class="bar"><div class="bar-fill warn" style="width:80.8%"></div><span class="bar-label">80.8%</span></div> <span class="cov-frac">84/104</span></td></tr>
 <tr><td>spi</td><td class="mono">spi_master.v</td><td><div class="bar"><div class="bar-fill good" style="width:96.0%"></div><span class="bar-label">96.0%</span></div> <span class="cov-frac">96/100</span></td></tr>
 <tr><td>sram</td><td class="mono">sram.v</td><td><div class="bar"><div class="bar-fill good" style="width:100.0%"></div><span class="bar-label">100.0%</span></div> <span class="cov-frac">29/29</span></td></tr>
 <tr><td>timer</td><td class="mono">timer.v</td><td><div class="bar"><div class="bar-fill good" style="width:96.4%"></div><span class="bar-label">96.4%</span></div> <span class="cov-frac">54/56</span></td></tr>
@@ -222,8 +222,8 @@ flowchart TB
   <section id="toggle-waivers">
     <h2>Toggle Coverage Waivers</h2>
     <div class="overall-bars">
-<div class="metric"><div class="name">Before waivers (deduped per-bit)</div><div class="bar"><div class="bar-fill warn" style="width:69.5%"></div><span class="bar-label">69.5%</span></div><div class="cov-frac">7923/11401 bits</div></div>
-<div class="metric"><div class="name">After 36 waiver rules (1513 bits waived)</div><div class="bar"><div class="bar-fill warn" style="width:80.1%"></div><span class="bar-label">80.1%</span></div><div class="cov-frac">7923/9888 bits</div></div>
+<div class="metric"><div class="name">Before waivers (deduped per-bit)</div><div class="bar"><div class="bar-fill warn" style="width:69.5%"></div><span class="bar-label">69.5%</span></div><div class="cov-frac">7926/11405 bits</div></div>
+<div class="metric"><div class="name">After 36 waiver rules (1513 bits waived)</div><div class="bar"><div class="bar-fill warn" style="width:80.1%"></div><span class="bar-label">80.1%</span></div><div class="cov-frac">7926/9892 bits</div></div>
 </div>
 <p style="color:var(--text-dim);font-size:0.85rem">"Deduped per-bit" parses <code>merged.dat</code> directly and counts each source-level toggle bit once, regardless of how many hierarchy instances share the same underlying module (unlike the raw aggregate above, which counts a shared sub-module once per instantiation). A waived bit is removed from both the numerator and the denominator; it is not counted as covered. Rules + rationale: <code>reports/sign_off/coverage/toggle_waivers.txt</code>. Full report: <code>docs/coverage_waiver_report.md</code>.</p>
 <details class="cat"><summary>Waiver rules applied <span class="count">25 reasons, 1513 bits</span></summary>
@@ -254,7 +254,7 @@ flowchart TB
 <tr><td>1</td><td>Crossbar&#x27;s internal mux selecting among slave arready signals, all of which are hardwired 1.</td><td class="mono">blocks/axi_lite_xbar/rtl/axi_lite_xbar.v:449 w_slave_arready_r</td></tr>
 <tr><td>1</td><td>Same documented scope cut, dma_ram.v&#x27;s slave side (only ever receives the one supported burst-type encoding).</td><td class="mono">blocks/dma/rtl/dma_ram.v:30 s_awburst[1]</td></tr>
 </tbody></table></details>
-<details class="cat"><summary>Residual gaps (not waived, still open) <span class="count">1965 bits across 240 signals</span></summary>
+<details class="cat"><summary>Residual gaps (not waived, still open) <span class="count">1966 bits across 241 signals</span></summary>
 <p class="note">Not structurally impossible &mdash; each reflects limited test-vector diversity (e.g. one fixed AES key, a handful of probed addresses, small divider values) rather than hardware that cannot toggle. Left open deliberately rather than waived away; see docs/coverage_waiver_report.md for the reasoning per group.</p>
 <table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Signal</th><th>Bits uncovered</th></tr></thead><tbody>
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_engine.v</td><td>80</td><td class="mono">key_reg</td><td>128</td></tr>
@@ -267,15 +267,15 @@ flowchart TB
 <tr><td>axi_lite_xbar</td><td class="mono">blocks/axi_lite_xbar/rtl/axi_lite_xbar.v</td><td>142</td><td class="mono">aes_rdata</td><td>32</td></tr>
 <tr><td>axi_lite_xbar</td><td class="mono">blocks/axi_lite_xbar/rtl/axi_lite_xbar.v</td><td>151</td><td class="mono">dma_rdata</td><td>32</td></tr>
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_engine.v</td><td>79</td><td class="mono">len_reg</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>113</td><td class="mono">timer_rdata</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>119</td><td class="mono">wdt_rdata</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>125</td><td class="mono">uartx_rdata</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>131</td><td class="mono">i2cx_rdata</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>137</td><td class="mono">spix_rdata</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>143</td><td class="mono">aesx_rdata</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>150</td><td class="mono">dmax_rdata</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>157</td><td class="mono">dma_m_wdata</td><td>32</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>161</td><td class="mono">dma_m_rdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>144</td><td class="mono">timer_rdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>150</td><td class="mono">wdt_rdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>156</td><td class="mono">uartx_rdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>162</td><td class="mono">i2cx_rdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>168</td><td class="mono">spix_rdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>174</td><td class="mono">aesx_rdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>181</td><td class="mono">dmax_rdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>188</td><td class="mono">dma_m_wdata</td><td>32</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>192</td><td class="mono">dma_m_rdata</td><td>32</td></tr>
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_engine.v</td><td>79</td><td class="mono">src_addr_reg</td><td>31</td></tr>
 <tr><td>i2c</td><td class="mono">blocks/i2c/rtl/i2c_master.v</td><td>64</td><td class="mono">divider_reg</td><td>31</td></tr>
 <tr><td>i2c</td><td class="mono">blocks/i2c/rtl/i2c_master.v</td><td>65</td><td class="mono">div_cnt</td><td>31</td></tr>
@@ -284,10 +284,10 @@ flowchart TB
 <tr><td>axi_lite_xbar</td><td class="mono">blocks/axi_lite_xbar/rtl/axi_lite_xbar.v</td><td>72</td><td class="mono">s1_wdata</td><td>30</td></tr>
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_engine.v</td><td>51</td><td class="mono">s_rdata</td><td>30</td></tr>
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_engine.v</td><td>79</td><td class="mono">dst_addr_reg</td><td>30</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>61</td><td class="mono">irq_bus</td><td>30</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>165</td><td class="mono">jtag_wdata</td><td>30</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>350</td><td class="mono">jtag_addr_tck</td><td>30</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>352</td><td class="mono">jtag_rdata_tck</td><td>30</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>92</td><td class="mono">irq_bus</td><td>30</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>196</td><td class="mono">jtag_wdata</td><td>30</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>381</td><td class="mono">jtag_addr_tck</td><td>30</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>383</td><td class="mono">jtag_rdata_tck</td><td>30</td></tr>
 <tr><td>spi</td><td class="mono">blocks/spi/rtl/spi_master.v</td><td>68</td><td class="mono">div_cnt</td><td>30</td></tr>
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_engine.v</td><td>111</td><td class="mono">cur_src</td><td>29</td></tr>
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_engine.v</td><td>112</td><td class="mono">blocks_left</td><td>29</td></tr>
@@ -301,28 +301,28 @@ flowchart TB
 <tr><td>i2c</td><td class="mono">blocks/i2c/rtl/i2c_master.v</td><td>40</td><td class="mono">s_rdata</td><td>26</td></tr>
 <tr><td>spi</td><td class="mono">blocks/spi/rtl/spi_master.v</td><td>46</td><td class="mono">s_rdata</td><td>24</td></tr>
 <tr><td>axi_lite_xbar</td><td class="mono">blocks/axi_lite_xbar/rtl/axi_lite_xbar.v</td><td>100</td><td class="mono">ram_rdata</td><td>14</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>107</td><td class="mono">ram_rdata</td><td>14</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>138</td><td class="mono">ram_rdata</td><td>14</td></tr>
 <tr><td>jtag</td><td class="mono">blocks/jtag/rtl/jtag_axi_bridge.v</td><td>53</td><td class="mono">rdata_tck</td><td>13</td></tr>
 <tr><td>jtag</td><td class="mono">blocks/jtag/rtl/jtag_axi_bridge.v</td><td>89</td><td class="mono">rdata_reg</td><td>13</td></tr>
 <tr><td>jtag</td><td class="mono">blocks/jtag/rtl/jtag_axi_bridge.v</td><td>157</td><td class="mono">rdata_sync1</td><td>13</td></tr>
 <tr><td>jtag</td><td class="mono">blocks/jtag/rtl/jtag_axi_bridge.v</td><td>157</td><td class="mono">rdata_sync2</td><td>13</td></tr>
 <tr><td>jtag</td><td class="mono">blocks/jtag/rtl/jtag_dtm.v</td><td>40</td><td class="mono">bridge_rdata_tck</td><td>13</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>350</td><td class="mono">jtag_wdata_tck</td><td>12</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>52</td><td class="mono">cpu_wdata</td><td>10</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>381</td><td class="mono">jtag_wdata_tck</td><td>12</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>83</td><td class="mono">cpu_wdata</td><td>10</td></tr>
 <tr><td>i2c</td><td class="mono">blocks/i2c/rtl/i2c_master.v</td><td>71</td><td class="mono">rxdata_reg</td><td>8</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>156</td><td class="mono">dma_m_awlen</td><td>8</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>160</td><td class="mono">dma_m_arlen</td><td>8</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>187</td><td class="mono">dma_m_awlen</td><td>8</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>191</td><td class="mono">dma_m_arlen</td><td>8</td></tr>
 <tr><td>boot_rom</td><td class="mono">blocks/boot_rom/rtl/boot_rom.v</td><td>16</td><td class="mono">s_wdata</td><td>7</td></tr>
 <tr><td>i2c</td><td class="mono">blocks/i2c/rtl/i2c_master.v</td><td>37</td><td class="mono">s_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>98</td><td class="mono">rom_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>104</td><td class="mono">ram_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>110</td><td class="mono">timer_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>116</td><td class="mono">wdt_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>122</td><td class="mono">uartx_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>128</td><td class="mono">i2cx_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>134</td><td class="mono">spix_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>140</td><td class="mono">aesx_wdata</td><td>7</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>147</td><td class="mono">dmax_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>129</td><td class="mono">rom_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>135</td><td class="mono">ram_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>141</td><td class="mono">timer_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>147</td><td class="mono">wdt_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>153</td><td class="mono">uartx_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>159</td><td class="mono">i2cx_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>165</td><td class="mono">spix_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>171</td><td class="mono">aesx_wdata</td><td>7</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>178</td><td class="mono">dmax_wdata</td><td>7</td></tr>
 <tr><td>spi</td><td class="mono">blocks/spi/rtl/spi_master.v</td><td>43</td><td class="mono">s_wdata</td><td>7</td></tr>
 <tr><td>timer</td><td class="mono">blocks/timer/rtl/timer.v</td><td>30</td><td class="mono">s_wdata</td><td>7</td></tr>
 <tr><td>uart</td><td class="mono">blocks/uart/rtl/uart.v</td><td>22</td><td class="mono">s_wdata</td><td>7</td></tr>
@@ -345,10 +345,10 @@ flowchart TB
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_ram.v</td><td>120</td><td class="mono">r_word_idx</td><td>5</td></tr>
 <tr><td>axi_lite_xbar</td><td class="mono">blocks/axi_lite_xbar/rtl/axi_lite_xbar.v</td><td>73</td><td class="mono">s1_wstrb</td><td>4</td></tr>
 <tr><td>dma</td><td class="mono">blocks/dma/rtl/dma_ram.v</td><td>70</td><td class="mono">w_word_idx</td><td>4</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>157</td><td class="mono">dma_m_wstrb</td><td>4</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>165</td><td class="mono">jtag_wstrb</td><td>4</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>156</td><td class="mono">dma_m_awsize</td><td>3</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>160</td><td class="mono">dma_m_arsize</td><td>3</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>188</td><td class="mono">dma_m_wstrb</td><td>4</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>196</td><td class="mono">jtag_wstrb</td><td>4</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>187</td><td class="mono">dma_m_awsize</td><td>3</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>191</td><td class="mono">dma_m_arsize</td><td>3</td></tr>
 <tr><td>aes</td><td class="mono">blocks/aes/rtl/aes.v</td><td>86</td><td class="mono">mode_reg</td><td>2</td></tr>
 <tr><td>aes</td><td class="mono">blocks/aes/rtl/aes.v</td><td>99</td><td class="mono">aw_offset</td><td>2</td></tr>
 <tr><td>aes</td><td class="mono">blocks/aes/rtl/aes.v</td><td>100</td><td class="mono">ar_offset</td><td>2</td></tr>
@@ -360,8 +360,8 @@ flowchart TB
 <tr><td>i2c</td><td class="mono">blocks/i2c/rtl/i2c_master.v</td><td>84</td><td class="mono">aw_offset</td><td>2</td></tr>
 <tr><td>i2c</td><td class="mono">blocks/i2c/rtl/i2c_master.v</td><td>85</td><td class="mono">ar_offset</td><td>2</td></tr>
 <tr><td>i2c</td><td class="mono">blocks/i2c/rtl/i2c_master.v</td><td>317</td><td class="mono">txdata_reg</td><td>2</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>156</td><td class="mono">dma_m_awburst</td><td>2</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>160</td><td class="mono">dma_m_arburst</td><td>2</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>187</td><td class="mono">dma_m_awburst</td><td>2</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>191</td><td class="mono">dma_m_arburst</td><td>2</td></tr>
 <tr><td>spi</td><td class="mono">blocks/spi/rtl/spi_master.v</td><td>98</td><td class="mono">aw_offset</td><td>2</td></tr>
 <tr><td>spi</td><td class="mono">blocks/spi/rtl/spi_master.v</td><td>99</td><td class="mono">ar_offset</td><td>2</td></tr>
 <tr><td>timer</td><td class="mono">blocks/timer/rtl/timer.v</td><td>54</td><td class="mono">aw_offset</td><td>2</td></tr>
@@ -412,90 +412,91 @@ flowchart TB
 <tr><td>jtag</td><td class="mono">blocks/jtag/rtl/jtag_axi_bridge.v</td><td>156</td><td class="mono">resp_ok_sync1</td><td>1</td></tr>
 <tr><td>jtag</td><td class="mono">blocks/jtag/rtl/jtag_dtm.v</td><td>39</td><td class="mono">bridge_resp_ok_tck</td><td>1</td></tr>
 <tr><td>jtag</td><td class="mono">blocks/jtag/rtl/jtag_dtm.v</td><td>74</td><td class="mono">ir_reg</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>34</td><td class="mono">wdog_reset_req</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>35</td><td class="mono">i2c_scl</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>36</td><td class="mono">i2c_sda</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>37</td><td class="mono">spi_sclk</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>38</td><td class="mono">spi_mosi</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>39</td><td class="mono">spi_miso</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>40</td><td class="mono">spi_cs_n</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>46</td><td class="mono">resetn</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>60</td><td class="mono">i2c_irq</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>60</td><td class="mono">spi_irq</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>60</td><td class="mono">aes_irq</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>60</td><td class="mono">dma_irq</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>97</td><td class="mono">rom_awvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>98</td><td class="mono">rom_wvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>98</td><td class="mono">rom_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>99</td><td class="mono">rom_bvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>99</td><td class="mono">rom_bready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>99</td><td class="mono">rom_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>101</td><td class="mono">rom_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>104</td><td class="mono">ram_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>105</td><td class="mono">ram_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>107</td><td class="mono">ram_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>110</td><td class="mono">timer_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>111</td><td class="mono">timer_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>112</td><td class="mono">timer_arvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>113</td><td class="mono">timer_rvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>113</td><td class="mono">timer_rready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>113</td><td class="mono">timer_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>116</td><td class="mono">wdt_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>117</td><td class="mono">wdt_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>118</td><td class="mono">wdt_arvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>119</td><td class="mono">wdt_rvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>119</td><td class="mono">wdt_rready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>119</td><td class="mono">wdt_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>122</td><td class="mono">uartx_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>123</td><td class="mono">uartx_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>125</td><td class="mono">uartx_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>127</td><td class="mono">i2cx_awvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>128</td><td class="mono">i2cx_wvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>128</td><td class="mono">i2cx_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>129</td><td class="mono">i2cx_bvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>129</td><td class="mono">i2cx_bready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>129</td><td class="mono">i2cx_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>130</td><td class="mono">i2cx_arvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>131</td><td class="mono">i2cx_rvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>131</td><td class="mono">i2cx_rready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>131</td><td class="mono">i2cx_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>133</td><td class="mono">spix_awvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>134</td><td class="mono">spix_wvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>134</td><td class="mono">spix_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>135</td><td class="mono">spix_bvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>135</td><td class="mono">spix_bready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>135</td><td class="mono">spix_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>136</td><td class="mono">spix_arvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>137</td><td class="mono">spix_rvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>137</td><td class="mono">spix_rready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>137</td><td class="mono">spix_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>139</td><td class="mono">aesx_awvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>140</td><td class="mono">aesx_wvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>140</td><td class="mono">aesx_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>141</td><td class="mono">aesx_bvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>141</td><td class="mono">aesx_bready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>141</td><td class="mono">aesx_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>142</td><td class="mono">aesx_arvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>143</td><td class="mono">aesx_rvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>143</td><td class="mono">aesx_rready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>143</td><td class="mono">aesx_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>147</td><td class="mono">dmax_wstrb</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>148</td><td class="mono">dmax_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>150</td><td class="mono">dmax_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>155</td><td class="mono">dma_m_awvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>157</td><td class="mono">dma_m_wvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>157</td><td class="mono">dma_m_wlast</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>158</td><td class="mono">dma_m_bvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>158</td><td class="mono">dma_m_bready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>158</td><td class="mono">dma_m_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>159</td><td class="mono">dma_m_arvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>161</td><td class="mono">dma_m_rvalid</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>161</td><td class="mono">dma_m_rready</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>161</td><td class="mono">dma_m_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>161</td><td class="mono">dma_m_rlast</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>166</td><td class="mono">jtag_bresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>168</td><td class="mono">jtag_rresp</td><td>1</td></tr>
-<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>351</td><td class="mono">jtag_resp_ok_tck</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>42</td><td class="mono">wdog_reset_req</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>43</td><td class="mono">i2c_scl</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>44</td><td class="mono">i2c_sda</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>45</td><td class="mono">spi_sclk</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>46</td><td class="mono">spi_mosi</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>47</td><td class="mono">spi_miso</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>48</td><td class="mono">spi_cs_n</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>66</td><td class="mono">rst_tck_sync</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>66</td><td class="mono">rst_tck_meta</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>91</td><td class="mono">i2c_irq</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>91</td><td class="mono">spi_irq</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>91</td><td class="mono">aes_irq</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>91</td><td class="mono">dma_irq</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>128</td><td class="mono">rom_awvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>129</td><td class="mono">rom_wvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>129</td><td class="mono">rom_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>130</td><td class="mono">rom_bvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>130</td><td class="mono">rom_bready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>130</td><td class="mono">rom_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>132</td><td class="mono">rom_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>135</td><td class="mono">ram_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>136</td><td class="mono">ram_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>138</td><td class="mono">ram_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>141</td><td class="mono">timer_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>142</td><td class="mono">timer_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>143</td><td class="mono">timer_arvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>144</td><td class="mono">timer_rvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>144</td><td class="mono">timer_rready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>144</td><td class="mono">timer_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>147</td><td class="mono">wdt_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>148</td><td class="mono">wdt_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>149</td><td class="mono">wdt_arvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>150</td><td class="mono">wdt_rvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>150</td><td class="mono">wdt_rready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>150</td><td class="mono">wdt_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>153</td><td class="mono">uartx_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>154</td><td class="mono">uartx_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>156</td><td class="mono">uartx_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>158</td><td class="mono">i2cx_awvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>159</td><td class="mono">i2cx_wvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>159</td><td class="mono">i2cx_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>160</td><td class="mono">i2cx_bvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>160</td><td class="mono">i2cx_bready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>160</td><td class="mono">i2cx_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>161</td><td class="mono">i2cx_arvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>162</td><td class="mono">i2cx_rvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>162</td><td class="mono">i2cx_rready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>162</td><td class="mono">i2cx_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>164</td><td class="mono">spix_awvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>165</td><td class="mono">spix_wvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>165</td><td class="mono">spix_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>166</td><td class="mono">spix_bvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>166</td><td class="mono">spix_bready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>166</td><td class="mono">spix_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>167</td><td class="mono">spix_arvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>168</td><td class="mono">spix_rvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>168</td><td class="mono">spix_rready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>168</td><td class="mono">spix_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>170</td><td class="mono">aesx_awvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>171</td><td class="mono">aesx_wvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>171</td><td class="mono">aesx_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>172</td><td class="mono">aesx_bvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>172</td><td class="mono">aesx_bready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>172</td><td class="mono">aesx_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>173</td><td class="mono">aesx_arvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>174</td><td class="mono">aesx_rvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>174</td><td class="mono">aesx_rready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>174</td><td class="mono">aesx_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>178</td><td class="mono">dmax_wstrb</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>179</td><td class="mono">dmax_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>181</td><td class="mono">dmax_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>186</td><td class="mono">dma_m_awvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>188</td><td class="mono">dma_m_wvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>188</td><td class="mono">dma_m_wlast</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>189</td><td class="mono">dma_m_bvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>189</td><td class="mono">dma_m_bready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>189</td><td class="mono">dma_m_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>190</td><td class="mono">dma_m_arvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>192</td><td class="mono">dma_m_rvalid</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>192</td><td class="mono">dma_m_rready</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>192</td><td class="mono">dma_m_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>192</td><td class="mono">dma_m_rlast</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>197</td><td class="mono">jtag_bresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>199</td><td class="mono">jtag_rresp</td><td>1</td></tr>
+<tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>382</td><td class="mono">jtag_resp_ok_tck</td><td>1</td></tr>
 <tr><td>watchdog</td><td class="mono">blocks/watchdog/rtl/watchdog.v</td><td>48</td><td class="mono">ctrl_en</td><td>1</td></tr>
 </tbody></table></details>
   </section>
@@ -507,7 +508,7 @@ flowchart TB
       <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">uart</span><span class="fsm-file">uart.v</span><span class="fsm-pct good">4/4 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="16477 hits">TX_IDLE</span>
+<span class="state-chip good" title="16478 hits">TX_IDLE</span>
 <span class="state-chip good" title="104 hits">TX_START</span>
 <span class="state-chip good" title="832 hits">TX_DATA</span>
 <span class="state-chip good" title="104 hits">TX_STOP</span>
@@ -515,46 +516,46 @@ flowchart TB
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">i2c_master</span><span class="fsm-file">i2c_master.v</span><span class="fsm-pct good">9/9 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="17517 hits">ST_IDLE</span>
-<span class="state-chip good" title="32 hits">ST_START</span>
-<span class="state-chip good" title="256 hits">ST_ADDR</span>
-<span class="state-chip good" title="32 hits">ST_ADDR_ACK</span>
-<span class="state-chip good" title="128 hits">ST_WDATA</span>
-<span class="state-chip good" title="16 hits">ST_WDATA_ACK</span>
-<span class="state-chip good" title="64 hits">ST_RDATA</span>
-<span class="state-chip good" title="8 hits">ST_RDATA_ACK</span>
-<span class="state-chip good" title="48 hits">ST_STOP</span>
+<span class="state-chip good" title="17518 hits">ST_IDLE</span>
+<span class="state-chip good" title="16 hits">ST_START</span>
+<span class="state-chip good" title="128 hits">ST_ADDR</span>
+<span class="state-chip good" title="16 hits">ST_ADDR_ACK</span>
+<span class="state-chip good" title="64 hits">ST_WDATA</span>
+<span class="state-chip good" title="8 hits">ST_WDATA_ACK</span>
+<span class="state-chip good" title="32 hits">ST_RDATA</span>
+<span class="state-chip good" title="4 hits">ST_RDATA_ACK</span>
+<span class="state-chip good" title="24 hits">ST_STOP</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">spi_master</span><span class="fsm-file">spi_master.v</span><span class="fsm-pct good">2/2 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="17517 hits">IDLE</span>
-<span class="state-chip good" title="680 hits">RUN</span>
+<span class="state-chip good" title="17518 hits">IDLE</span>
+<span class="state-chip good" title="340 hits">RUN</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">jtag_tap</span><span class="fsm-file">jtag_tap.v</span><span class="fsm-pct good">16/16 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="978 hits">TEST_LOGIC_RESET</span>
-<span class="state-chip good" title="1752 hits">RUN_TEST_IDLE</span>
-<span class="state-chip good" title="1322 hits">SELECT_DR_SCAN</span>
-<span class="state-chip good" title="612 hits">CAPTURE_DR</span>
-<span class="state-chip good" title="1668 hits">SHIFT_DR</span>
-<span class="state-chip good" title="794 hits">EXIT1_DR</span>
-<span class="state-chip good" title="806 hits">PAUSE_DR</span>
-<span class="state-chip good" title="402 hits">EXIT2_DR</span>
-<span class="state-chip good" title="612 hits">UPDATE_DR</span>
-<span class="state-chip good" title="710 hits">SELECT_IR_SCAN</span>
-<span class="state-chip good" title="296 hits">CAPTURE_IR</span>
-<span class="state-chip good" title="500 hits">SHIFT_IR</span>
-<span class="state-chip good" title="402 hits">EXIT1_IR</span>
-<span class="state-chip good" title="480 hits">PAUSE_IR</span>
-<span class="state-chip good" title="230 hits">EXIT2_IR</span>
-<span class="state-chip good" title="294 hits">UPDATE_IR</span>
+<span class="state-chip good" title="489 hits">TEST_LOGIC_RESET</span>
+<span class="state-chip good" title="876 hits">RUN_TEST_IDLE</span>
+<span class="state-chip good" title="661 hits">SELECT_DR_SCAN</span>
+<span class="state-chip good" title="306 hits">CAPTURE_DR</span>
+<span class="state-chip good" title="834 hits">SHIFT_DR</span>
+<span class="state-chip good" title="397 hits">EXIT1_DR</span>
+<span class="state-chip good" title="403 hits">PAUSE_DR</span>
+<span class="state-chip good" title="201 hits">EXIT2_DR</span>
+<span class="state-chip good" title="306 hits">UPDATE_DR</span>
+<span class="state-chip good" title="355 hits">SELECT_IR_SCAN</span>
+<span class="state-chip good" title="148 hits">CAPTURE_IR</span>
+<span class="state-chip good" title="250 hits">SHIFT_IR</span>
+<span class="state-chip good" title="201 hits">EXIT1_IR</span>
+<span class="state-chip good" title="240 hits">PAUSE_IR</span>
+<span class="state-chip good" title="115 hits">EXIT2_IR</span>
+<span class="state-chip good" title="147 hits">UPDATE_IR</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">aes_core</span><span class="fsm-file">aes_core.v</span><span class="fsm-pct good">4/4 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="35034 hits">ST_IDLE</span>
+<span class="state-chip good" title="35036 hits">ST_IDLE</span>
 <span class="state-chip good" title="11099 hits">ST_KEYEXP</span>
 <span class="state-chip good" title="9081 hits">ST_ROUND</span>
 <span class="state-chip good" title="1009 hits">ST_FINAL</span>
@@ -562,13 +563,13 @@ flowchart TB
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">aes_chain</span><span class="fsm-file">aes_chain.v</span><span class="fsm-pct good">2/2 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="35034 hits">ST_IDLE</span>
+<span class="state-chip good" title="35036 hits">ST_IDLE</span>
 <span class="state-chip good" title="22198 hits">ST_CORE</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">axi_lite_xbar (write)</span><span class="fsm-file">axi_lite_xbar.v</span><span class="fsm-pct good">4/4 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="16849 hits">W_IDLE</span>
+<span class="state-chip good" title="16850 hits">W_IDLE</span>
 <span class="state-chip good" title="167 hits">W_ISSUE</span>
 <span class="state-chip good" title="167 hits">W_WAIT_B</span>
 <span class="state-chip good" title="334 hits">W_RESP</span>
@@ -576,7 +577,7 @@ flowchart TB
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">axi_lite_xbar (read)</span><span class="fsm-file">axi_lite_xbar.v</span><span class="fsm-pct good">4/4 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="8432 hits">R_IDLE</span>
+<span class="state-chip good" title="8433 hits">R_IDLE</span>
 <span class="state-chip good" title="2272 hits">R_ISSUE</span>
 <span class="state-chip good" title="2271 hits">R_WAIT_R</span>
 <span class="state-chip good" title="4542 hits">R_RESP</span>
@@ -584,19 +585,19 @@ flowchart TB
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">dma_ram (write)</span><span class="fsm-file">dma_ram.v</span><span class="fsm-pct good">2/2 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="17517 hits">W_IDLE</span>
+<span class="state-chip good" title="17518 hits">W_IDLE</span>
 <span class="state-chip good" title="480 hits">W_BURST</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">dma_ram (read)</span><span class="fsm-file">dma_ram.v</span><span class="fsm-pct good">2/2 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="17517 hits">R_IDLE</span>
+<span class="state-chip good" title="17518 hits">R_IDLE</span>
 <span class="state-chip good" title="243 hits">R_BURST</span>
 </div></div>
 <div class="fsm-card">
 <div class="fsm-head"><span class="fsm-name">dma_engine</span><span class="fsm-file">dma_engine.v</span><span class="fsm-pct good">9/9 states</span></div>
 <div class="fsm-states">
-<span class="state-chip good" title="17517 hits">ST_IDLE</span>
+<span class="state-chip good" title="17518 hits">ST_IDLE</span>
 <span class="state-chip good" title="24 hits">ST_RD_ADDR</span>
 <span class="state-chip good" title="60 hits">ST_RD_DATA</span>
 <span class="state-chip good" title="12 hits">ST_AES_GO</span>

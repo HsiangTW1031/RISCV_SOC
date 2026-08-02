@@ -8,9 +8,9 @@
 
 三塊純記憶體陣列（`boot_rom` 64KB、`sram` 128KB、`dma_ram` 8KB)換成 blackbox stub（`blocks/soc_top/syn/mem_blackboxes.v`)——真實 ASIC flow 裡這些會是硬 IP SRAM macro,不是真的拿 flip-flop 湊出來的,讓 Yosys 把一個 32K-word 的陣列展開成百萬顆 flip-flop 既不真實也慢到不划算。除了這三塊,**PicoRV32、手刻 crossbar、每個周邊的控制/資料路徑、AES core + CBC/CTR chaining、DMA engine 全部都是真的合成**——這是為什麼下面這個 Fmax 數字反映的是真正的邏輯關鍵路徑,不是被記憶體模型撐大的假象。
 
-- **Chip area**（Nangate45 單位):130337.1,其中 sequential elements 佔 36.5%(47566.9)
-- **Cell count**:79128 個 standard cell instance
-- **關鍵路徑**:2.0ns 時脈假設下 WNS = -9.02ns,實際關鍵路徑延遲 **10.966ns**
+- **Chip area**（Nangate45 單位):129847.1,其中 sequential elements 佔 36.65%(47588.2)——比加 reset synchronizer(見第 7、9 節)之前略降(129847.1 vs. 130337.1),多出的 4 個正反器被 synthesis 的 dead-code cleanup 抵銷還有找,不是量測雜訊
+- **Cell count**:78649 個 standard cell instance
+- **關鍵路徑**:2.0ns 時脈假設下 WNS = -9.02ns,實際關鍵路徑延遲 **10.966ns**(reset synchronizer 前後完全沒變,符合預期——reset 分配邏輯跟 AES key expansion 這條臨界路徑毫無關係)
 - **關鍵路徑位置**:`u_aes/u_chain/u_core/u_key_expand`——AES 的 key expansion 組合邏輯,跟 Phase 4 單獨合成 `aes_core`(見 `docs/aes_report.md`,10.153ns、Fmax≈98.5MHz)幾乎是同一個瓶頸,只是被放進完整 SoC 後的 fanout/context 讓它慢了一點點——這個一致性本身就是交叉驗證,說明兩次合成量到的是同一個真實瓶頸,不是雜訊。
 
 **Fmax ≈ 1 / 10.966ns ≈ 91.2 MHz**
@@ -80,7 +80,7 @@
 | **soc_top** | 關鍵路徑 43.128ns(同一個 `u_key_expand` 瓶頸)→ **slow corner Fmax ≈ 23.2MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
 | **aes_core** | 關鍵路徑 38.219ns → **slow corner Fmax ≈ 26.2MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
 
-Setup 用的 SDC 時脈週期(2.0ns/500MHz)本來就是刻意設定得比實際能達到的頻率更緊(見 `constraints/*.sdc` 註解)——目的是讓 `report_checks` 直接印出關鍵路徑的真實 data arrival time,再自己算 Fmax,不是為了衝一個特定頻率,所以 setup 兩份報告顯示大量違規(WNS -41.32ns/-36.40ns)是預期中的,不代表真的有時序問題;唯一有意義的數字是 data arrival time 換算出來的 slow-corner Fmax,這才是兩個 corner 一起看才拿得到的、比第 1 節保守的真實數字。Hold 完全乾淨(fast corner 下 TNS 剛好 0.00,沒有任何一個 endpoint 違規)。
+Setup 用的 SDC 時脈週期(2.0ns/500MHz)本來就是刻意設定得比實際能達到的頻率更緊(見 `constraints/*.sdc` 註解)——目的是讓 `report_checks` 直接印出關鍵路徑的真實 data arrival time,再自己算 Fmax,不是為了衝一個特定頻率,所以 setup 兩份報告顯示大量違規(WNS -41.32ns/-36.40ns)是預期中的,不代表真的有時序問題;唯一有意義的數字是 data arrival time 換算出來的 slow-corner Fmax,這才是兩個 corner 一起看才拿得到的、比第 1 節保守的真實數字。Hold 完全乾淨(fast corner 下 TNS 剛好 0.00,沒有任何一個 endpoint 違規)——這是加上 reset synchronizer、並且補上對應的 SDC exception(`set_false_path -from [get_ports rst]`)之後的結果,過程跟理由見 `docs/cdc_report.md`。
 
 ## 8. Signoff 範圍界限(刻意的取捨,不是漏掉)
 

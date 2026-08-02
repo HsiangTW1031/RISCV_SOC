@@ -2,18 +2,18 @@
   "coverage_overall": {
     "line": {
       "pct": 47.2,
-      "covered": 3153,
-      "total": 6684
+      "covered": 3156,
+      "total": 6686
     },
     "toggle": {
       "pct": 58.1,
-      "covered": 43157,
-      "total": 74282
+      "covered": 43169,
+      "total": 74290
     },
     "branch": {
-      "pct": 77.3,
-      "covered": 1500,
-      "total": 1940
+      "pct": 77.4,
+      "covered": 1504,
+      "total": 1944
     }
   },
   "coverage_by_file": [
@@ -104,16 +104,16 @@
     {
       "file": "picorv32.v",
       "block": "picorv32 (vendored)",
-      "covered": 1136,
+      "covered": 1144,
       "total": 1417,
-      "pct": 80.2
+      "pct": 80.7
     },
     {
       "file": "soc_top.v",
       "block": "soc_top",
-      "covered": 71,
-      "total": 88,
-      "pct": 80.7
+      "covered": 84,
+      "total": 104,
+      "pct": 80.8
     },
     {
       "file": "spi_master.v",
@@ -157,7 +157,7 @@
       "states": [
         {
           "name": "TX_IDLE",
-          "hits": 16477,
+          "hits": 16478,
           "visited": true
         },
         {
@@ -185,47 +185,47 @@
       "states": [
         {
           "name": "ST_IDLE",
-          "hits": 17517,
+          "hits": 17518,
           "visited": true
         },
         {
           "name": "ST_START",
-          "hits": 32,
-          "visited": true
-        },
-        {
-          "name": "ST_ADDR",
-          "hits": 256,
-          "visited": true
-        },
-        {
-          "name": "ST_ADDR_ACK",
-          "hits": 32,
-          "visited": true
-        },
-        {
-          "name": "ST_WDATA",
-          "hits": 128,
-          "visited": true
-        },
-        {
-          "name": "ST_WDATA_ACK",
           "hits": 16,
           "visited": true
         },
         {
-          "name": "ST_RDATA",
+          "name": "ST_ADDR",
+          "hits": 128,
+          "visited": true
+        },
+        {
+          "name": "ST_ADDR_ACK",
+          "hits": 16,
+          "visited": true
+        },
+        {
+          "name": "ST_WDATA",
           "hits": 64,
           "visited": true
         },
         {
-          "name": "ST_RDATA_ACK",
+          "name": "ST_WDATA_ACK",
           "hits": 8,
           "visited": true
         },
         {
+          "name": "ST_RDATA",
+          "hits": 32,
+          "visited": true
+        },
+        {
+          "name": "ST_RDATA_ACK",
+          "hits": 4,
+          "visited": true
+        },
+        {
           "name": "ST_STOP",
-          "hits": 48,
+          "hits": 24,
           "visited": true
         }
       ],
@@ -238,12 +238,12 @@
       "states": [
         {
           "name": "IDLE",
-          "hits": 17517,
+          "hits": 17518,
           "visited": true
         },
         {
           "name": "RUN",
-          "hits": 680,
+          "hits": 340,
           "visited": true
         }
       ],
@@ -256,82 +256,82 @@
       "states": [
         {
           "name": "TEST_LOGIC_RESET",
-          "hits": 978,
+          "hits": 489,
           "visited": true
         },
         {
           "name": "RUN_TEST_IDLE",
-          "hits": 1752,
+          "hits": 876,
           "visited": true
         },
         {
           "name": "SELECT_DR_SCAN",
-          "hits": 1322,
+          "hits": 661,
           "visited": true
         },
         {
           "name": "CAPTURE_DR",
-          "hits": 612,
+          "hits": 306,
           "visited": true
         },
         {
           "name": "SHIFT_DR",
-          "hits": 1668,
+          "hits": 834,
           "visited": true
         },
         {
           "name": "EXIT1_DR",
-          "hits": 794,
+          "hits": 397,
           "visited": true
         },
         {
           "name": "PAUSE_DR",
-          "hits": 806,
+          "hits": 403,
           "visited": true
         },
         {
           "name": "EXIT2_DR",
-          "hits": 402,
+          "hits": 201,
           "visited": true
         },
         {
           "name": "UPDATE_DR",
-          "hits": 612,
+          "hits": 306,
           "visited": true
         },
         {
           "name": "SELECT_IR_SCAN",
-          "hits": 710,
+          "hits": 355,
           "visited": true
         },
         {
           "name": "CAPTURE_IR",
-          "hits": 296,
+          "hits": 148,
           "visited": true
         },
         {
           "name": "SHIFT_IR",
-          "hits": 500,
+          "hits": 250,
           "visited": true
         },
         {
           "name": "EXIT1_IR",
-          "hits": 402,
+          "hits": 201,
           "visited": true
         },
         {
           "name": "PAUSE_IR",
-          "hits": 480,
+          "hits": 240,
           "visited": true
         },
         {
           "name": "EXIT2_IR",
-          "hits": 230,
+          "hits": 115,
           "visited": true
         },
         {
           "name": "UPDATE_IR",
-          "hits": 294,
+          "hits": 147,
           "visited": true
         }
       ],
@@ -344,7 +344,7 @@
       "states": [
         {
           "name": "ST_IDLE",
-          "hits": 35034,
+          "hits": 35036,
           "visited": true
         },
         {
@@ -372,7 +372,7 @@
       "states": [
         {
           "name": "ST_IDLE",
-          "hits": 35034,
+          "hits": 35036,
           "visited": true
         },
         {
@@ -390,7 +390,7 @@
       "states": [
         {
           "name": "W_IDLE",
-          "hits": 16849,
+          "hits": 16850,
           "visited": true
         },
         {
@@ -418,7 +418,7 @@
       "states": [
         {
           "name": "R_IDLE",
-          "hits": 8432,
+          "hits": 8433,
           "visited": true
         },
         {
@@ -446,7 +446,7 @@
       "states": [
         {
           "name": "W_IDLE",
-          "hits": 17517,
+          "hits": 17518,
           "visited": true
         },
         {
@@ -464,7 +464,7 @@
       "states": [
         {
           "name": "R_IDLE",
-          "hits": 17517,
+          "hits": 17518,
           "visited": true
         },
         {
@@ -482,7 +482,7 @@
       "states": [
         {
           "name": "ST_IDLE",
-          "hits": 17517,
+          "hits": 17518,
           "visited": true
         },
         {
@@ -1750,13 +1750,13 @@
   ],
   "toggle_waiver_report": {
     "before": {
-      "covered": 7923,
-      "total": 11401,
+      "covered": 7926,
+      "total": 11405,
       "pct": 69.5
     },
     "after": {
-      "covered": 7923,
-      "total": 9888,
+      "covered": 7926,
+      "total": 9892,
       "pct": 80.1
     },
     "waived_bit_count": 1513,
@@ -2014,9 +2014,9 @@
         "pct": 58.7
       },
       "soc_top": {
-        "covered": 828,
-        "total": 1929,
-        "pct": 42.9
+        "covered": 831,
+        "total": 1933,
+        "pct": 43.0
       },
       "spi": {
         "covered": 140,
@@ -2076,8 +2076,8 @@
         "pct": 64.7
       },
       "soc_top": {
-        "covered": 828,
-        "total": 1453,
+        "covered": 831,
+        "total": 1457,
         "pct": 57.0
       },
       "spi": {
@@ -4680,7 +4680,7 @@
         "line": 16,
         "signal": "s_wdata[11]",
         "block": "boot_rom",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -4688,7 +4688,7 @@
         "line": 16,
         "signal": "s_wdata[17]",
         "block": "boot_rom",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -4696,7 +4696,7 @@
         "line": 16,
         "signal": "s_wdata[22]",
         "block": "boot_rom",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -4704,7 +4704,7 @@
         "line": 16,
         "signal": "s_wdata[23]",
         "block": "boot_rom",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -4712,7 +4712,7 @@
         "line": 16,
         "signal": "s_wdata[25]",
         "block": "boot_rom",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -4720,7 +4720,7 @@
         "line": 16,
         "signal": "s_wdata[27]",
         "block": "boot_rom",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -4728,7 +4728,7 @@
         "line": 16,
         "signal": "s_wdata[31]",
         "block": "boot_rom",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -8616,7 +8616,7 @@
         "line": 64,
         "signal": "divider_reg[1]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9048,7 +9048,7 @@
         "line": 68,
         "signal": "addr_rw[5]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9064,7 +9064,7 @@
         "line": 68,
         "signal": "addr_rw[7]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9072,7 +9072,7 @@
         "line": 69,
         "signal": "tx_shift[0]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9080,7 +9080,7 @@
         "line": 69,
         "signal": "tx_shift[4]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9088,7 +9088,7 @@
         "line": 70,
         "signal": "rx_shift[6]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9096,7 +9096,7 @@
         "line": 70,
         "signal": "rx_shift[7]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9104,7 +9104,7 @@
         "line": 71,
         "signal": "rxdata_reg[0]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9120,7 +9120,7 @@
         "line": 71,
         "signal": "rxdata_reg[2]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9128,7 +9128,7 @@
         "line": 71,
         "signal": "rxdata_reg[3]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9152,7 +9152,7 @@
         "line": 71,
         "signal": "rxdata_reg[6]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9160,7 +9160,7 @@
         "line": 71,
         "signal": "rxdata_reg[7]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9224,7 +9224,7 @@
         "line": 316,
         "signal": "addr_reg[4]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9240,7 +9240,7 @@
         "line": 316,
         "signal": "addr_reg[6]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9248,7 +9248,7 @@
         "line": 317,
         "signal": "txdata_reg[0]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9256,7 +9256,7 @@
         "line": 317,
         "signal": "txdata_reg[4]",
         "block": "i2c",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9536,7 +9536,7 @@
         "line": 52,
         "signal": "resp_ok_tck",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9552,7 +9552,7 @@
         "line": 53,
         "signal": "rdata_tck[12]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9560,7 +9560,7 @@
         "line": 53,
         "signal": "rdata_tck[14]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9568,7 +9568,7 @@
         "line": 53,
         "signal": "rdata_tck[18]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9584,7 +9584,7 @@
         "line": 53,
         "signal": "rdata_tck[20]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9592,7 +9592,7 @@
         "line": 53,
         "signal": "rdata_tck[21]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9608,7 +9608,7 @@
         "line": 53,
         "signal": "rdata_tck[25]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9624,7 +9624,7 @@
         "line": 53,
         "signal": "rdata_tck[3]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -9992,7 +9992,7 @@
         "line": 89,
         "signal": "rdata_reg[12]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10000,7 +10000,7 @@
         "line": 89,
         "signal": "rdata_reg[14]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10008,7 +10008,7 @@
         "line": 89,
         "signal": "rdata_reg[18]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10024,7 +10024,7 @@
         "line": 89,
         "signal": "rdata_reg[20]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10032,7 +10032,7 @@
         "line": 89,
         "signal": "rdata_reg[21]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10048,7 +10048,7 @@
         "line": 89,
         "signal": "rdata_reg[25]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10064,7 +10064,7 @@
         "line": 89,
         "signal": "rdata_reg[3]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10088,7 +10088,7 @@
         "line": 91,
         "signal": "resp_ok",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10096,7 +10096,7 @@
         "line": 156,
         "signal": "resp_ok_sync2",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10104,7 +10104,7 @@
         "line": 156,
         "signal": "resp_ok_sync1",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10120,7 +10120,7 @@
         "line": 157,
         "signal": "rdata_sync1[12]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10128,7 +10128,7 @@
         "line": 157,
         "signal": "rdata_sync1[14]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10136,7 +10136,7 @@
         "line": 157,
         "signal": "rdata_sync1[18]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10152,7 +10152,7 @@
         "line": 157,
         "signal": "rdata_sync1[20]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10160,7 +10160,7 @@
         "line": 157,
         "signal": "rdata_sync1[21]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10176,7 +10176,7 @@
         "line": 157,
         "signal": "rdata_sync1[25]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10192,7 +10192,7 @@
         "line": 157,
         "signal": "rdata_sync1[3]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10224,7 +10224,7 @@
         "line": 157,
         "signal": "rdata_sync2[12]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10232,7 +10232,7 @@
         "line": 157,
         "signal": "rdata_sync2[14]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10240,7 +10240,7 @@
         "line": 157,
         "signal": "rdata_sync2[18]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10256,7 +10256,7 @@
         "line": 157,
         "signal": "rdata_sync2[20]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10264,7 +10264,7 @@
         "line": 157,
         "signal": "rdata_sync2[21]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10280,7 +10280,7 @@
         "line": 157,
         "signal": "rdata_sync2[25]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10296,7 +10296,7 @@
         "line": 157,
         "signal": "rdata_sync2[3]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10320,7 +10320,7 @@
         "line": 39,
         "signal": "bridge_resp_ok_tck",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10336,7 +10336,7 @@
         "line": 40,
         "signal": "bridge_rdata_tck[12]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10344,7 +10344,7 @@
         "line": 40,
         "signal": "bridge_rdata_tck[14]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10352,7 +10352,7 @@
         "line": 40,
         "signal": "bridge_rdata_tck[18]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10368,7 +10368,7 @@
         "line": 40,
         "signal": "bridge_rdata_tck[20]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10376,7 +10376,7 @@
         "line": 40,
         "signal": "bridge_rdata_tck[21]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10392,7 +10392,7 @@
         "line": 40,
         "signal": "bridge_rdata_tck[25]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10408,7 +10408,7 @@
         "line": 40,
         "signal": "bridge_rdata_tck[3]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10704,7 +10704,7 @@
         "line": 74,
         "signal": "ir_reg[3]",
         "block": "jtag",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -10981,7 +10981,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 34,
+        "line": 42,
         "signal": "wdog_reset_req",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -10989,7 +10989,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 35,
+        "line": 43,
         "signal": "i2c_scl",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -10997,7 +10997,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 36,
+        "line": 44,
         "signal": "i2c_sda",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11005,7 +11005,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 37,
+        "line": 45,
         "signal": "spi_sclk",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11013,7 +11013,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 38,
+        "line": 46,
         "signal": "spi_mosi",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11021,7 +11021,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 39,
+        "line": 47,
         "signal": "spi_miso",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11029,7 +11029,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 40,
+        "line": 48,
         "signal": "spi_cs_n",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11037,15 +11037,23 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 46,
-        "signal": "resetn",
+        "line": 66,
+        "signal": "rst_tck_sync",
         "block": "soc_top",
-        "hit_0to1": 1,
+        "hit_0to1": 0,
         "hit_1to0": 0
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 66,
+        "signal": "rst_tck_meta",
+        "block": "soc_top",
+        "hit_0to1": 0,
+        "hit_1to0": 0
+      },
+      {
+        "file": "blocks/soc_top/rtl/soc_top.v",
+        "line": 83,
         "signal": "cpu_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11053,7 +11061,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11061,7 +11069,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11069,7 +11077,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11077,7 +11085,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11085,7 +11093,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11093,7 +11101,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11101,7 +11109,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11109,7 +11117,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11117,7 +11125,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 52,
+        "line": 83,
         "signal": "cpu_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11125,7 +11133,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 60,
+        "line": 91,
         "signal": "i2c_irq",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11133,7 +11141,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 60,
+        "line": 91,
         "signal": "spi_irq",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11141,7 +11149,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 60,
+        "line": 91,
         "signal": "aes_irq",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11149,7 +11157,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 60,
+        "line": 91,
         "signal": "dma_irq",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11157,7 +11165,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11165,7 +11173,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11173,7 +11181,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11181,7 +11189,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11189,7 +11197,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11197,7 +11205,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11205,7 +11213,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11213,7 +11221,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11221,7 +11229,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11229,7 +11237,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11237,7 +11245,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11245,7 +11253,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11253,7 +11261,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11261,7 +11269,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11269,7 +11277,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11277,7 +11285,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11285,7 +11293,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11293,7 +11301,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11301,7 +11309,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11309,7 +11317,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11317,7 +11325,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11325,7 +11333,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11333,7 +11341,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11341,7 +11349,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11349,7 +11357,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11357,7 +11365,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11365,7 +11373,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11373,7 +11381,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11381,7 +11389,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11389,7 +11397,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 61,
+        "line": 92,
         "signal": "irq_bus[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11397,7 +11405,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 97,
+        "line": 128,
         "signal": "rom_awvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11405,7 +11413,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11413,7 +11421,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11421,7 +11429,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11429,7 +11437,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11437,7 +11445,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11445,7 +11453,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11453,7 +11461,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11461,7 +11469,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11469,7 +11477,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 98,
+        "line": 129,
         "signal": "rom_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11477,7 +11485,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 99,
+        "line": 130,
         "signal": "rom_bvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11485,7 +11493,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 99,
+        "line": 130,
         "signal": "rom_bready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11493,7 +11501,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 99,
+        "line": 130,
         "signal": "rom_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11501,7 +11509,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 101,
+        "line": 132,
         "signal": "rom_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11509,7 +11517,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 104,
+        "line": 135,
         "signal": "ram_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11517,7 +11525,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 104,
+        "line": 135,
         "signal": "ram_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11525,7 +11533,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 104,
+        "line": 135,
         "signal": "ram_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11533,7 +11541,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 104,
+        "line": 135,
         "signal": "ram_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11541,7 +11549,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 104,
+        "line": 135,
         "signal": "ram_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11549,7 +11557,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 104,
+        "line": 135,
         "signal": "ram_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11557,7 +11565,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 104,
+        "line": 135,
         "signal": "ram_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11565,7 +11573,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 104,
+        "line": 135,
         "signal": "ram_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11573,7 +11581,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 105,
+        "line": 136,
         "signal": "ram_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11581,7 +11589,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11589,7 +11597,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11597,7 +11605,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11605,7 +11613,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11613,7 +11621,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11621,7 +11629,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11629,7 +11637,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11637,7 +11645,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11645,7 +11653,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11653,7 +11661,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11661,7 +11669,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11669,7 +11677,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11677,7 +11685,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11685,7 +11693,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11693,7 +11701,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 107,
+        "line": 138,
         "signal": "ram_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11701,7 +11709,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 110,
+        "line": 141,
         "signal": "timer_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11709,7 +11717,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 110,
+        "line": 141,
         "signal": "timer_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11717,7 +11725,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 110,
+        "line": 141,
         "signal": "timer_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11725,7 +11733,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 110,
+        "line": 141,
         "signal": "timer_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11733,7 +11741,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 110,
+        "line": 141,
         "signal": "timer_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11741,7 +11749,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 110,
+        "line": 141,
         "signal": "timer_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11749,7 +11757,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 110,
+        "line": 141,
         "signal": "timer_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11757,7 +11765,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 110,
+        "line": 141,
         "signal": "timer_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -11765,7 +11773,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 111,
+        "line": 142,
         "signal": "timer_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11773,7 +11781,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 112,
+        "line": 143,
         "signal": "timer_arvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11781,7 +11789,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11789,7 +11797,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11797,7 +11805,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11805,7 +11813,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11813,7 +11821,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11821,7 +11829,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11829,7 +11837,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11837,7 +11845,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11845,7 +11853,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11853,7 +11861,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11861,7 +11869,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11869,7 +11877,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11877,7 +11885,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11885,7 +11893,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11893,7 +11901,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11901,7 +11909,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11909,7 +11917,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11917,7 +11925,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11925,7 +11933,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11933,7 +11941,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11941,7 +11949,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11949,7 +11957,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11957,7 +11965,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11965,7 +11973,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11973,7 +11981,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11981,7 +11989,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11989,7 +11997,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -11997,7 +12005,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12005,7 +12013,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12013,7 +12021,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12021,7 +12029,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12029,7 +12037,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12037,7 +12045,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12045,7 +12053,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12053,7 +12061,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 113,
+        "line": 144,
         "signal": "timer_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12061,7 +12069,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 116,
+        "line": 147,
         "signal": "wdt_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12069,7 +12077,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 116,
+        "line": 147,
         "signal": "wdt_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12077,7 +12085,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 116,
+        "line": 147,
         "signal": "wdt_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12085,7 +12093,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 116,
+        "line": 147,
         "signal": "wdt_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12093,7 +12101,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 116,
+        "line": 147,
         "signal": "wdt_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12101,7 +12109,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 116,
+        "line": 147,
         "signal": "wdt_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12109,7 +12117,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 116,
+        "line": 147,
         "signal": "wdt_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12117,7 +12125,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 116,
+        "line": 147,
         "signal": "wdt_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12125,7 +12133,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 117,
+        "line": 148,
         "signal": "wdt_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12133,7 +12141,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 118,
+        "line": 149,
         "signal": "wdt_arvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12141,7 +12149,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12149,7 +12157,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12157,7 +12165,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12165,7 +12173,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12173,7 +12181,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12181,7 +12189,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12189,7 +12197,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12197,7 +12205,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12205,7 +12213,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12213,7 +12221,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12221,7 +12229,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12229,7 +12237,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12237,7 +12245,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12245,7 +12253,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12253,7 +12261,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12261,7 +12269,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12269,7 +12277,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12277,7 +12285,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12285,7 +12293,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12293,7 +12301,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12301,7 +12309,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12309,7 +12317,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12317,7 +12325,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12325,7 +12333,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12333,7 +12341,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12341,7 +12349,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12349,7 +12357,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12357,7 +12365,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12365,7 +12373,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12373,7 +12381,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12381,7 +12389,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12389,7 +12397,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12397,7 +12405,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12405,7 +12413,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12413,7 +12421,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 119,
+        "line": 150,
         "signal": "wdt_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12421,7 +12429,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 122,
+        "line": 153,
         "signal": "uartx_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12429,7 +12437,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 122,
+        "line": 153,
         "signal": "uartx_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12437,7 +12445,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 122,
+        "line": 153,
         "signal": "uartx_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12445,7 +12453,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 122,
+        "line": 153,
         "signal": "uartx_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12453,7 +12461,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 122,
+        "line": 153,
         "signal": "uartx_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12461,7 +12469,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 122,
+        "line": 153,
         "signal": "uartx_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12469,7 +12477,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 122,
+        "line": 153,
         "signal": "uartx_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12477,7 +12485,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 122,
+        "line": 153,
         "signal": "uartx_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12485,7 +12493,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 123,
+        "line": 154,
         "signal": "uartx_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12493,7 +12501,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12501,7 +12509,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12509,7 +12517,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12517,7 +12525,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12525,7 +12533,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12533,7 +12541,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12541,7 +12549,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12549,7 +12557,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12557,7 +12565,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12565,7 +12573,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12573,7 +12581,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12581,7 +12589,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12589,7 +12597,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12597,7 +12605,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12605,7 +12613,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12613,7 +12621,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12621,7 +12629,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12629,7 +12637,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12637,7 +12645,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12645,7 +12653,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12653,7 +12661,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12661,7 +12669,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12669,7 +12677,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12677,7 +12685,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12685,7 +12693,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12693,7 +12701,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12701,7 +12709,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12709,7 +12717,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12717,7 +12725,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12725,7 +12733,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12733,7 +12741,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12741,7 +12749,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12749,7 +12757,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 125,
+        "line": 156,
         "signal": "uartx_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12757,7 +12765,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 127,
+        "line": 158,
         "signal": "i2cx_awvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12765,7 +12773,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12773,7 +12781,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12781,7 +12789,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12789,7 +12797,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12797,7 +12805,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12805,7 +12813,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12813,7 +12821,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12821,7 +12829,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12829,7 +12837,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 128,
+        "line": 159,
         "signal": "i2cx_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -12837,7 +12845,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 129,
+        "line": 160,
         "signal": "i2cx_bvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12845,7 +12853,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 129,
+        "line": 160,
         "signal": "i2cx_bready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12853,7 +12861,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 129,
+        "line": 160,
         "signal": "i2cx_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12861,7 +12869,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 130,
+        "line": 161,
         "signal": "i2cx_arvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12869,7 +12877,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12877,7 +12885,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12885,7 +12893,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12893,7 +12901,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12901,7 +12909,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12909,7 +12917,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12917,7 +12925,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12925,7 +12933,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12933,7 +12941,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12941,7 +12949,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12949,7 +12957,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12957,7 +12965,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12965,7 +12973,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12973,7 +12981,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12981,7 +12989,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12989,7 +12997,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -12997,7 +13005,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13005,7 +13013,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13013,7 +13021,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13021,7 +13029,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13029,7 +13037,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13037,7 +13045,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13045,7 +13053,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13053,7 +13061,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13061,7 +13069,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13069,7 +13077,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13077,7 +13085,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13085,7 +13093,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13093,7 +13101,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13101,7 +13109,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13109,7 +13117,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13117,7 +13125,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13125,7 +13133,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13133,7 +13141,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13141,7 +13149,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 131,
+        "line": 162,
         "signal": "i2cx_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13149,7 +13157,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 133,
+        "line": 164,
         "signal": "spix_awvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13157,7 +13165,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13165,7 +13173,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13173,7 +13181,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13181,7 +13189,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13189,7 +13197,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13197,7 +13205,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13205,7 +13213,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13213,7 +13221,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13221,7 +13229,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 134,
+        "line": 165,
         "signal": "spix_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13229,7 +13237,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 135,
+        "line": 166,
         "signal": "spix_bvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13237,7 +13245,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 135,
+        "line": 166,
         "signal": "spix_bready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13245,7 +13253,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 135,
+        "line": 166,
         "signal": "spix_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13253,7 +13261,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 136,
+        "line": 167,
         "signal": "spix_arvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13261,7 +13269,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13269,7 +13277,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13277,7 +13285,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13285,7 +13293,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13293,7 +13301,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13301,7 +13309,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13309,7 +13317,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13317,7 +13325,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13325,7 +13333,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13333,7 +13341,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13341,7 +13349,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13349,7 +13357,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13357,7 +13365,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13365,7 +13373,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13373,7 +13381,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13381,7 +13389,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13389,7 +13397,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13397,7 +13405,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13405,7 +13413,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13413,7 +13421,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13421,7 +13429,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13429,7 +13437,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13437,7 +13445,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13445,7 +13453,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13453,7 +13461,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13461,7 +13469,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13469,7 +13477,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13477,7 +13485,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13485,7 +13493,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13493,7 +13501,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13501,7 +13509,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13509,7 +13517,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13517,7 +13525,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13525,7 +13533,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13533,7 +13541,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 137,
+        "line": 168,
         "signal": "spix_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13541,7 +13549,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 139,
+        "line": 170,
         "signal": "aesx_awvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13549,7 +13557,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13557,7 +13565,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13565,7 +13573,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13573,7 +13581,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13581,7 +13589,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13589,7 +13597,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13597,7 +13605,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13605,7 +13613,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13613,7 +13621,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 140,
+        "line": 171,
         "signal": "aesx_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13621,7 +13629,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 141,
+        "line": 172,
         "signal": "aesx_bvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13629,7 +13637,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 141,
+        "line": 172,
         "signal": "aesx_bready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13637,7 +13645,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 141,
+        "line": 172,
         "signal": "aesx_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13645,7 +13653,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 142,
+        "line": 173,
         "signal": "aesx_arvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13653,7 +13661,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13661,7 +13669,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13669,7 +13677,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13677,7 +13685,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13685,7 +13693,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13693,7 +13701,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13701,7 +13709,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13709,7 +13717,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13717,7 +13725,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13725,7 +13733,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13733,7 +13741,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13741,7 +13749,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13749,7 +13757,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13757,7 +13765,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13765,7 +13773,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13773,7 +13781,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13781,7 +13789,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13789,7 +13797,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13797,7 +13805,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13805,7 +13813,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13813,7 +13821,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13821,7 +13829,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13829,7 +13837,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13837,7 +13845,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13845,7 +13853,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13853,7 +13861,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13861,7 +13869,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13869,7 +13877,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13877,7 +13885,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13885,7 +13893,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13893,7 +13901,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13901,7 +13909,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13909,7 +13917,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13917,7 +13925,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13925,7 +13933,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 143,
+        "line": 174,
         "signal": "aesx_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13933,7 +13941,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 147,
+        "line": 178,
         "signal": "dmax_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -13941,7 +13949,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 147,
+        "line": 178,
         "signal": "dmax_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13949,7 +13957,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 147,
+        "line": 178,
         "signal": "dmax_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13957,7 +13965,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 147,
+        "line": 178,
         "signal": "dmax_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13965,7 +13973,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 147,
+        "line": 178,
         "signal": "dmax_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13973,7 +13981,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 147,
+        "line": 178,
         "signal": "dmax_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13981,7 +13989,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 147,
+        "line": 178,
         "signal": "dmax_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13989,7 +13997,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 147,
+        "line": 178,
         "signal": "dmax_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -13997,7 +14005,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 148,
+        "line": 179,
         "signal": "dmax_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14005,7 +14013,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14013,7 +14021,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14021,7 +14029,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14029,7 +14037,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[12]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14037,7 +14045,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[13]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14045,7 +14053,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[14]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14053,7 +14061,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[15]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14061,7 +14069,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14069,7 +14077,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14077,7 +14085,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[18]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14085,7 +14093,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[19]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14093,7 +14101,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14101,7 +14109,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14109,7 +14117,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14117,7 +14125,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14125,7 +14133,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14133,7 +14141,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14141,7 +14149,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14149,7 +14157,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14157,7 +14165,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14165,7 +14173,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14173,7 +14181,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14181,7 +14189,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[2]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14189,7 +14197,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[30]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14197,7 +14205,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14205,7 +14213,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[3]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14213,7 +14221,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14221,7 +14229,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14229,7 +14237,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14237,7 +14245,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14245,7 +14253,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14253,7 +14261,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14261,7 +14269,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 150,
+        "line": 181,
         "signal": "dmax_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14269,7 +14277,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 155,
+        "line": 186,
         "signal": "dma_m_awvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14277,7 +14285,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awlen[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14285,7 +14293,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awlen[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14293,7 +14301,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awlen[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14301,7 +14309,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awlen[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14309,7 +14317,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awlen[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14317,7 +14325,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awlen[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14325,7 +14333,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awlen[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14333,7 +14341,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awlen[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14341,7 +14349,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awsize[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14349,7 +14357,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awsize[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14357,7 +14365,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awsize[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14365,7 +14373,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awburst[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14373,7 +14381,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 156,
+        "line": 187,
         "signal": "dma_m_awburst[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14381,7 +14389,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14389,7 +14397,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14397,7 +14405,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14405,7 +14413,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14413,7 +14421,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14421,7 +14429,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14429,7 +14437,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14437,7 +14445,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14445,7 +14453,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14453,7 +14461,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14461,7 +14469,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14469,7 +14477,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14477,7 +14485,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14485,7 +14493,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14493,7 +14501,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14501,7 +14509,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14509,7 +14517,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14517,7 +14525,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14525,7 +14533,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14533,7 +14541,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14541,7 +14549,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14549,7 +14557,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14557,7 +14565,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14565,7 +14573,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14573,7 +14581,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14581,7 +14589,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14589,7 +14597,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14597,7 +14605,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14605,7 +14613,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14613,7 +14621,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14621,7 +14629,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14629,7 +14637,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14637,7 +14645,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14645,7 +14653,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14653,7 +14661,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wstrb[1]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14661,7 +14669,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wstrb[2]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14669,7 +14677,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wstrb[3]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -14677,7 +14685,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 157,
+        "line": 188,
         "signal": "dma_m_wlast",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14685,7 +14693,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 158,
+        "line": 189,
         "signal": "dma_m_bvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14693,7 +14701,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 158,
+        "line": 189,
         "signal": "dma_m_bready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14701,7 +14709,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 158,
+        "line": 189,
         "signal": "dma_m_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14709,7 +14717,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 159,
+        "line": 190,
         "signal": "dma_m_arvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14717,7 +14725,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arlen[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14725,7 +14733,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arlen[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14733,7 +14741,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arlen[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14741,7 +14749,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arlen[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14749,7 +14757,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arlen[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14757,7 +14765,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arlen[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14765,7 +14773,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arlen[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14773,7 +14781,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arlen[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14781,7 +14789,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arsize[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14789,7 +14797,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arsize[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14797,7 +14805,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arsize[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14805,7 +14813,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arburst[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14813,7 +14821,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 160,
+        "line": 191,
         "signal": "dma_m_arburst[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14821,7 +14829,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rvalid",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14829,7 +14837,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rready",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14837,7 +14845,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14845,7 +14853,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14853,7 +14861,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14861,7 +14869,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14869,7 +14877,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[13]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14877,7 +14885,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[14]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14885,7 +14893,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[15]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14893,7 +14901,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14901,7 +14909,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14909,7 +14917,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14917,7 +14925,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14925,7 +14933,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14933,7 +14941,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14941,7 +14949,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14949,7 +14957,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14957,7 +14965,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14965,7 +14973,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14973,7 +14981,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14981,7 +14989,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14989,7 +14997,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -14997,7 +15005,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15005,7 +15013,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15013,7 +15021,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15021,7 +15029,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[30]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15029,7 +15037,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15037,7 +15045,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[3]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15045,7 +15053,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15053,7 +15061,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15061,7 +15069,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15069,7 +15077,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15077,7 +15085,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15085,7 +15093,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15093,7 +15101,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15101,7 +15109,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 161,
+        "line": 192,
         "signal": "dma_m_rlast",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15109,7 +15117,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15117,7 +15125,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15125,7 +15133,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15133,7 +15141,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[12]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15141,7 +15149,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[13]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15149,7 +15157,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[14]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15157,7 +15165,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[15]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15165,7 +15173,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15173,7 +15181,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[18]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15181,7 +15189,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[19]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15189,7 +15197,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15197,7 +15205,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[20]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15205,7 +15213,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[21]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15213,7 +15221,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15221,7 +15229,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15229,7 +15237,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15237,7 +15245,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15245,7 +15253,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15253,7 +15261,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15261,7 +15269,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15269,7 +15277,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[2]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15277,7 +15285,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[30]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15285,7 +15293,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15293,7 +15301,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[3]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15301,7 +15309,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15309,7 +15317,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15317,7 +15325,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15325,7 +15333,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15333,7 +15341,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15341,7 +15349,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wdata[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15349,7 +15357,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wstrb[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15357,7 +15365,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wstrb[1]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15365,7 +15373,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wstrb[2]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15373,7 +15381,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 165,
+        "line": 196,
         "signal": "jtag_wstrb[3]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15381,7 +15389,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 166,
+        "line": 197,
         "signal": "jtag_bresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15389,7 +15397,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 168,
+        "line": 199,
         "signal": "jtag_rresp[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15397,7 +15405,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[0]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15405,7 +15413,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15413,7 +15421,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15421,7 +15429,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[12]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15429,7 +15437,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[13]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15437,7 +15445,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[14]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15445,7 +15453,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[16]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15453,7 +15461,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[17]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15461,7 +15469,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[18]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15469,7 +15477,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[19]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15477,7 +15485,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15485,7 +15493,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[20]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15493,7 +15501,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[21]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15501,7 +15509,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[22]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15509,7 +15517,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[23]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15517,7 +15525,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15525,7 +15533,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[25]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15533,7 +15541,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15541,7 +15549,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[27]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15549,7 +15557,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[29]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15557,7 +15565,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[2]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15565,7 +15573,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[30]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15573,7 +15581,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[31]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15581,7 +15589,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[3]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15589,7 +15597,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15597,7 +15605,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15605,7 +15613,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15613,7 +15621,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15621,7 +15629,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15629,7 +15637,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_addr_tck[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15637,7 +15645,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15645,7 +15653,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15653,7 +15661,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15661,7 +15669,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15669,7 +15677,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15677,7 +15685,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15685,7 +15693,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15693,7 +15701,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15701,7 +15709,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15709,7 +15717,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15717,7 +15725,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15725,7 +15733,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 350,
+        "line": 381,
         "signal": "jtag_wdata_tck[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15733,7 +15741,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 351,
+        "line": 382,
         "signal": "jtag_resp_ok_tck",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15741,7 +15749,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[0]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15749,7 +15757,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[10]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15757,7 +15765,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[11]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15765,7 +15773,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[12]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15773,7 +15781,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[13]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15781,7 +15789,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[14]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15789,7 +15797,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[15]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15797,7 +15805,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[17]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15805,7 +15813,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[18]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15813,7 +15821,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[19]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15821,7 +15829,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[1]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15829,7 +15837,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[20]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15837,7 +15845,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[21]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15845,7 +15853,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[22]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15853,7 +15861,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[23]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15861,7 +15869,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[24]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15869,7 +15877,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[25]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15877,7 +15885,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[26]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15885,7 +15893,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[27]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15893,7 +15901,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[28]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15901,7 +15909,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[2]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15909,7 +15917,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[30]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15917,7 +15925,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[31]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15925,7 +15933,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[3]",
         "block": "soc_top",
         "hit_0to1": 1,
@@ -15933,7 +15941,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[4]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15941,7 +15949,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[5]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15949,7 +15957,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[6]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15957,7 +15965,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[7]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15965,7 +15973,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[8]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -15973,7 +15981,7 @@
       },
       {
         "file": "blocks/soc_top/rtl/soc_top.v",
-        "line": 352,
+        "line": 383,
         "signal": "jtag_rdata_tck[9]",
         "block": "soc_top",
         "hit_0to1": 0,
@@ -16400,7 +16408,7 @@
         "line": 67,
         "signal": "divider_reg[2]",
         "block": "spi",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -16752,7 +16760,7 @@
         "line": 14,
         "signal": "s_rdata[21]",
         "block": "sram",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -16768,7 +16776,7 @@
         "line": 14,
         "signal": "s_rdata[25]",
         "block": "sram",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -16776,7 +16784,7 @@
         "line": 14,
         "signal": "s_rdata[26]",
         "block": "sram",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -16784,7 +16792,7 @@
         "line": 14,
         "signal": "s_rdata[7]",
         "block": "sram",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -16792,7 +16800,7 @@
         "line": 14,
         "signal": "s_rdata[9]",
         "block": "sram",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17504,7 +17512,7 @@
         "line": 35,
         "signal": "s_wdata[11]",
         "block": "watchdog",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17512,7 +17520,7 @@
         "line": 35,
         "signal": "s_wdata[17]",
         "block": "watchdog",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17520,7 +17528,7 @@
         "line": 35,
         "signal": "s_wdata[22]",
         "block": "watchdog",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17528,7 +17536,7 @@
         "line": 35,
         "signal": "s_wdata[23]",
         "block": "watchdog",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17536,7 +17544,7 @@
         "line": 35,
         "signal": "s_wdata[25]",
         "block": "watchdog",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17544,7 +17552,7 @@
         "line": 35,
         "signal": "s_wdata[27]",
         "block": "watchdog",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17552,7 +17560,7 @@
         "line": 35,
         "signal": "s_wdata[31]",
         "block": "watchdog",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17792,7 +17800,7 @@
         "line": 48,
         "signal": "ctrl_en",
         "block": "watchdog",
-        "hit_0to1": 2,
+        "hit_0to1": 1,
         "hit_1to0": 0
       },
       {
@@ -17829,5 +17837,5 @@
       }
     ]
   },
-  "coverage_own_rtl_line_pct": 96.3
+  "coverage_own_rtl_line_pct": 96.1
 }

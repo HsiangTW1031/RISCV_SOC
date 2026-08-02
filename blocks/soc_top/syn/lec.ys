@@ -18,6 +18,14 @@
 # then reports status without -assert (so it always finishes and reports
 # real numbers instead of erroring out on an incomplete proof).
 #
+# `async2sync` is required since soc_top.v's reset synchronizers
+# (docs/cdc_report.md's RDC section) are this design's only genuinely
+# asynchronous-reset flip-flops -- equiv_simple has no direct SAT model
+# for an async FF cell (confirmed: "No SAT model available for async FF
+# cell ... Consider running `async2sync`"), so both gold and gate get
+# this pass to replace the async reset inputs with equivalent
+# synchronous-modeled logic before the equivalence check runs.
+#
 # Run from blocks/soc_top/syn/:
 #   yosys lec.ys
 read_verilog -I../../../rtl/include -I../rtl \
@@ -39,6 +47,7 @@ read_verilog -I../../../rtl/include -I../rtl \
     mem_blackboxes.v \
     ../rtl/soc_top.v
 prep -flatten -top soc_top
+async2sync
 memory_collect
 memory_map
 design -save gold
@@ -48,6 +57,7 @@ read_verilog mem_blackboxes.v
 read_verilog soc_top_out.v
 read_liberty -ignore_miss_func /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
 prep -flatten -top soc_top
+async2sync
 memory_collect
 memory_map
 design -save gate

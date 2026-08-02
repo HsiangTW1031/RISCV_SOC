@@ -10,13 +10,15 @@ Dashboard 呈現:`reports/sign_off/dashboard.html` 的「Toggle Coverage Waivers
 
 | 統計方式 | Toggle coverage | 說明 |
 |---|---|---|
-| Raw aggregate(`verilator_coverage --report summary`) | **58.1%**(43157/74282) | 沿用至今的舊數字。同一個 source-level toggle point,只要被多個 hierarchy instance 引用(例如 `aes_core.v` 在合併後的測試套件中被 5 個不同路徑實例化),就會被重複計數,分母被灌水但沒有對應的多樣性增加。 |
-| Deduped per-bit,**waive 前** | **69.5%**(7923/11401 bits) | 直接 parse `merged.dat` 原始資料,以 (file, line, signal) 去重複,每個實際存在的 bit 只算一次(任一 instance 有覆蓋就算覆蓋)。比 raw aggregate 更誠實,單純修正重複計數的問題,還沒套用任何 waiver。 |
-| Deduped per-bit,**waive 後** | **80.1%**(7923/9888 bits) | 套用 36 條 waiver rule,排除 1513 個「結構上不可能 toggle」的 bit(從分子分母同時移除)之後的最終 sign-off 數字。 |
+| Raw aggregate(`verilator_coverage --report summary`) | **58.1%**(43169/74290) | 沿用至今的舊數字。同一個 source-level toggle point,只要被多個 hierarchy instance 引用(例如 `aes_core.v` 在合併後的測試套件中被 5 個不同路徑實例化),就會被重複計數,分母被灌水但沒有對應的多樣性增加。 |
+| Deduped per-bit,**waive 前** | **69.5%**(7926/11405 bits) | 直接 parse `merged.dat` 原始資料,以 (file, line, signal) 去重複,每個實際存在的 bit 只算一次(任一 instance 有覆蓋就算覆蓋)。比 raw aggregate 更誠實,單純修正重複計數的問題,還沒套用任何 waiver。 |
+| Deduped per-bit,**waive 後** | **80.1%**(7926/9892 bits) | 套用 36 條 waiver rule,排除 1513 個「結構上不可能 toggle」的 bit(從分子分母同時移除)之後的最終 sign-off 數字。 |
 
-**waive 前後對照:69.5% → 80.1%,+10.6 個百分點,分母從 11401 bits 縮減到 9888 bits(移除 1513 bits)。**
+**waive 前後對照:69.5% → 80.1%,+10.6 個百分點,分母從 11405 bits 縮減到 9892 bits(移除 1513 bits)。**
 
-covered bit 數(7923)本身完全沒變——waiver 不會讓任何東西「變成 covered」,純粹是把「本來就不該被拿來衡量」的 bit 移出評分範圍。
+covered bit 數(7926)本身完全沒變——waiver 不會讓任何東西「變成 covered」,純粹是把「本來就不該被拿來衡量」的 bit 移出評分範圍。
+
+(這幾個數字比最初版本多了 4 個 bit,是後來在 `soc_top.v` 加了 reset synchronizer 新增的 4 個正反器,見 `docs/cdc_report.md`——多出來的 bit 全部落在 soc_top 自己的分類裡,不影響任何一條 waiver rule 或其他 block 的數字。)
 
 ## 2. 為什麼採用「deduped per-bit」而不是直接在 raw aggregate 上套 waiver
 
@@ -46,7 +48,7 @@ Verilator 內建的 `--report summary,hier` 是以 hierarchy instance 為單位�
 | dma | 767/1403 (54.7%) | 767/1208 (63.5%) | +8.8pp |
 | i2c | 126/289 (43.6%) | 126/251 (50.2%) | +6.6pp |
 | jtag | 394/671 (58.7%) | 394/609 (64.7%) | +6.0pp |
-| soc_top | 828/1929 (42.9%) | 828/1453 (57.0%) | +14.1pp |
+| soc_top | 831/1933 (43.0%) | 831/1457 (57.0%) | +14.0pp |
 | spi | 140/274 (51.1%) | 140/236 (59.3%) | +8.2pp |
 | sram | 134/178 (75.3%) | 134/140 (95.7%) | +20.4pp |
 | timer | 148/226 (65.5%) | 148/188 (78.7%) | +13.2pp |
@@ -57,7 +59,7 @@ Verilator 內建的 `--report summary,hier` 是以 hierarchy instance 為單位�
 
 ## 5. Residual gap(刻意不 waive,留待未來加測試向量)
 
-總計 1965 bits,分布在下列幾種模式——每一種都是「這個 register 理論上可以是任何值,只是目前測試剛好只用了少數幾組向量」,跟前面的「結構上不可能」是不同性質,所以刻意不 waive:
+總計 1966 bits,分布在下列幾種模式——每一種都是「這個 register 理論上可以是任何值,只是目前測試剛好只用了少數幾組向量」,跟前面的「結構上不可能」是不同性質,所以刻意不 waive:
 
 - **`dma_engine.v` 的 `key_reg`(128 bit)、`iv_reg`(64 bit)**:DMA 路徑的每一組測試都固定用同一組 NIST 官方測試金鑰/IV,這個 register 從沒被載入過第二組不同的值。風險偏低——AES 資料路徑本身已經透過 `aes_diff` 測試用 500 組隨機金鑰單獨驗證過,這裡缺的只是 DMA 自己這份 register 的搬運路徑沒有額外驗證,不是核心加解密邏輯沒驗證。
 - **`i2c_master.v`/`spi_master.v` 的 `divider_reg`/`div_cnt`**:32-bit 的除頻常數 register,但實際測試只用過幾組偏小的除頻值,高位元從沒被設過——一個合理但還沒補的加分項(測一組刻意選大的除頻值即可補齊)。

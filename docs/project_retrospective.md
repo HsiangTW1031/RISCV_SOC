@@ -305,4 +305,32 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 
 **這個改動只動了 `soc_top.v`**,單一 block 的獨立測試都是直接 instantiate 各自 RTL、自己驅動 `rst`,不經過這層同步器,完全不受影響——這也是為什麼可以只在整合層級加,不用動到每個周邊自己的 RTL。完整說明寫在 `docs/cdc_report.md` 第 6 節。
 
-**待辦**:`soc_top.v` 的 RTL 改了,連帶讓 `blocks/soc_top/syn/soc_top_out.v`(以及 generic netlist)、STA 報告、`docs/lec_report.md` 的 soc_top 數字、以及 coverage dashboard 都變成基於舊 RTL 的過時快照——這幾個目前還沒重新跑過,留到下次需要那些數字時再重新產生。
+### 把 reset synchronizer 改動連帶的過時快照重新跑過一輪
+
+`soc_top.v` 的 RTL 改了之後,synthesis netlist、STA 報告、LEC 數字、coverage dashboard 全部變成基於舊 RTL 的過時快照——這一段記錄重新跑這些東西時,踩到的幾個坑。
+
+#### 手動重跑 STA 直接撞上兩個「已經修過但這次繞過了修法」的舊問題
+
+手動跑 `yosys synth.ys` + `sta sta.tcl` 想拿新數字,結果 OpenSTA 直接報 `syntax error`——查了兩輪才發現:①`wire signed [31:0] i;`,PicoRV32 內部一個徹底沒人讀的 for-loop index 變數(`assign i = 32'd1;`,零個 reader),OpenSTA 的簡化版 Verilog parser 不支援 `signed` 這個 qualifier;②修完第一個,緊接著撞上第二個,`boot_rom` 這個 blackbox 實例化時帶了一個字串型別的 parameter override(`.HEXFILE("firmware.hex")`),OpenSTA 的 parser 也不支援字串參數。
+
+一開始的反應是直接修 `synth.ys`(加 `opt_clean -purge` 想把那個死掉的 `i` 清掉)——結果清是清掉了,但緊接著就撞上第二個問題,而且這兩個問題明明都不是這次 RTL 改動造成的(PicoRV32、boot_rom 都沒被碰過)。回頭去看 `scripts/collect_soc_reports.sh` 才發現:**這兩個問題老早就有人踩過、也早就修好了**——只是修法寫在 `collect_soc_reports.sh` 的 sed 後處理步驟裡,不在 `synth.ys` 本身,而這次是直接手動跑 `yosys synth.ys`/`sta sta.tcl`,繞過了這層既有的修法,才會覺得像是新問題。把 `synth.ys` 裡多加的 `opt_clean -purge` 改回原本的 `clean`,直接改用 `collect_soc_reports.sh` 這個既有的、正確的 orchestration script 重新跑一輪——這個教訓值得記下來:**遇到看起來眼熟的問題,先查專案裡有沒有現成的腳本/修法,不要急著在別的地方重新發明一次**。
+
+#### 真的抓到一個新的 removal check 違規,不是重複的舊問題
+
+用 `collect_soc_reports.sh` 跑出乾淨的報告之後,另外重跑 `sta_mcmm.tcl`(多 corner 版本)確認 hold 沒有壞掉,結果這次是真的抓到一個新問題:hold 從乾淨的 `wns min 0.00` 變成 `wns min -0.08`,起點是 `rst` 這個 port、終點是 reset synchronizer 自己的正反器,類型是 removal check(非同步 SET/RESET 腳位的 hold 對應版本)。判斷這是 reset synchronizer 結構上必然的性質(`rst` 本質上非同步,不可能保證每次變化都跟 `clk` 的任一個 edge 有 0.086ns 的餘裕),不是真的時序問題,在 SDC 加了 `set_false_path -from [get_ports rst]`(先確認過 `rst` 在整個設計裡只剩這兩個 synchronizer 在用,排除範圍夠精準)解決,hold 恢復乾淨,setup 數字完全沒變。這次的教訓也記下來:**做完 CDC/RDC 的 RTL 修正之後,一定要重新跑一次 STA 確認,不能只看 regression 綠燈就假設時序也沒事**——regression 是功能驗證,不會告訴你 removal/recovery timing 有沒有問題。
+
+#### LEC 也需要跟著補一個 pass
+
+`blocks/soc_top/syn/lec.ys` 重跑時直接報錯:「No SAT model available for async FF cell ... Consider running `async2sync`」——新加的 reset synchronizer 正反器是這個設計裡唯一真正非同步 reset 的正反器,LEC 原本的 SAT flow 沒有為它準備模型。照錯誤訊息建議,在 gold/gate 兩邊都加上 `async2sync`(Yosys 內建 pass)解決,加完後數字幾乎不變(60.2%→60.1%),確認新加的 reset 邏輯本身沒有引入新的等價性問題。
+
+#### 這個 session 第三次遇到同一種建置快取損毀
+
+跑 `collect_soc_reports.sh` 內建的 regression 時,又一次看到 13/19 測試 `BUILD-FAIL`,錯誤訊息跟前兩次一模一樣(`obj_dir_*` 目錄裡帶空格數字後綴的殘留檔案讓 `make` 解析錯誤)。這是這個 session 第三次踩到同一個問題,而且完全複現在我完全沒碰過的 block(`timer`/`watchdog` 等)上,確認不是任何一次 RTL 改動造成的。用 `brctl status` 查了一下,確認這台機器的 iCloud 同步(bird daemon)是在跑的——這個專案剛好放在 `~/Desktop/` 底下,如果 Desktop 有開「iCloud Drive 同步 Desktop 跟文件」,大量小檔案在短時間內被 Verilator 平行寫入/重寫,很可能就是這種「檔名帶空格數字後綴」重複檔案的來源。這只是一個合理推測,沒有進一步驗證或去改系統設定(那是使用者自己的偏好選擇,不是我該擅自動的東西)——每次遇到就清掉 `obj_dir_*` 重新建置,目前為止都能徹底解決。
+
+#### 最後的結果
+
+- `blocks/soc_top/syn/synth.ys` 維持原本的 `clean`(沒有引入新的清理步驟),改用既有的 `scripts/collect_soc_reports.sh` 重新產生全部報告。
+- Chip area 129847.1(cell count 78649),比改動前的 130337.1(79128)略降,關鍵路徑 10.966ns(Fmax 91.2MHz)完全沒變——reset 邏輯跟 AES key expansion 這條臨界路徑無關。
+- Multi-corner STA 補上 `set_false_path -from [get_ports rst]` 之後,hold 恢復乾淨。
+- LEC(`docs/lec_report.md`)soc_top 數字更新為 60.1%,並補上 `async2sync` pass。
+- Coverage/dashboard 數字微幅變動(多了 4 個新增正反器對應的 toggle 檢查點),`docs/coverage_waiver_report.md`、`docs/verification_summary.md` 都同步更新成新數字。
