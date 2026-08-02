@@ -180,6 +180,23 @@ risks: see [`docs/phase_plan.md`](docs/phase_plan.md).
       real bug found across the whole project, root cause and fix,
       including two error patterns that each recurred independently in
       more than one phase
+- [x] A dedicated, independent lint-only pass per block
+      (`scripts/run_lint.sh`, `blocks/<name>/lint/lint_report.txt`) —
+      caught 4 genuine dead-code findings the regular builds' suppressed
+      warnings had been hiding project-wide
+- [x] Quantitative coverage — line/toggle/branch (`scripts/run_coverage.sh`)
+      plus real per-state FSM coverage for all 11 state machines in the
+      project (derived from case-arm line-coverage hit counts, since
+      Verilator's `--coverage-fsm` doesn't recognize plain Verilog-2001
+      case-based FSMs — see `docs/project_retrospective.md` for the full
+      debugging story): **96.3% line coverage on this project's own RTL,
+      100% FSM state coverage (11/11 state machines)**
+- [x] An HTML sign-off dashboard (`scripts/build_dashboard.py` →
+      `reports/soc_top/dashboard.html`) — coverage bars, an FSM
+      state-coverage checklist, and all 135 lint findings triaged into
+      categories (documented limitation / benign-by-design / vendored
+      PicoRV32 style), instead of raw text reports. Committed to the repo
+      — clone it and open the file directly, no toolchain required
 
 **All phases (0-7) complete.** See `docs/phase_plan.md` for the original
 plan and `docs/project_retrospective.md` for the full bug/debugging history.
