@@ -271,3 +271,26 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 - Gate-level simulation:aes_core、soc_top(含真實開機、中斷、UART、JTAG、DMA)在 Yosys 合成後的 netlist 上都 PASS。
 - Formal LEC:aes_core 97.7% 完整證明,soc_top 刻意縮小範圍的 60.2% 部分驗證——完整理由跟數字見 `docs/lec_report.md`。
 - `docs/performance.md` 新增第 8 節,明確記錄這個專案的 signoff 範圍界限(停在 gate-level netlist,不含 place & route/DRC/LVS/DFT/power signoff),講清楚是刻意的取捨,不是漏掉。
+
+### 再往下一層:CDC(Clock Domain Crossing)驗證
+
+問「這個平台是不是只有一個 clock」的時候,直接查 RTL 糾正了一個誤解:不是單一 clock,`tck`(JTAG 測試時脈)跟 `clk`(系統時脈)是兩個完全獨立、非同步的 domain,`jtag_axi_bridge.v` 是唯一橫跨兩者的模組。這台機器沒有裝任何專門的 CDC 工具,得用業界在沒有商用工具時的替代做法:STA 正確宣告 + 結構性 review + 模擬壓力測試三件事互補。
+
+#### SDC/STA:tck 該宣告成 clock,還是純資料訊號?
+
+這兩個選項不是二選一,而是要一起用:`tck` 因為真的驅動 `jtag_tap.v`/`jtag_dtm.v` 裡正反器的 clock pin,不宣告成 clock 的話 STA 會完全跳過整個 tck domain 的時序分析(不只是跨 domain 的部分);但宣告成 clock 之後,如果沒有額外講清楚它跟 `clk` 沒有相位關係,STA 會試著去算兩個 clock 之間的 worst-case skew,對兩個真正非同步的訊號來說這個計算完全沒有意義。正確做法:`create_clock` 宣告 tck(選一個保守的週期,20ns/50MHz,反正 tck domain 自己的邏輯很簡單,選哪個值幾乎都會過,重點不在這個數字)+ `set_clock_groups -asynchronous` 明確排除兩者之間的路徑。改完重跑 `sta.tcl`/`sta_mcmm.tcl`,確認 `Path Group` 只有乾淨分開的 `clk`/`tck` 兩組,沒有混合的跨 domain 路徑被拿去算 setup/hold——這一步解決的是「STA 不要對非同步邊界產生誤判」,不是「synchronizer 本身有沒有做對」。
+
+#### 模擬壓力測試:发現現有測試只測過一個方向的時脈比例
+
+`jtag_axi_bridge.v` 的 CDC 機制(toggle synchronizer + busy 比較邏輯)本身的 header comment 明確宣稱「regardless of how large the clock-period ratio is in either direction」——這是一句可以被測試驗證的具體宣稱。檢查現有的 `jtag_chain` regression 測試才發現,它固定用 tck 遠慢於 clk 的比例(每個 tck 半週期對應 10 個 clk 半週期),只測過「真實 JTAG probe 對比快系統時脈」這一個方向,反過來的方向(tck 比 clk 快)從沒測過。既然設計自己宣稱兩個方向都成立,就補一個新的 regression target 驗證看看:`jtag_chain_fast_tck_sim_main.cpp`,完全相同的 IDCODE/AXI write-read-back/BYPASS 測試序列,只把時脈關係反過來(tck 每 5 個半週期才讓 clk 走一個半週期)。跑完一次就 PASS,證實這個 toggle-synchronizer 設計真的對兩個方向都成立,不是只在「tck 慢」這個常見情境下剛好沒事。
+
+#### 過程中發現一批跟這次改動無關、但會讓 regression 整個看起來壞掉的舊問題
+
+寫完新測試、跑 `scripts/run_regression.sh` 想確認整體沒有壞掉時,結果 19 個測試裡有 15 個 `BUILD-FAIL`,錯誤訊息是 `make: *** No rule to make target '3.d'`——一開始以為是新加的測試或改動的 SDC 弄壞了什麼,但仔細看錯誤內容,是各個 block 自己的 `obj_dir_regr` 建置快取目錄底下,存在檔名帶空格的殘留檔案(像 `verilated_threads 3.d` 這種,之前 session 就注意過這類帶空白數字後綴的重複檔案,但沒有深究),讓 `make` 的 dependency 解析把檔名切錯,誤判成「要 make 一個叫 3.d 的目標」。這些 `obj_dir_*` 目錄整個都是 `.gitignore` 排除的建置快取,不是原始碼,直接整批刪掉讓它們重新從零建置,19 個測試全部正常編譯、全部 PASS——確認這批失敗是之前累積下來的建置快取損毀,跟這次的 CDC 改動本身無關。
+
+#### 最後的結果
+
+- `blocks/soc_top/constraints/soc_top.sdc` 新增 tck clock 宣告 + `set_clock_groups -asynchronous`,`sta.tcl`/`sta_mcmm.tcl` 重跑確認 Path Group 正確分開。
+- `blocks/jtag/rtl/jtag_axi_bridge.v` 的每一條跨 domain 訊號(START/DONE toggle、BUSY 比較、RESP_OK/RDATA 的 2-flop 同步)逐條對照 RTL review 過,確認同步器級數跟拓樸(第一級直接取樣來源暫存器,無組合邏輯夾雜)。
+- 新增 `jtag_chain_fast_tck` regression target,補上原本沒測過的「tck 比 clk 快」方向,跟原有的 `jtag_chain` 一起涵蓋兩個時脈比例的極端。
+- 完整報告、每條訊號的 review 結果、以及明確標注的範圍界限(數位模擬無法重現真實 metastability)寫在 `docs/cdc_report.md`。

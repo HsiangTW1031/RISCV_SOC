@@ -1,6 +1,6 @@
 # Verification Summary
 
-18 個獨立的 Verilator 測試,一次跑過 `scripts/run_regression.sh`,目前全綠。每一列對應一個獨立編譯出來的測試 binary;細節與驗證方法論見各自的 `docs/specs/*.md`。
+19 個獨立的 Verilator 測試,一次跑過 `scripts/run_regression.sh`,目前全綠。每一列對應一個獨立編譯出來的測試 binary;細節與驗證方法論見各自的 `docs/specs/*.md`。
 
 ## 1. 總表
 
@@ -14,7 +14,8 @@
 | 6 | `i2c` | 寫入、讀取、對未知位址 NACK、busy/no-queue | 導向測試,對一個假 I2C slave（`fake_i2c_slave.v`) | PASS |
 | 7 | `spi` | 全部 4 種 CPOL/CPHA 模式、byte-accurate、busy/done、忙碌中 START 被忽略 | 導向測試,對一個假 SPI slave（`fake_spi_slave.v`) | PASS |
 | 8 | `jtag_tap` | IEEE 1149.1 16-state FSM 完全比對參考模型,任意狀態下 TMS reset 安全性質 | Property-based + 參考模型比對 | PASS |
-| 9 | `jtag_chain` | TAP+DTM+bridge 整條鏈,tck↔clk CDC,IDCODE、BYPASS、透過真正 AXI4-Lite slave 讀寫 | 端到端整合測試 | PASS |
+| 9 | `jtag_chain` | TAP+DTM+bridge 整條鏈,tck↔clk CDC(tck 慢於 clk 的方向)、IDCODE、BYPASS、透過真正 AXI4-Lite slave 讀寫 | 端到端整合測試 | PASS |
+| 9b | `jtag_chain_fast_tck` | 同上,但 tck 反過來比 clk 快——CDC ratio 的另一個極端方向 | 端到端整合測試(CDC 壓力測試,見 `docs/cdc_report.md`) | PASS |
 | 10 | `aes_key_expand` | 11 組 round key | FIPS-197 Appendix A.1 官方向量 | PASS |
 | 11 | `aes_core` | 單一 block encrypt/decrypt | FIPS-197 Appendix B + C.1 官方向量 | PASS |
 | 12 | `aes_chain` | CBC/CTR mode chaining,兩個方向 | NIST SP 800-38A Appendix F.2/F.5 官方向量 | PASS |
@@ -58,6 +59,16 @@ Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、wai
 - **Gate-level simulation**(`scripts/run_gatelevel_sim.sh`):拿現有的 regression testbench,直接對 Yosys 合成後的 netlist(而非 RTL)跑一次,驗證 synthesis 本身沒有改變行為。aes_core、soc_top(含真實開機、5 次 Timer 中斷、UART 輸出、JTAG 讀寫 RAM、DMA 控制埠)兩個都 **PASS**。
 - **Signoff 範圍界限**:這個專案的 signoff 停在「gate-level netlist,邏輯跟時序都驗證過」——不含 place & route、DRC/LVS、DFT、power signoff,理由見 `docs/performance.md` 第 8 節(刻意的取捨,不是漏掉)。
 
-## 5. 這次 Phase 7 regression 抓到的一個真實 bug
+## 5. CDC(Clock Domain Crossing)驗證
+
+這個平台不是單一時脈——`tck`(JTAG 測試時脈,外部 debug probe 驅動)跟 `clk`(系統時脈)是兩個完全獨立、非同步的 domain,`jtag_axi_bridge.v` 是唯一橫跨兩者的模組。這台機器沒有裝專門的 CDC 工具(Spyglass CDC/Questa CDC 都沒有),用三件互補的事來驗證:
+
+1. **STA 正確宣告非同步邊界**:`tck` 宣告成真正的 clock(而非純資料訊號,因為它真的驅動正反器)+ `set_clock_groups -asynchronous` 排除跨 domain 路徑的誤判。
+2. **結構性 review**:對照 RTL 逐條確認每個跨 domain 訊號的 synchronizer 級數(全部 ≥2 級)、第一級是否直接取樣來源暫存器(無組合邏輯夾雜)。
+3. **模擬層級的 ratio 壓力測試**:`jtag_chain`(tck 慢於 clk)+ 新增的 `jtag_chain_fast_tck`(tck 快於 clk)兩個方向都測過,驗證 RTL 宣稱的「任意時脈比例都成立」不是空話。
+
+完整方法論、逐條訊號的 review 結果、以及明確標注的範圍界限(數位模擬無法重現真實 metastability,這部分需要 timing library MTBF 計算,不在這個專案範圍內):`docs/cdc_report.md`。
+
+## 6. 這次 Phase 7 regression 抓到的一個真實 bug
 
 跑 `scripts/run_regression.sh` 的過程中,`watchdog` 測試意外地從乾淨重編後失敗(2 個 check),但目錄裡舊的、還沒清掉的 binary 卻是綠的——追下去發現:`blocks/watchdog/dv/sim_main.cpp` 裡寫死的 `WARN_MARGIN = 3`,跟 `watchdog.v` 實際的 default parameter `WARN_MARGIN = 4`（從 Phase 2 第一次 commit 就是 4,`docs/specs/watchdog.md` 也一直寫 4)對不上——測試本身的常數從一開始就是錯的,只是舊的 binary 剛好是在某次意外用對的數字建出來的,之後沒人重新乾淨編譯過,才一直「看起來是綠的」。這正是「一次性乾淨 regression」存在的意義:抓到「原始碼其實已經不吻合、只是沒人重新建置驗證過」這種腐化。修法:把測試的常數改成 4,重編後全綠。詳細除錯過程見 `docs/project_retrospective.md`。

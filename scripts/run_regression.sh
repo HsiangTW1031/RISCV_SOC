@@ -86,6 +86,14 @@ run_one "jtag_chain" "$ROOT/blocks/jtag/dv" jtag_chain_testtop jtag_chain_sim ob
   ../rtl/jtag_tap.v ../rtl/jtag_dtm.v ../rtl/jtag_axi_bridge.v \
   jtag_chain_testtop.v jtag_chain_sim_main.cpp
 
+# CDC stress test at the opposite ratio corner (tck faster than clk, see
+# docs/cdc_report.md) -- same scan sequence/checks, only the clock
+# relationship differs.
+run_one "jtag_chain_fast_tck" "$ROOT/blocks/jtag/dv" jtag_chain_testtop jtag_chain_fast_tck_sim obj_dir_fast_tck_regr \
+  -I"$ROOT/rtl/include" "$ROOT/tb/common/fake_axi_lite_slave.v" \
+  ../rtl/jtag_tap.v ../rtl/jtag_dtm.v ../rtl/jtag_axi_bridge.v \
+  jtag_chain_testtop.v jtag_chain_fast_tck_sim_main.cpp
+
 # ---- AES: key expansion, core, chain (CBC/CTR), AXI-Lite wrapper, diff ----
 run_one "aes_key_expand" "$ROOT/blocks/aes/dv" aes_key_expand keyexp_sim obj_dir_keyexp_regr \
   -I../rtl ../rtl/aes_key_expand.v key_expand_sim_main.cpp
