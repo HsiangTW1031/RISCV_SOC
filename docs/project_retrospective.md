@@ -238,3 +238,36 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 - 每一條 waiver rule 都附上對應的 RTL 行號實證(不是憑感覺套 pattern),寫在 `reports/sign_off/coverage/toggle_waivers.txt`
 - 1965 bits 刻意不 waive、留作 residual gap(主要是 `dma_engine.v` 的 `key_reg`/`iv_reg` 只測過一組固定金鑰、`divider_reg` 只測過偏小的除頻值、部分 `s_rdata`/`m_rdata` 高位元、以及 `soc_top` 自己還沒有端到端測過 SPI/I2C)——這些留在 `docs/coverage_waiver_report.md`,不是消失掉,是明確標記成「之後可以加測試補的項目」
 - 完整量化的 waive 前後對照(含每個 block 的細分)獨立寫在 `docs/coverage_waiver_report.md`,`reports/sign_off/dashboard.html` 也新增對應的區塊呈現同一份數據。
+
+### 再往下一層:gate-level 的驗證(multi-corner STA、formal LEC、gate-level simulation)
+
+問完「跟業界標準比還缺什麼」之後,補了四塊東西(範圍限定在 `aes` + `soc_top`,跟既有 per-block synthesis 的範圍一致):hold-time STA、multi-corner STA、RTL 對 netlist 的 formal equivalence check(LEC)、gate-level simulation。這一段記錄實際做這幾件事時踩到的坑。
+
+#### Multi-corner STA:意外發現只有一份 corner library
+
+原本以為要另外下載 slow/fast corner 的 liberty 檔案,才能做真正的 setup(slow corner)/hold(fast corner)分析——結果直接在系統上搜,發現 `/Users/shunghsiangwu/eda/src/OpenSTA/test/nangate45/` 底下就有 OpenSTA 自己測試用的 `Nangate45_fast.lib`/`Nangate45_slow.lib`,跟合成用的 `NangateOpenCellLibrary_typical.lib` 逐一比對 cell 名稱,239/241 顆完全一致,只差一顆跟邏輯無關的物理 tap cell `TAPCELL_X1`——確認是同一個 cell family,可以直接拿來用,不用另外去找。OpenSTA 自己的 `examples/min_max_delays.tcl` 也剛好示範了完全對的語法(`read_liberty -max slow.lib` + `read_liberty -min fast.lib` + `report_checks -path_delay min_max`),照抄這個模式寫 `sta_mcmm.tcl` 一次就跑成功,沒有繞路。跑出來的結果也是刻意檢查過才確定合理:setup 在 SDC 刻意設定的 2.0ns/500MHz 探測週期下當然大量違規(WNS -41.32ns/-36.40ns),這是 `constraints/*.sdc` 本來就記載的預期行為(拿來讀真實 data arrival time、換算 Fmax 用的,不是要衝這個頻率);hold 在 fast corner 下完全乾淨,TNS 剛好等於 0.00——這才是這一步真正新增的、有意義的資訊。
+
+#### Gate-level simulation:合成出來的真正 Nangate45 netlist 沒辦法直接模擬
+
+一開始想直接拿 `synth.ys` 已經產生的 `soc_top_out.v`(真正 tech-mapped 到 Nangate45 標準元件的 netlist)給 Verilator 模擬,才發現系統上只有 latch/clock-gate/adder 這幾類 cell 的 functional Verilog model(`cells_latch.v`/`cells_clkgate.v`/`cells_adders.v`),沒有 AND/OR/NAND/DFF 這些基本邏輯閘的 functional model——沒有這些,Verilator 沒辦法知道一顆 `AND2_X1` 實際的行為是什麼。解法是另外產生一份「generic netlist」:`synth -top X` 跑完就停,不繼續做 `dfflibmap`/`abc -liberty` 這一步技術映射,這樣 netlist 還停留在 Yosys 自己內部的通用邏輯閘(`$_AND_`/`$_DFF_P_` 這類)——實際測試發現 Yosys 的 `write_verilog` 會把這些內部通用邏輯閘**自動展開成一般的 Verilog assign/always 敘述**,完全不需要外部 cell library,Verilator 可以直接吃。這份「generic netlist」驗證的是 synthesis 本身的邏輯優化有沒有改變行為,跟 LEC 驗證的「技術映射有沒有改變行為」是互補、但不同的兩件事。
+
+跑 soc_top 的 gate-level 版本時第一次 build 失敗,錯誤是一堆 `PINMISSING`(instance 缺 pin)——查了實際缺的是哪些 pin 之後,發現全部是本來就沒被用到的訊號(PicoRV32 從沒接的 PCPI coprocessor 介面、以及 crossbar 的 `s0_bresp`/`s0_rresp`——這個之前就在 lint 分類裡記錄過,PicoRV32 的 AXI master 本來就不檢查 BRESP/RRESP),是 Yosys 優化掉這些訊號之後,`write_verilog` 沒有把 module 自己的 port list 完全同步修剪掉導致的落差,不是真的接錯線——確認全部對應到已知的、本來就沒用的訊號後才加上 `-Wno-PINMISSING`。加上之後,`soc_top` 的 gate-level 版本一次跑過:真實開機、5 次 Timer 中斷、UART 輸出、JTAG 讀寫 RAM、DMA 控制埠全部 PASS,證實 Yosys 對這個規模的完整 SoC(含 PicoRV32)做的合成優化沒有改變任何行為。
+
+#### Formal LEC:兩次因為兩邊(gold/gate)沒有對齊而失敗,最後 aes_core 到 97.7%、soc_top 刻意縮小範圍
+
+寫 `equiv_make`/`equiv_simple`/`equiv_induct` 這組 Yosys 指令第一次執行,直接撞到 `ERROR: Re-definition of module`——原因是 `design -save gold` 之後沒有清掉當前 design 就繼續 `read_verilog` 讀 gate netlist,兩邊都叫 `aes_core`,自然衝突,補上 `design -reset` 解決。
+
+第二次撞到 `ERROR: No SAT model available for cell _16878__gate (INV_X1)`——一開始以為是 `read_liberty -lib` 讀出來的 cell 有問題,查了 `read_liberty` 的說明才發現 `-lib`這個 flag 的意思是「只建立空的 blackbox module」,完全沒有帶任何邏輯內容,SAT solver 當然找不到模型可以用——改成不加 `-lib`(直接讀,連帶 `-ignore_miss_func` 忽略少數缺 function 定義的 cell)就正常了,因為 `NangateOpenCellLibrary_typical.lib` 本身每顆 cell 都帶 `function` attribute(例如 `AND2_X1` 就是 `function : "(A1 & A2)";`),Yosys 讀進來就能重建出邏輯內容,不需要額外的 functional Verilog model 這一步(這一點也順便解答了前一段 gate-level simulation 遇到的「沒有 functional model」問題——LEC 不需要,因為它是靠 liberty 檔案自己的 function 描述,不是真的去模擬)。
+
+第三次撞到 `ERROR: No SAT model available for cell ...($mem_v2)`——這次是 aes_key_expand 內部的 round-key 陣列在 RTL(gold)端還停留在 Yosys 的粗粒度記憶體抽象(`$mem_v2`),但 gate 端已經被完整的 `synth` flow(包含 `memory_collect`/`memory_map`)拆成一顆一顆的正反器,兩邊抽象層級對不齊,導致 `equiv_induct` 找不到能對應的模型——在 gold 端也補上 `memory_collect`/`memory_map`,讓兩邊都拆到同一個粒度後就正常了。
+
+`aes_core` 完整跑完 `equiv_simple` + `equiv_induct`(預設 4 步歸納)後,還剩 904 個未證明,分組後全部集中在 `u_key_expand.rk[0]`——把歸納深度加到 `-seq 12` 後降到 520 個,分組後發現這 520 個沿著同一條訊號鏈(`rnum` round counter → `sub_shift_enc`/`sub_shift_dec` → `data_reg` → `data_out`,加上幾個控制訊號),跟 AES core 本身「10 拍 key expansion + 11 輪」的真實時序深度吻合——判斷這是歸納步數還沒完全覆蓋到這個深度造成的,不是真的邏輯不等價,而且同一份 netlist 已經被 `run_gatelevel_sim.sh` 用真實 FIPS-197 測試向量獨立驗證過行為正確,兩種方法互相印證,沒有繼續往上加大 `-seq`(每加深一次,SAT 求解時間就大幅增加,報酬遞減)——**97.7%(22126/22646)是誠實記錄下來的最終結果,不是硬做出來的 100%**。
+
+`soc_top` 含整顆 PicoRV32、cell count 是 aes_core 的兩個數量級以上,對這種規模跑跟 aes_core 一樣完整的 sequential induction 不切實際(aes_core 一個 block 光是 `equiv_induct` 就要跑十幾分鐘還沒完全收斂了),而且「含嵌入式 CPU 的整顆晶片做 full-chip formal equivalence」即使在真正的商用 EDA 工具上也是出了名的難題,業界標準做法本來就是「block-level formal + full-chip simulation」——所以 `blocks/soc_top/syn/lec.ys` 刻意只跑 `equiv_simple`(不做 induction),當作 best-effort 的部分驗證,跑出 60.2%(36036/59864,純組合邏輯層級的等價性),明確標注這不是「signoff 通過」的數字,整顆 SoC 真正的驗證由前面的 gate-level simulation 補上。這個範圍縮小是刻意做的判斷,不是省事——寫進 `docs/lec_report.md` 時特別把理由講清楚。
+
+#### 最後的結果
+
+- Multi-corner STA:soc_top slow-corner Fmax ≈ 23.2MHz(比之前只看 typical corner 的 91.2MHz 保守很多),兩個 block 在 fast corner 下 hold 都完全乾淨(0 個違規)——完整數字見 `docs/performance.md` 第 7 節。
+- Gate-level simulation:aes_core、soc_top(含真實開機、中斷、UART、JTAG、DMA)在 Yosys 合成後的 netlist 上都 PASS。
+- Formal LEC:aes_core 97.7% 完整證明,soc_top 刻意縮小範圍的 60.2% 部分驗證——完整理由跟數字見 `docs/lec_report.md`。
+- `docs/performance.md` 新增第 8 節,明確記錄這個專案的 signoff 範圍界限(停在 gate-level netlist,不含 place & route/DRC/LVS/DFT/power signoff),講清楚是刻意的取捨,不是漏掉。

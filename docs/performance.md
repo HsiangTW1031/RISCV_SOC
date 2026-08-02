@@ -70,3 +70,24 @@
 
 - STA 的 SDC 假設所有輸入/輸出的 I/O delay 是 0(見 `blocks/soc_top/constraints/soc_top.sdc`)——這個專案裡每個模組的 AXI 訊號在邊界都已經是暫存器輸出,所以量到的關鍵路徑是這個 SoC 真正的內部邏輯路徑,不是任意的 I/O budget 假設。
 - 中斷延遲跟 DMA cycle count 都是從**真正跑起來的模擬**直接量測(VCD 波形分析、C++ testbench 裡的 cycle counter),不是從 RTL 推算或假設。
+
+## 7. Multi-corner STA(setup at slow corner、hold at fast corner)
+
+第 1 節的 91.2MHz 是**單一 typical corner**下量到的數字——真正的 signoff 應該要同時查 setup(worst-case,通常在 slow corner)跟 hold(worst-case,通常在 fast corner),只看 typical 只能當初步估算,不是簽核依據。`blocks/{aes,soc_top}/sta/sta_mcmm.tcl` 補上這一步:同一份 netlist,分別用 OpenSTA 自帶的 Nangate45 slow/fast corner library(跟合成用的 `NangateOpenCellLibrary_typical.lib` 驗證過是同一個 cell family,239/241 顆 cell 完全一致,只差一顆跟邏輯無關的物理 tap cell `TAPCELL_X1`)重新算一次:
+
+| | Setup(slow corner,max delay) | Hold(fast corner,min delay) |
+|---|---|---|
+| **soc_top** | 關鍵路徑 43.128ns(同一個 `u_key_expand` 瓶頸)→ **slow corner Fmax ≈ 23.2MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
+| **aes_core** | 關鍵路徑 38.219ns → **slow corner Fmax ≈ 26.2MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
+
+Setup 用的 SDC 時脈週期(2.0ns/500MHz)本來就是刻意設定得比實際能達到的頻率更緊(見 `constraints/*.sdc` 註解)——目的是讓 `report_checks` 直接印出關鍵路徑的真實 data arrival time,再自己算 Fmax,不是為了衝一個特定頻率,所以 setup 兩份報告顯示大量違規(WNS -41.32ns/-36.40ns)是預期中的,不代表真的有時序問題;唯一有意義的數字是 data arrival time 換算出來的 slow-corner Fmax,這才是兩個 corner 一起看才拿得到的、比第 1 節保守的真實數字。Hold 完全乾淨(fast corner 下 TNS 剛好 0.00,沒有任何一個 endpoint 違規)。
+
+## 8. Signoff 範圍界限(刻意的取捨,不是漏掉)
+
+這個專案的 signoff 停在:**RTL → logic synthesis(Yosys)→ gate-level netlist → STA(setup+hold,typical+slow+fast 三個 corner)→ 對 RTL 的 formal equivalence check + gate-level simulation**。以下明確**不做**,是刻意的範圍界限,不是忘記:
+
+- **Place & Route、DRC/LVS、parasitic extraction 等物理實現**——這個專案沒有目標製程的實體 PDK 授權,也沒有真正流片的計畫,做這一步對這個規模的 side project 沒有實質意義。
+- **DFT(scan chain insertion、ATPG)**——這是真正流片、需要在生產線上做良率測試的晶片才需要的東西,跟前一項是同一個理由:沒有流片,就沒有「测試良率」這個問題要解決。
+- **Power signoff(UPF、多電壓域、clock gating 分析)**——這個設計是單一時脈域、沒有低功耗設計意圖(沒有多電壓域、沒有 power gating),power signoff 沒有對應的設計決策可以驗證。
+
+這條線畫在「gate-level netlist 的邏輯跟時序都驗證過,對得上 RTL」這裡——再往下的每一步都是「怎麼把這個已經驗證過的邏輯,實際做成一塊矽」的問題,不是「這個設計對不對」的問題。

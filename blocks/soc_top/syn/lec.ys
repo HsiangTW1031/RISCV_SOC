@@ -1,0 +1,60 @@
+# Formal equivalence check (LEC) for the whole-SoC netlist -- best-effort
+# only, deliberately scoped down from blocks/aes/syn/lec.ys's full flow.
+#
+# aes_core alone (465 local cells, 22646 $equiv checkpoints) needed several
+# minutes of SAT-based k-induction to reach 97.7% proven, and even then
+# didn't fully converge (see docs/lec_report.md). soc_top has ~79000
+# standard cells (docs/performance.md) including a full RISC-V CPU --
+# running the same sequential equiv_induct here is not practical in a
+# reasonable amount of time, and isn't standard practice even in real
+# industry flows at this scale (full-chip formal LEC with an embedded CPU
+# is a genuinely hard problem; the normal solution is block-level formal +
+# full-chip simulation, which is exactly what this project has:
+# blocks/aes/syn/lec.ys for the formal side, scripts/run_gatelevel_sim.sh
+# for the full-chip simulation side).
+#
+# This script only runs equiv_make + equiv_simple (fast, one SAT call per
+# cell, no expensive multi-step induction) as a best-effort partial check,
+# then reports status without -assert (so it always finishes and reports
+# real numbers instead of erroring out on an incomplete proof).
+#
+# Run from blocks/soc_top/syn/:
+#   yosys lec.ys
+read_verilog -I../../../rtl/include -I../rtl \
+    ../rtl/picorv32.v \
+    ../rtl/axi_lite_xbar.v \
+    ../rtl/timer.v \
+    ../rtl/watchdog.v \
+    ../rtl/uart.v \
+    ../rtl/i2c_master.v \
+    ../rtl/spi_master.v \
+    ../rtl/aes_key_expand.v \
+    ../rtl/aes_core.v \
+    ../rtl/aes_chain.v \
+    ../rtl/aes.v \
+    ../rtl/dma_engine.v \
+    ../rtl/jtag_tap.v \
+    ../rtl/jtag_dtm.v \
+    ../rtl/jtag_axi_bridge.v \
+    mem_blackboxes.v \
+    ../rtl/soc_top.v
+prep -flatten -top soc_top
+memory_collect
+memory_map
+design -save gold
+
+design -reset
+read_verilog mem_blackboxes.v
+read_verilog soc_top_out.v
+read_liberty -ignore_miss_func /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+prep -flatten -top soc_top
+memory_collect
+memory_map
+design -save gate
+
+design -copy-from gold -as gold soc_top
+design -copy-from gate -as gate soc_top
+equiv_make gold gate equiv
+hierarchy -top equiv
+equiv_simple
+equiv_status

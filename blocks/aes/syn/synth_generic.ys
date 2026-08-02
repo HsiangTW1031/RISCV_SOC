@@ -1,0 +1,14 @@
+# Generic (pre-technology-mapping) gate-level netlist for aes_core, used
+# only by scripts/run_gatelevel_sim.sh's gate-level simulation -- see
+# blocks/soc_top/syn/synth_generic.ys for the full rationale (same
+# methodology, applied here to the standalone AES core).
+#
+# Run from blocks/aes/syn/:
+#   yosys synth_generic.ys
+read_verilog -I../rtl ../rtl/aes_key_expand.v ../rtl/aes_core.v
+
+hierarchy -check -top aes_core
+synth -top aes_core
+
+clean
+write_verilog aes_core_generic.v

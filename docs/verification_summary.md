@@ -49,6 +49,15 @@ Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、wai
 
 圖像化的 sign-off dashboard(coverage bar chart、toggle waiver 摘要、每個 FSM 的狀態 checklist、135 筆 lint 發現分類後的 summary、架構圖)：`reports/sign_off/dashboard.html`,可以直接用瀏覽器打開,不需要額外工具。
 
-## 4. 這次 Phase 7 regression 抓到的一個真實 bug
+## 4. Gate-level 層級的驗證(STA multi-corner、formal LEC、gate-level simulation)
+
+範圍限定在 `aes` + `soc_top`(跟現有 per-block synthesis/STA 的既有範圍一致):
+
+- **Multi-corner STA**(`blocks/{aes,soc_top}/sta/sta_mcmm.tcl`):第 1 節、`docs/performance.md` 引用的 Fmax 是單一 typical corner 的數字,這裡補上 setup(slow corner)+ hold(fast corner)。soc_top 在 slow corner 下真實關鍵路徑 43.128ns(**slow-corner Fmax ≈ 23.2MHz**),fast corner 下 hold 完全乾淨(0 個違規)。完整數字見 `docs/performance.md` 第 7 節。
+- **Formal equivalence check(LEC)**(`blocks/{aes,soc_top}/syn/lec.ys`):用 Yosys 的 `equiv_make`/`equiv_simple`/`equiv_induct` 形式化證明「synthesis 出來的 gate-level netlist」邏輯上等價於 RTL。aes_core 完整跑完,97.7% 證明完成;soc_top 因為含整顆 CPU、規模差兩個數量級,刻意只跑不含 sequential induction 的部分驗證(60.2%),改用下面的 gate-level simulation 補足整顆 SoC 的驗證——完整理由跟數字見 `docs/lec_report.md`。
+- **Gate-level simulation**(`scripts/run_gatelevel_sim.sh`):拿現有的 regression testbench,直接對 Yosys 合成後的 netlist(而非 RTL)跑一次,驗證 synthesis 本身沒有改變行為。aes_core、soc_top(含真實開機、5 次 Timer 中斷、UART 輸出、JTAG 讀寫 RAM、DMA 控制埠)兩個都 **PASS**。
+- **Signoff 範圍界限**:這個專案的 signoff 停在「gate-level netlist,邏輯跟時序都驗證過」——不含 place & route、DRC/LVS、DFT、power signoff,理由見 `docs/performance.md` 第 8 節(刻意的取捨,不是漏掉)。
+
+## 5. 這次 Phase 7 regression 抓到的一個真實 bug
 
 跑 `scripts/run_regression.sh` 的過程中,`watchdog` 測試意外地從乾淨重編後失敗(2 個 check),但目錄裡舊的、還沒清掉的 binary 卻是綠的——追下去發現:`blocks/watchdog/dv/sim_main.cpp` 裡寫死的 `WARN_MARGIN = 3`,跟 `watchdog.v` 實際的 default parameter `WARN_MARGIN = 4`（從 Phase 2 第一次 commit 就是 4,`docs/specs/watchdog.md` 也一直寫 4)對不上——測試本身的常數從一開始就是錯的,只是舊的 binary 剛好是在某次意外用對的數字建出來的,之後沒人重新乾淨編譯過,才一直「看起來是綠的」。這正是「一次性乾淨 regression」存在的意義:抓到「原始碼其實已經不吻合、只是沒人重新建置驗證過」這種腐化。修法:把測試的常數改成 4,重編後全綠。詳細除錯過程見 `docs/project_retrospective.md`。

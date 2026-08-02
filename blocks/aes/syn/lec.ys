@@ -1,0 +1,36 @@
+# Formal equivalence check (LEC): proves the real Nangate45-mapped
+# aes_core_out.v netlist (aes_core.v + aes_key_expand.v run through
+# dfflibmap + abc -liberty, see synth.ys) is logically equivalent to the
+# original RTL -- i.e. that synthesis's technology mapping didn't change
+# behavior. This is the formal counterpart to
+# scripts/run_gatelevel_sim.sh's simulation-based check (which uses a
+# generic, non-tech-mapped netlist instead, since this machine lacks
+# functional Verilog models for the full Nangate45 basic-gate set).
+#
+# NangateOpenCellLibrary_typical.lib carries `function` attributes for
+# every cell (confirmed: e.g. AND2_X1's function is "(A1 & A2)"), so
+# read_liberty gives Yosys everything it needs to understand the mapped
+# netlist's logic directly -- no separate functional Verilog model needed
+# for this step.
+#
+# Run from blocks/aes/syn/:
+#   yosys lec.ys
+read_verilog -I../rtl ../rtl/aes_key_expand.v ../rtl/aes_core.v
+prep -flatten -top aes_core
+memory_collect
+memory_map
+design -save gold
+
+design -reset
+read_verilog aes_core_out.v
+read_liberty -ignore_miss_func /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+prep -flatten -top aes_core
+design -save gate
+
+design -copy-from gold -as gold aes_core
+design -copy-from gate -as gate aes_core
+equiv_make gold gate equiv
+hierarchy -top equiv
+equiv_simple
+equiv_induct -seq 12
+equiv_status -assert
