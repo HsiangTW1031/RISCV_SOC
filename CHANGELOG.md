@@ -4,6 +4,40 @@ Maps each git tag to what changed and why. Commit messages have the "what";
 `docs/project_retrospective.md` has the full bug-by-bug story behind most of
 these — this file is the short index between the two.
 
+## [v1.3.0] - 2026-08-03
+
+Pushed deduped toggle coverage (after waivers) from 80.1% to 92.2% by
+adding test vectors to existing testbenches -- no RTL changes.
+
+### Added
+- `i2c`/`spi`: a larger divider value to exercise `divider_reg`/`div_cnt`
+  bits the fast-sim default never reached
+- `dma_engine`: a second, independent key/IV (FIPS-197 Appendix B) via a
+  new single-block ECB test, plus exhaustive all-ones/all-zeros writes to
+  `key_reg`/`iv_reg`/`src_addr_reg`/`dst_addr_reg`/`len_reg`
+- `axi_lite_xbar`: a 3-value pass per slave port's rdata mirror register,
+  and a second value for the JTAG master port's wdata mirror
+- `jtag_chain`: a third address/data combination for the bridge's CDC
+  pipeline registers
+- `soc_top`: exhaustive JTAG pokes to the remaining peripherals, closing
+  its own top-level `*_rdata`/`*_wdata` mirror wires (separate coverage
+  points from `axi_lite_xbar.v`'s own mirrors despite sharing a name)
+
+### Fixed
+- (documentation) `docs/coverage_waiver_report.md` and
+  `docs/verification_summary.md` updated with the new numbers; the old
+  1966-bit residual gap breakdown is now 772 bits
+
+Caught the same bug three times while doing this — a naive "value +
+bitwise complement" 2-value scheme only gives both toggle directions to
+bits that are 1 in the original value. Documented as a new recurring
+pattern (Error Pattern C) in `docs/project_retrospective.md`.
+
+19/19 regression, 135 lint findings, chip area, and Fmax all unchanged —
+purely a verification-breadth improvement. See
+`docs/project_retrospective.md`'s "把 deduped toggle coverage 從 80.1%
+推到 92.2%" section for the full story.
+
 ## [v1.2.0] - 2026-08-03
 
 Convention-over-configuration for lint/regression/coverage: every block now
