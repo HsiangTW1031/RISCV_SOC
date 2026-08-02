@@ -5,35 +5,6 @@ This is free software, and you are free to change and redistribute it
 under certain conditions; type `show_copying' for details. 
 This program comes with ABSOLUTELY NO WARRANTY; for details type `show_warranty'.
 Warning 441: soc_top.sdc line 14, set_input_delay relative to a clock defined on the same port/pin not allowed.
-Startpoint: rst (input port clocked by clk)
-Endpoint: _13_ (recovery check against rising-edge clock clk)
-Path Group: asynchronous
-Path Type: max
-
-     Cap     Slew    Delay     Time   Description
----------------------------------------------------------------------------
-            0.000    0.000    0.000   clock clk (rise edge)
-                     0.000    0.000   clock network delay (ideal)
-                     0.000    0.000 v input external delay
-   6.197    0.000    0.000    0.000 v rst (in)
-            0.000    0.000    0.000 v _07_/A (INV_X1)
-   1.356    0.006    0.008    0.008 ^ _07_/ZN (INV_X1)
-            0.006    0.000    0.008 ^ _13_/SN (DFFS_X1)
-                              0.008   data arrival time
-
-            0.000    2.000    2.000   clock clk (rise edge)
-                     0.000    2.000   clock network delay (ideal)
-                     0.000    2.000   clock reconvergence pessimism
-                              2.000 ^ _13_/CK (DFFS_X1)
-                     0.042    2.042   library recovery time
-                              2.042   data required time
----------------------------------------------------------------------------
-                              2.042   data required time
-                             -0.008   data arrival time
----------------------------------------------------------------------------
-                              2.034   slack (MET)
-
-
 Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
             (rising edge-triggered flip-flop clocked by clk)
 Endpoint: u_aes/u_chain/u_core/u_key_expand/_15429_
@@ -109,62 +80,6 @@ Path Type: max
 
 wns max -9.02
 tns max -33161.76
-
-Startpoint: rst (input port clocked by clk)
-Endpoint: _13_ (recovery check against rising-edge clock clk)
-Path Group: asynchronous
-Path Type: max
-
-   Delay     Time   Description
------------------------------------------------------------
-   0.000    0.000   clock clk (rise edge)
-   0.000    0.000   clock network delay (ideal)
-   0.000    0.000 v input external delay
-   0.000    0.000 v rst (in)
-   0.008    0.008 ^ _07_/ZN (INV_X1)
-   0.000    0.008 ^ _13_/SN (DFFS_X1)
-            0.008   data arrival time
-
-   2.000    2.000   clock clk (rise edge)
-   0.000    2.000   clock network delay (ideal)
-   0.000    2.000   clock reconvergence pessimism
-            2.000 ^ _13_/CK (DFFS_X1)
-   0.042    2.042   library recovery time
-            2.042   data required time
------------------------------------------------------------
-            2.042   data required time
-           -0.008   data arrival time
------------------------------------------------------------
-            2.034   slack (MET)
-
-
-Startpoint: rst (input port clocked by clk)
-Endpoint: _14_ (recovery check against rising-edge clock clk)
-Path Group: asynchronous
-Path Type: max
-
-   Delay     Time   Description
------------------------------------------------------------
-   0.000    0.000   clock clk (rise edge)
-   0.000    0.000   clock network delay (ideal)
-   0.000    0.000 v input external delay
-   0.000    0.000 v rst (in)
-   0.008    0.008 ^ _09_/ZN (INV_X1)
-   0.000    0.008 ^ _14_/SN (DFFS_X1)
-            0.008   data arrival time
-
-   2.000    2.000   clock clk (rise edge)
-   0.000    2.000   clock network delay (ideal)
-   0.000    2.000   clock reconvergence pessimism
-            2.000 ^ _14_/CK (DFFS_X1)
-   0.042    2.042   library recovery time
-            2.042   data required time
------------------------------------------------------------
-            2.042   data required time
-           -0.008   data arrival time
------------------------------------------------------------
-            2.034   slack (MET)
-
 
 Startpoint: u_aes/u_chain/u_core/u_key_expand/_15566_
             (rising edge-triggered flip-flop clocked by clk)

@@ -1,4 +1,4 @@
-# Whole-SoC synthesis area report (Yosys, Nangate45)
+# Whole-chip synthesis area report (Yosys, Nangate45)
 # Full verbose log (all optimization passes) kept locally at
 # blocks/soc_top/syn/synth_log.txt -- not committed (tens of MB).
 
@@ -79,6 +79,6 @@
      of which used for sequential elements: 47588.198000 (36.65%)
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 72e694f02b, time: 24.99s, user: 8.49s, system: 0.22s, MEM: 237.59 MB peak
+End of script. Logfile hash: c459821e2d, time: 21.65s, user: 7.99s, system: 0.19s, MEM: 259.58 MB peak
 Yosys 0.67+post (git sha1 b8e7da6f40ae8f552c116bf6c359b07c6533e159, Release, AppleClang clang++ 21.0.0.21000099)
-Time spent: 66% 2x abc (15 sec), 6% 65x opt_expr (1 sec), ...
+Time spent: 66% 2x abc (14 sec), 7% 65x opt_expr (1 sec), ...

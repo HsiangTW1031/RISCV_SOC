@@ -1375,8 +1375,8 @@
       "file": "picorv32.v",
       "line": 181,
       "message": "Signal is not used: 'dbg_insn_addr'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1384,8 +1384,8 @@
       "file": "picorv32.v",
       "line": 183,
       "message": "Signal is not used: 'dbg_mem_valid'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1393,8 +1393,8 @@
       "file": "picorv32.v",
       "line": 184,
       "message": "Signal is not used: 'dbg_mem_instr'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1402,8 +1402,8 @@
       "file": "picorv32.v",
       "line": 185,
       "message": "Signal is not used: 'dbg_mem_ready'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1411,8 +1411,8 @@
       "file": "picorv32.v",
       "line": 186,
       "message": "Signal is not used: 'dbg_mem_addr'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1420,8 +1420,8 @@
       "file": "picorv32.v",
       "line": 187,
       "message": "Signal is not used: 'dbg_mem_wdata'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1429,8 +1429,8 @@
       "file": "picorv32.v",
       "line": 188,
       "message": "Signal is not used: 'dbg_mem_wstrb'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1438,8 +1438,8 @@
       "file": "picorv32.v",
       "line": 189,
       "message": "Signal is not used: 'dbg_mem_rdata'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1447,8 +1447,8 @@
       "file": "picorv32.v",
       "line": 375,
       "message": "Signal is not used: 'mem_busy'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1456,8 +1456,8 @@
       "file": "picorv32.v",
       "line": 696,
       "message": "Signal is not used: 'dbg_rs1val'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1465,8 +1465,8 @@
       "file": "picorv32.v",
       "line": 697,
       "message": "Signal is not used: 'dbg_rs2val'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1474,8 +1474,8 @@
       "file": "picorv32.v",
       "line": 698,
       "message": "Signal is not used: 'dbg_rs1val_valid'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1483,8 +1483,8 @@
       "file": "picorv32.v",
       "line": 699,
       "message": "Signal is not used: 'dbg_rs2val_valid'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1492,8 +1492,8 @@
       "file": "picorv32.v",
       "line": 769,
       "message": "Signal is not used: 'dbg_valid_insn'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1501,8 +1501,8 @@
       "file": "picorv32.v",
       "line": 1184,
       "message": "Signal is not used: 'dbg_ascii_state'",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1510,8 +1510,8 @@
       "file": "picorv32.v",
       "line": 2204,
       "message": "Bits of signal are not used: 'pcpi_insn'[24:15,11:7]",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "soc_top",
@@ -1519,8 +1519,8 @@
       "file": "picorv32.v",
       "line": 2424,
       "message": "Bits of signal are not used: 'pcpi_insn'[24:15,11:7]",
-      "category": "vendored-picorv32-style",
-      "note": "PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture."
+      "category": "vendored",
+      "note": "picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project's RTL."
     },
     {
       "block": "spi",

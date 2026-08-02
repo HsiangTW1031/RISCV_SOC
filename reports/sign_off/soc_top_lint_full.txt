@@ -2,307 +2,307 @@
 Files: -Irtl/include -Iblocks/soc_top/rtl blocks/soc_top/rtl/picorv32.v blocks/soc_top/rtl/axi_lite_xbar.v blocks/soc_top/rtl/boot_rom.v blocks/soc_top/rtl/sram.v blocks/soc_top/rtl/timer.v blocks/soc_top/rtl/watchdog.v blocks/soc_top/rtl/uart.v blocks/soc_top/rtl/i2c_master.v blocks/soc_top/rtl/spi_master.v blocks/soc_top/rtl/aes_key_expand.v blocks/soc_top/rtl/aes_core.v blocks/soc_top/rtl/aes_chain.v blocks/soc_top/rtl/aes.v blocks/soc_top/rtl/dma_ram.v blocks/soc_top/rtl/dma_engine.v blocks/soc_top/rtl/jtag_tap.v blocks/soc_top/rtl/jtag_dtm.v blocks/soc_top/rtl/jtag_axi_bridge.v blocks/soc_top/rtl/soc_top.v
 
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/axi_lite_xbar.v:159:18: Bits of function variable are not used: 'addr'[27:16,11:0]
-                                                                                                                           : ... note: In instance 'soc_top.u_xbar'
+                                                                                                                            : ... note: In instance 'soc_top.u_xbar'
   159 |     input [31:0] addr;
       |                  ^~~~
                        ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.050
                        ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/sram.v:10:76: Bits of signal are not used: 's_awaddr'[31:17,1:0]
-                                                                                                                 : ... note: In instance 'soc_top.u_ram'
+                                                                                                                  : ... note: In instance 'soc_top.u_ram'
    10 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/sram.v:12:48: Signal is not used: 's_bready'
-                                                                                                                 : ... note: In instance 'soc_top.u_ram'
+                                                                                                                  : ... note: In instance 'soc_top.u_ram'
    12 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/sram.v:13:76: Bits of signal are not used: 's_araddr'[31:17,1:0]
-                                                                                                                 : ... note: In instance 'soc_top.u_ram'
+                                                                                                                  : ... note: In instance 'soc_top.u_ram'
    13 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/sram.v:14:48: Signal is not used: 's_rready'
-                                                                                                                 : ... note: In instance 'soc_top.u_ram'
+                                                                                                                  : ... note: In instance 'soc_top.u_ram'
    14 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/timer.v:29:76: Bits of signal are not used: 's_awaddr'[31:4]
-                                                                                                                  : ... note: In instance 'soc_top.u_timer'
+                                                                                                                   : ... note: In instance 'soc_top.u_timer'
    29 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/timer.v:30:102: Signal is not used: 's_wstrb'
-                                                                                                                   : ... note: In instance 'soc_top.u_timer'
+                                                                                                                    : ... note: In instance 'soc_top.u_timer'
    30 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/timer.v:31:48: Signal is not used: 's_bready'
-                                                                                                                  : ... note: In instance 'soc_top.u_timer'
+                                                                                                                   : ... note: In instance 'soc_top.u_timer'
    31 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/timer.v:32:76: Bits of signal are not used: 's_araddr'[31:4]
-                                                                                                                  : ... note: In instance 'soc_top.u_timer'
+                                                                                                                   : ... note: In instance 'soc_top.u_timer'
    32 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/timer.v:33:48: Signal is not used: 's_rready'
-                                                                                                                  : ... note: In instance 'soc_top.u_timer'
+                                                                                                                   : ... note: In instance 'soc_top.u_timer'
    33 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/watchdog.v:34:76: Bits of signal are not used: 's_awaddr'[31:4]
-                                                                                                                     : ... note: In instance 'soc_top.u_wdt'
+                                                                                                                      : ... note: In instance 'soc_top.u_wdt'
    34 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/watchdog.v:35:102: Signal is not used: 's_wstrb'
-                                                                                                                      : ... note: In instance 'soc_top.u_wdt'
+                                                                                                                       : ... note: In instance 'soc_top.u_wdt'
    35 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/watchdog.v:36:48: Signal is not used: 's_bready'
-                                                                                                                     : ... note: In instance 'soc_top.u_wdt'
+                                                                                                                      : ... note: In instance 'soc_top.u_wdt'
    36 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/watchdog.v:37:76: Bits of signal are not used: 's_araddr'[31:4]
-                                                                                                                     : ... note: In instance 'soc_top.u_wdt'
+                                                                                                                      : ... note: In instance 'soc_top.u_wdt'
    37 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/watchdog.v:38:48: Signal is not used: 's_rready'
-                                                                                                                     : ... note: In instance 'soc_top.u_wdt'
+                                                                                                                      : ... note: In instance 'soc_top.u_wdt'
    38 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/uart.v:21:76: Bits of signal are not used: 's_awaddr'[31:4]
-                                                                                                                 : ... note: In instance 'soc_top.u_uart'
+                                                                                                                  : ... note: In instance 'soc_top.u_uart'
    21 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/uart.v:22:76: Bits of signal are not used: 's_wdata'[31:8]
-                                                                                                                 : ... note: In instance 'soc_top.u_uart'
+                                                                                                                  : ... note: In instance 'soc_top.u_uart'
    22 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                            ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/uart.v:22:102: Signal is not used: 's_wstrb'
-                                                                                                                  : ... note: In instance 'soc_top.u_uart'
+                                                                                                                   : ... note: In instance 'soc_top.u_uart'
    22 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/uart.v:23:48: Signal is not used: 's_bready'
-                                                                                                                 : ... note: In instance 'soc_top.u_uart'
+                                                                                                                  : ... note: In instance 'soc_top.u_uart'
    23 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/uart.v:24:76: Bits of signal are not used: 's_araddr'[31:4]
-                                                                                                                 : ... note: In instance 'soc_top.u_uart'
+                                                                                                                  : ... note: In instance 'soc_top.u_uart'
    24 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/uart.v:25:48: Signal is not used: 's_rready'
-                                                                                                                 : ... note: In instance 'soc_top.u_uart'
+                                                                                                                  : ... note: In instance 'soc_top.u_uart'
    25 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/i2c_master.v:36:76: Bits of signal are not used: 's_awaddr'[31:5]
-                                                                                                                       : ... note: In instance 'soc_top.u_i2c'
+                                                                                                                        : ... note: In instance 'soc_top.u_i2c'
    36 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/i2c_master.v:37:102: Signal is not used: 's_wstrb'
-                                                                                                                        : ... note: In instance 'soc_top.u_i2c'
+                                                                                                                         : ... note: In instance 'soc_top.u_i2c'
    37 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/i2c_master.v:38:48: Signal is not used: 's_bready'
-                                                                                                                       : ... note: In instance 'soc_top.u_i2c'
+                                                                                                                        : ... note: In instance 'soc_top.u_i2c'
    38 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/i2c_master.v:39:76: Bits of signal are not used: 's_araddr'[31:5]
-                                                                                                                       : ... note: In instance 'soc_top.u_i2c'
+                                                                                                                        : ... note: In instance 'soc_top.u_i2c'
    39 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/i2c_master.v:40:48: Signal is not used: 's_rready'
-                                                                                                                       : ... note: In instance 'soc_top.u_i2c'
+                                                                                                                        : ... note: In instance 'soc_top.u_i2c'
    40 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/spi_master.v:42:76: Bits of signal are not used: 's_awaddr'[31:5]
-                                                                                                                       : ... note: In instance 'soc_top.u_spi'
+                                                                                                                        : ... note: In instance 'soc_top.u_spi'
    42 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/spi_master.v:43:102: Signal is not used: 's_wstrb'
-                                                                                                                        : ... note: In instance 'soc_top.u_spi'
+                                                                                                                         : ... note: In instance 'soc_top.u_spi'
    43 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/spi_master.v:44:48: Signal is not used: 's_bready'
-                                                                                                                       : ... note: In instance 'soc_top.u_spi'
+                                                                                                                        : ... note: In instance 'soc_top.u_spi'
    44 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/spi_master.v:45:76: Bits of signal are not used: 's_araddr'[31:5]
-                                                                                                                       : ... note: In instance 'soc_top.u_spi'
+                                                                                                                        : ... note: In instance 'soc_top.u_spi'
    45 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/spi_master.v:46:48: Signal is not used: 's_rready'
-                                                                                                                       : ... note: In instance 'soc_top.u_spi'
+                                                                                                                        : ... note: In instance 'soc_top.u_spi'
    46 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/aes.v:51:76: Bits of signal are not used: 's_awaddr'[31:7]
-                                                                                                                : ... note: In instance 'soc_top.u_aes'
+                                                                                                                 : ... note: In instance 'soc_top.u_aes'
    51 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/aes.v:52:102: Signal is not used: 's_wstrb'
-                                                                                                                 : ... note: In instance 'soc_top.u_aes'
+                                                                                                                  : ... note: In instance 'soc_top.u_aes'
    52 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/aes.v:53:48: Signal is not used: 's_bready'
-                                                                                                                : ... note: In instance 'soc_top.u_aes'
+                                                                                                                 : ... note: In instance 'soc_top.u_aes'
    53 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/aes.v:54:76: Bits of signal are not used: 's_araddr'[31:7]
-                                                                                                                : ... note: In instance 'soc_top.u_aes'
+                                                                                                                 : ... note: In instance 'soc_top.u_aes'
    54 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/aes.v:55:48: Signal is not used: 's_rready'
-                                                                                                                : ... note: In instance 'soc_top.u_aes'
+                                                                                                                 : ... note: In instance 'soc_top.u_aes'
    55 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_ram.v:27:24: Bits of signal are not used: 's_awaddr'[31:13,1:0]
-                                                                                                                    : ... note: In instance 'soc_top.u_dma_ram'
+                                                                                                                     : ... note: In instance 'soc_top.u_dma_ram'
    27 |     input  wire [31:0] s_awaddr,
       |                        ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_ram.v:29:26: Signal is not used: 's_awsize'
-                                                                                                                    : ... note: In instance 'soc_top.u_dma_ram'
+                                                                                                                     : ... note: In instance 'soc_top.u_dma_ram'
    29 |     input  wire [3-1:0]  s_awsize,
       |                          ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_ram.v:30:25: Signal is not used: 's_awburst'
-                                                                                                                    : ... note: In instance 'soc_top.u_dma_ram'
+                                                                                                                     : ... note: In instance 'soc_top.u_dma_ram'
    30 |     input  wire [2-1:0] s_awburst,
       |                         ^~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_ram.v:47:24: Bits of signal are not used: 's_araddr'[31:13,1:0]
-                                                                                                                    : ... note: In instance 'soc_top.u_dma_ram'
+                                                                                                                     : ... note: In instance 'soc_top.u_dma_ram'
    47 |     input  wire [31:0] s_araddr,
       |                        ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_ram.v:49:26: Signal is not used: 's_arsize'
-                                                                                                                    : ... note: In instance 'soc_top.u_dma_ram'
+                                                                                                                     : ... note: In instance 'soc_top.u_dma_ram'
    49 |     input  wire [3-1:0]  s_arsize,
       |                          ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_ram.v:50:25: Signal is not used: 's_arburst'
-                                                                                                                    : ... note: In instance 'soc_top.u_dma_ram'
+                                                                                                                     : ... note: In instance 'soc_top.u_dma_ram'
    50 |     input  wire [2-1:0] s_arburst,
       |                         ^~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_engine.v:47:76: Bits of signal are not used: 's_awaddr'[31:7]
-                                                                                                                       : ... note: In instance 'soc_top.u_dma'
+                                                                                                                        : ... note: In instance 'soc_top.u_dma'
    47 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_engine.v:48:102: Signal is not used: 's_wstrb'
-                                                                                                                        : ... note: In instance 'soc_top.u_dma'
+                                                                                                                         : ... note: In instance 'soc_top.u_dma'
    48 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_engine.v:49:48: Signal is not used: 's_bready'
-                                                                                                                       : ... note: In instance 'soc_top.u_dma'
+                                                                                                                        : ... note: In instance 'soc_top.u_dma'
    49 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_engine.v:50:76: Bits of signal are not used: 's_araddr'[31:7]
-                                                                                                                       : ... note: In instance 'soc_top.u_dma'
+                                                                                                                        : ... note: In instance 'soc_top.u_dma'
    50 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_engine.v:51:48: Signal is not used: 's_rready'
-                                                                                                                       : ... note: In instance 'soc_top.u_dma'
+                                                                                                                        : ... note: In instance 'soc_top.u_dma'
    51 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_engine.v:57:75: Signal is not used: 'm_bresp'
-                                                                                                                       : ... note: In instance 'soc_top.u_dma'
+                                                                                                                        : ... note: In instance 'soc_top.u_dma'
    57 |     input  wire         m_bvalid,  output reg m_bready,  input wire [1:0] m_bresp,
       |                                                                           ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_engine.v:60:102: Signal is not used: 'm_rresp'
-                                                                                                                        : ... note: In instance 'soc_top.u_dma'
+                                                                                                                         : ... note: In instance 'soc_top.u_dma'
    60 |     input  wire         m_rvalid,  output reg m_rready,  input wire [31:0] m_rdata, input wire [1:0] m_rresp, input wire m_rlast,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/dma_engine.v:117:15: Signal is not used: 'chain_busy'
-                                                                                                                        : ... note: In instance 'soc_top.u_dma'
+                                                                                                                         : ... note: In instance 'soc_top.u_dma'
   117 |   wire        chain_busy, chain_done;
       |               ^~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/boot_rom.v:15:76: Signal is not used: 's_awaddr'
-                                                                                                                     : ... note: In instance 'soc_top.u_rom'
+                                                                                                                      : ... note: In instance 'soc_top.u_rom'
    15 |     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/boot_rom.v:16:76: Signal is not used: 's_wdata'
-                                                                                                                     : ... note: In instance 'soc_top.u_rom'
+                                                                                                                      : ... note: In instance 'soc_top.u_rom'
    16 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                            ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/boot_rom.v:16:102: Signal is not used: 's_wstrb'
-                                                                                                                      : ... note: In instance 'soc_top.u_rom'
+                                                                                                                       : ... note: In instance 'soc_top.u_rom'
    16 |     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
       |                                                                                                      ^~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/boot_rom.v:17:48: Signal is not used: 's_bready'
-                                                                                                                     : ... note: In instance 'soc_top.u_rom'
+                                                                                                                      : ... note: In instance 'soc_top.u_rom'
    17 |     output reg          s_bvalid,  input wire  s_bready,  output reg [1:0] s_bresp,
       |                                                ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/boot_rom.v:18:76: Bits of signal are not used: 's_araddr'[31:16,1:0]
-                                                                                                                     : ... note: In instance 'soc_top.u_rom'
+                                                                                                                      : ... note: In instance 'soc_top.u_rom'
    18 |     input  wire        s_arvalid, output wire s_arready, input wire [31:0] s_araddr,
       |                                                                            ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/boot_rom.v:19:48: Signal is not used: 's_rready'
-                                                                                                                     : ... note: In instance 'soc_top.u_rom'
+                                                                                                                      : ... note: In instance 'soc_top.u_rom'
    19 |     output reg          s_rvalid,  input wire  s_rready,  output reg [31:0] s_rdata, output reg [1:0] s_rresp
       |                                                ^~~~~~~~
 %Warning-UNUSEDPARAM: blocks/soc_top/rtl/aes_chain.v:47:14: Parameter is not used: 'MODE_ECB'
-                                                                                                                     : ... note: In instance 'soc_top.u_dma.u_chain'
+                                                                                                                      : ... note: In instance 'soc_top.u_dma.u_chain'
    47 |   localparam MODE_ECB = 2'd0;
       |              ^~~~~~~~
                       ... For warning description see https://verilator.org/warn/UNUSEDPARAM?v=5.050
                       ... Use "/* verilator lint_off UNUSEDPARAM */" and lint_on around source to disable this message.
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/aes_chain.v:78:15: Signal is not used: 'core_busy'
-                                                                                                                      : ... note: In instance 'soc_top.u_dma.u_chain'
+                                                                                                                       : ... note: In instance 'soc_top.u_dma.u_chain'
    78 |   wire        core_busy, core_done;
       |               ^~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:181:13: Signal is not used: 'dbg_insn_addr'
-                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   181 |  reg [31:0] dbg_insn_addr;
       |             ^~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:183:7: Signal is not used: 'dbg_mem_valid'
-                                                                                                                     : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   183 |  wire dbg_mem_valid = mem_valid;
       |       ^~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:184:7: Signal is not used: 'dbg_mem_instr'
-                                                                                                                     : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   184 |  wire dbg_mem_instr = mem_instr;
       |       ^~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:185:7: Signal is not used: 'dbg_mem_ready'
-                                                                                                                     : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   185 |  wire dbg_mem_ready = mem_ready;
       |       ^~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:186:14: Signal is not used: 'dbg_mem_addr'
-                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   186 |  wire [31:0] dbg_mem_addr  = mem_addr;
       |              ^~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:187:14: Signal is not used: 'dbg_mem_wdata'
-                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   187 |  wire [31:0] dbg_mem_wdata = mem_wdata;
       |              ^~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:188:14: Signal is not used: 'dbg_mem_wstrb'
-                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   188 |  wire [ 3:0] dbg_mem_wstrb = mem_wstrb;
       |              ^~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:189:14: Signal is not used: 'dbg_mem_rdata'
-                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   189 |  wire [31:0] dbg_mem_rdata = mem_rdata;
       |              ^~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:375:7: Signal is not used: 'mem_busy'
-                                                                                                                     : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   375 |  wire mem_busy = |{mem_do_prefetch, mem_do_rinst, mem_do_rdata, mem_do_wdata};
       |       ^~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:696:14: Signal is not used: 'dbg_rs1val'
-                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   696 |   reg [31:0] dbg_rs1val;
       |              ^~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:697:14: Signal is not used: 'dbg_rs2val'
-                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   697 |   reg [31:0] dbg_rs2val;
       |              ^~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:698:7: Signal is not used: 'dbg_rs1val_valid'
-                                                                                                                     : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   698 |   reg dbg_rs1val_valid;
       |       ^~~~~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:699:7: Signal is not used: 'dbg_rs2val_valid'
-                                                                                                                     : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   699 |   reg dbg_rs2val_valid;
       |       ^~~~~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:769:6: Signal is not used: 'dbg_valid_insn'
-                                                                                                                     : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                      : ... note: In instance 'soc_top.u_cpu.picorv32_core'
   769 |  reg dbg_valid_insn;
       |      ^~~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:1184:15: Signal is not used: 'dbg_ascii_state'
-                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core'
+                                                                                                                        : ... note: In instance 'soc_top.u_cpu.picorv32_core'
  1184 |   reg [127:0] dbg_ascii_state;
       |               ^~~~~~~~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:2204:20: Bits of signal are not used: 'pcpi_insn'[24:15,11:7]
-                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core..genblk1.pcpi_mul'
+                                                                                                                        : ... note: In instance 'soc_top.u_cpu.picorv32_core..genblk1.pcpi_mul'
  2204 |  input      [31:0] pcpi_insn,
       |                    ^~~~~~~~~
 %Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/picorv32.v:2424:20: Bits of signal are not used: 'pcpi_insn'[24:15,11:7]
-                                                                                                                       : ... note: In instance 'soc_top.u_cpu.picorv32_core.genblk2.pcpi_div'
+                                                                                                                        : ... note: In instance 'soc_top.u_cpu.picorv32_core.genblk2.pcpi_div'
  2424 |  input      [31:0] pcpi_insn,
       |                    ^~~~~~~~~
 %Error: Exiting due to 75 warning(s)

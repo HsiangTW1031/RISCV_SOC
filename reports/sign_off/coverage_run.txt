@@ -2,24 +2,24 @@
 
 
 TEST               STATUS
-timer              OK
-watchdog           OK
-uart               OK
-sram               OK
-boot_rom           OK
-i2c                OK
-spi                OK
-jtag_tap           OK
-jtag_chain         OK
 aes_key_expand     OK
 aes_core           OK
 aes_chain          OK
 aes_axi_wrapper    OK
 aes_diff           OK
 axi_lite_xbar      OK
+boot_rom           OK
 dma_ram            OK
 dma_engine         OK
+i2c                OK
+jtag_tap           OK
+jtag_chain         OK
 soc_top            OK
+spi                OK
+sram               OK
+timer              OK
+uart               OK
+watchdog           OK
 
 === Merging coverage data ===
 Coverage Summary:
@@ -31,7 +31,7 @@ Coverage Summary:
   fsm_arc   : 0.0% (    0/    0)
 Annotation Summary:
   lines with all attached points covered : 34.00%  (1264/3652)
-See lines with '%00' in /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/annotated
-Merged coverage data: /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/merged.dat
-LCOV info:            /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/coverage.info
-Annotated source:      /Users/shunghsiangwu/Desktop/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/annotated/
+See lines with '%00' in /Users/shunghsiangwu/AI_agent/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/annotated
+Merged coverage data: /Users/shunghsiangwu/AI_agent/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/merged.dat
+LCOV info:            /Users/shunghsiangwu/AI_agent/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/coverage.info
+Annotated source:      /Users/shunghsiangwu/AI_agent/Levi-agent/projects/RISCV_SOC/reports/sign_off/coverage/annotated/

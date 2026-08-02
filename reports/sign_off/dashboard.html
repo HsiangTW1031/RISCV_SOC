@@ -75,6 +75,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 28px 32px 80px; }
 .kpi .label { color: var(--text-dim); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
 .kpi .value { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 1.6rem; margin-top: 4px; font-weight: 600; }
 .kpi .value.good { color: var(--good); }
+.kpi .value.bad { color: var(--bad); }
 .kpi .value.accent { color: var(--accent); }
 section { margin: 48px 0; }
 section > h2 {
@@ -133,15 +134,15 @@ a { color: var(--accent); }
 
 <header class="top">
   <h1>RISCV_SOC &mdash; Sign-off Dashboard</h1>
-  <div class="sub">Generated 2026-08-02 17:27 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
+  <div class="sub">Generated 2026-08-03 01:03 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
 </header>
 
 <main>
   <div class="kpi-row">
-    <div class="kpi"><div class="label">Regression</div><div class="value good">0/0 PASS</div></div>
+    <div class="kpi"><div class="label">Regression</div><div class="value good">19/19 PASS</div></div>
     <div class="kpi"><div class="label">Own-RTL line coverage</div><div class="value good">96.1%</div></div>
     <div class="kpi"><div class="label">FSM state coverage</div><div class="value good">11/11 FSMs @ 100%</div></div>
-    <div class="kpi"><div class="label">Whole-SoC Fmax</div><div class="value accent">125000.0 MHz</div></div>
+    <div class="kpi"><div class="label">Whole-SoC Fmax</div><div class="value accent">91.2 MHz</div></div>
     <div class="kpi"><div class="label">Gate count (NAND2-eq)</div><div class="value accent">162,716</div></div>
     <div class="kpi"><div class="label">Lint findings</div><div class="value">135 <span style="font-size:0.5em;color:var(--text-dim)">(all triaged)</span></div></div>
   </div>
@@ -798,10 +799,10 @@ flowchart TB
 </tbody></table></details>
 </div>
 <div class="lint-bucket">
-<h3><span class="dot vendor"></span>Vendored PicoRV32 (not this project&#x27;s RTL) <span class="count">17</span></h3>
+<h3><span class="dot vendor"></span>Vendored third-party IP (not this project&#x27;s RTL) <span class="count">17</span></h3>
 <details class="cat">
-<summary>vendored-picorv32-style <span class="count">17</span></summary>
-<p class="note">PicoRV32 is vendored unmodified (project policy) -- this finding is in the vendored core itself, not this project&#x27;s RTL. See rtl/core/lint/lint_report.txt for the full, unsuppressed picture.</p>
+<summary>vendored <span class="count">17</span></summary>
+<p class="note">picorv32.v is vendored unmodified (project policy) -- this finding is in the vendored IP itself, not this project&#x27;s RTL.</p>
 <table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Message</th></tr></thead><tbody>
 <tr><td>soc_top</td><td>picorv32.v</td><td>181</td><td>Signal is not used: &#x27;dbg_insn_addr&#x27;</td></tr>
 <tr><td>soc_top</td><td>picorv32.v</td><td>183</td><td>Signal is not used: &#x27;dbg_mem_valid&#x27;</td></tr>

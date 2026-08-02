@@ -9,19 +9,44 @@ scripts/analyze_coverage.py:
 """
 import html
 import json
+import os
 import re
+import sys
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORTS = ROOT / "reports/sign_off"
 
+sys.path.insert(0, str(ROOT / "scripts"))
+import coverage_config as cfg  # noqa: E402
+
+PROJECT_NAME = os.environ.get("PROJECT_NAME", ROOT.name)
+PROJECT_REPO_URL = os.environ.get("PROJECT_REPO_URL", "")
+PROJECT_TAGLINE = os.environ.get(
+    "PROJECT_TAGLINE",
+    "from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)",
+)
+VENDORED_BLOCKS = set(cfg.VENDORED_FILES.values())
+
 data = json.loads((REPORTS / "dashboard_data.json").read_text())
 
 # ---- pull a few more numbers out of the existing sign-off text reports ----
 sim_text = (REPORTS / "simulation_regression.txt").read_text()
-n_targets = len(re.findall(r"^(PASS|FAIL):", sim_text, re.M))
+# Each regression row is "<target-name>  <PASS|FAIL|BUILD-FAIL>  <detail...>"
+# (see scripts/lib_verilator_targets.sh's print_regression_summary) -- the
+# result is the 2nd whitespace-separated column, not a line prefix (a line
+# starts with the target's own name, e.g. "aes_key_expand", not "PASS:").
+n_targets = 0
+n_targets_pass = 0
+for line in sim_text.splitlines():
+    parts = line.split()
+    if len(parts) >= 2 and parts[1] in ("PASS", "FAIL", "BUILD-FAIL"):
+        n_targets += 1
+        if parts[1] == "PASS":
+            n_targets_pass += 1
 regression_pass = bool(re.search(r"ALL \d+ regression targets PASS", sim_text))
+regression_kpi_kind = "good" if regression_pass else "bad"
 
 synth_text = (REPORTS / "synthesis_area.txt").read_text()
 m = re.search(r"Chip area for top module '\\?\w+': ([\d.]+)", synth_text)
@@ -48,6 +73,10 @@ gate_count = round(chip_area / NAND2_AREA) if chip_area else None
 fmax_display = f"{fmax_mhz} MHz" if fmax_mhz is not None else "N/A (no PDK)"
 gate_count_display = f"{gate_count:,}" if gate_count is not None else "N/A (no PDK)"
 
+fsm_total = len(data["fsm_coverage"])
+fsm_at_100 = sum(1 for v in data["fsm_coverage"].values() if v["pct"] == 100.0)
+fsm_display = f"{fsm_at_100}/{fsm_total} FSMs @ 100%" if fsm_total else "N/A (no FSMs configured)"
+
 cov = data["coverage_overall"]
 fsm = data["fsm_coverage"]
 findings = data["lint_findings"]
@@ -59,7 +88,7 @@ CATEGORY_META = {
     "documented-limitation-rready": ("Documented limitation", "warn"),
     "documented-limitation-bresp": ("Documented limitation", "warn"),
     "documented-limitation-rresp": ("Documented limitation", "warn"),
-    "vendored-picorv32-style": ("Vendored PicoRV32 (not this project's RTL)", "vendor"),
+    "vendored": ("Vendored third-party IP (not this project's RTL)", "vendor"),
     "benign-address-decode": ("Benign / by design", "benign"),
     "benign-no-byte-strobe": ("Benign / by design", "benign"),
     "benign-burst-subset": ("Benign / by design", "benign"),
@@ -96,14 +125,14 @@ def bar(pct, kind="good"):
 
 
 def render_lint_section():
-    order = ["Documented limitation", "Benign / by design", "Vendored PicoRV32 (not this project's RTL)", "Uncategorized"]
+    order = ["Documented limitation", "Benign / by design", "Vendored third-party IP (not this project's RTL)", "Uncategorized"]
     out = []
     for bucket in order:
         items = groups.get(bucket, [])
         if not items:
             continue
         kind = {"Documented limitation": "warn", "Benign / by design": "benign",
-                "Vendored PicoRV32 (not this project's RTL)": "vendor", "Uncategorized": "bad"}[bucket]
+                "Vendored third-party IP (not this project's RTL)": "vendor", "Uncategorized": "bad"}[bucket]
         out.append(f'<div class="lint-bucket">')
         out.append(f'<h3><span class="dot {kind}"></span>{esc(bucket)} <span class="count">{len(items)}</span></h3>')
         by_cat = subgroups(items)
@@ -196,7 +225,7 @@ def render_toggle_waiver_section():
 def render_file_table():
     out = ['<table class="filecov"><thead><tr><th>Block</th><th>File</th><th>Line coverage</th></tr></thead><tbody>']
     for f in files_cov:
-        vendored = f["block"].startswith("picorv32")
+        vendored = f["block"] in VENDORED_BLOCKS
         kind = "info" if vendored else ("good" if f["pct"] >= 90 else "warn")
         out.append(
             f'<tr><td>{esc(f["block"])}</td><td class="mono">{esc(f["file"])}</td>'
@@ -210,7 +239,7 @@ generated = REPORTS.stat().st_mtime
 import datetime
 gen_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-html_out = f"""<title>RISCV_SOC — Sign-off Dashboard</title>
+html_out = f"""<title>{esc(PROJECT_NAME)} — Sign-off Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 :root {{
@@ -287,6 +316,7 @@ main {{ max-width: 1180px; margin: 0 auto; padding: 28px 32px 80px; }}
 .kpi .label {{ color: var(--text-dim); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }}
 .kpi .value {{ font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 1.6rem; margin-top: 4px; font-weight: 600; }}
 .kpi .value.good {{ color: var(--good); }}
+.kpi .value.bad {{ color: var(--bad); }}
 .kpi .value.accent {{ color: var(--accent); }}
 section {{ margin: 48px 0; }}
 section > h2 {{
@@ -344,15 +374,15 @@ a {{ color: var(--accent); }}
 </style>
 
 <header class="top">
-  <h1>RISCV_SOC &mdash; Sign-off Dashboard</h1>
-  <div class="sub">Generated {gen_str} by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
+  <h1>{esc(PROJECT_NAME)} &mdash; Sign-off Dashboard</h1>
+  <div class="sub">Generated {gen_str} by scripts/build_dashboard.py &middot; {esc(PROJECT_TAGLINE)}</div>
 </header>
 
 <main>
   <div class="kpi-row">
-    <div class="kpi"><div class="label">Regression</div><div class="value good">{n_targets}/{n_targets} PASS</div></div>
+    <div class="kpi"><div class="label">Regression</div><div class="value {regression_kpi_kind}">{n_targets_pass}/{n_targets} PASS</div></div>
     <div class="kpi"><div class="label">Own-RTL line coverage</div><div class="value good">{data['coverage_own_rtl_line_pct']}%</div></div>
-    <div class="kpi"><div class="label">FSM state coverage</div><div class="value good">11/11 FSMs @ 100%</div></div>
+    <div class="kpi"><div class="label">FSM state coverage</div><div class="value good">{fsm_display}</div></div>
     <div class="kpi"><div class="label">Whole-SoC Fmax</div><div class="value accent">{fmax_display}</div></div>
     <div class="kpi"><div class="label">Gate count (NAND2-eq)</div><div class="value accent">{gate_count_display}</div></div>
     <div class="kpi"><div class="label">Lint findings</div><div class="value">{len(findings)} <span style="font-size:0.5em;color:var(--text-dim)">(all triaged)</span></div></div>
@@ -431,7 +461,7 @@ flowchart TB
   </section>
 
   <footer>
-    RISCV_SOC &middot; <a href="https://github.com/HsiangTW1031/RISCV_SOC">github.com/HsiangTW1031/RISCV_SOC</a>
+    {esc(PROJECT_NAME)}{' &middot; <a href="' + esc(PROJECT_REPO_URL) + '">' + esc(PROJECT_REPO_URL.replace("https://", "")) + '</a>' if PROJECT_REPO_URL else ''}
   </footer>
 </main>
 """

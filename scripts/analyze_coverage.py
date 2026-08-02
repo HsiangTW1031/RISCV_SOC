@@ -7,6 +7,12 @@ HTML sign-off dashboard.
 Run from the repo root:
     python3 scripts/analyze_coverage.py
 
+This file is the generic engine: it auto-discovers which .v/.vh file
+belongs to which block by scanning blocks/*/rtl/, so adding a block never
+requires touching this file. The only project-specific knowledge (real FSM
+state names, lint-finding triage, vendored-IP file labels) lives in
+scripts/coverage_config.py -- see that file's docstring.
+
 FSM state coverage isn't a native Verilator coverage category for plain
 Verilog-2001 case-based FSMs (see docs/project_retrospective.md) -- instead
 this reads each FSM's per-state `case` arm hit count directly out of the
@@ -24,62 +30,38 @@ ROOT = Path(__file__).resolve().parent.parent
 COV_DIR = ROOT / "reports/sign_off/coverage"
 ANNOTATED = COV_DIR / "annotated"
 
-# ---- FSM state tables (state name -> as it appears as "NAME: begin" or
-# "NAME:" in the case statement), one entry per module that has a real FSM.
-# timer.v/watchdog.v are plain down-counters, not FSMs -- intentionally
-# excluded.
-FSM_TABLES = {
-    "uart": {
-        "file": "uart.v",
-        "states": ["TX_IDLE", "TX_START", "TX_DATA", "TX_STOP"],
-    },
-    "i2c_master": {
-        "file": "i2c_master.v",
-        "states": ["ST_IDLE", "ST_START", "ST_ADDR", "ST_ADDR_ACK", "ST_WDATA",
-                   "ST_WDATA_ACK", "ST_RDATA", "ST_RDATA_ACK", "ST_STOP"],
-    },
-    "spi_master": {
-        "file": "spi_master.v",
-        "states": ["IDLE", "RUN"],
-    },
-    "jtag_tap": {
-        "file": "jtag_tap.v",
-        "states": ["TEST_LOGIC_RESET", "RUN_TEST_IDLE", "SELECT_DR_SCAN",
-                   "CAPTURE_DR", "SHIFT_DR", "EXIT1_DR", "PAUSE_DR", "EXIT2_DR",
-                   "UPDATE_DR", "SELECT_IR_SCAN", "CAPTURE_IR", "SHIFT_IR",
-                   "EXIT1_IR", "PAUSE_IR", "EXIT2_IR", "UPDATE_IR"],
-    },
-    "aes_core": {
-        "file": "aes_core.v",
-        "states": ["ST_IDLE", "ST_KEYEXP", "ST_ROUND", "ST_FINAL"],
-    },
-    "aes_chain": {
-        "file": "aes_chain.v",
-        "states": ["ST_IDLE", "ST_CORE"],
-    },
-    "axi_lite_xbar (write)": {
-        "file": "axi_lite_xbar.v",
-        "states": ["W_IDLE", "W_ISSUE", "W_WAIT_B", "W_RESP"],
-    },
-    "axi_lite_xbar (read)": {
-        "file": "axi_lite_xbar.v",
-        "states": ["R_IDLE", "R_ISSUE", "R_WAIT_R", "R_RESP"],
-    },
-    "dma_ram (write)": {
-        "file": "dma_ram.v",
-        "states": ["W_IDLE", "W_BURST"],
-    },
-    "dma_ram (read)": {
-        "file": "dma_ram.v",
-        "states": ["R_IDLE", "R_BURST"],
-    },
-    "dma_engine": {
-        "file": "dma_engine.v",
-        "states": ["ST_IDLE", "ST_RD_ADDR", "ST_RD_DATA", "ST_AES_GO",
-                   "ST_AES_WAIT", "ST_WR_ADDR", "ST_WR_DATA", "ST_WR_RESP",
-                   "ST_DONE"],
-    },
-}
+sys.path.insert(0, str(ROOT / "scripts"))
+import coverage_config as cfg  # noqa: E402
+
+CATEGORY_RULES = [(re.compile(pattern), category, note)
+                   for pattern, category, note in cfg.CATEGORY_RULES]
+
+
+def discover_file_to_block():
+    """Auto-derives {filename: block} by scanning blocks/*/rtl/ -- a file
+    is attributed to whichever block directory physically contains its
+    real (non-symlink) copy, unless coverage_config.VENDORED_FILES
+    overrides it with a pseudo-block label (for vendored third-party IP,
+    e.g. a vendored CPU core).
+
+    Symlinks are skipped when assigning ownership: a top-level block's
+    rtl/ dir may be a set of symlinks into every other block's canonical
+    source (one copy of each module on disk, see docs/phase_plan.md) --
+    counting those would attribute every other block's files to the top
+    level purely because it happens to be scanned last alphabetically.
+    """
+    mapping = {}
+    for rtl_dir in sorted(ROOT.glob("blocks/*/rtl")):
+        block = rtl_dir.parent.name
+        for f in list(rtl_dir.glob("*.v")) + list(rtl_dir.glob("*.vh")):
+            if f.is_symlink():
+                continue
+            mapping[f.name] = block
+    mapping.update(cfg.VENDORED_FILES)
+    return mapping
+
+
+FILE_TO_BLOCK = discover_file_to_block()
 
 # Verilator's --annotate output preserves 1:1 line correspondence with the
 # original source (no line-number column) -- each line is prefixed with a
@@ -124,7 +106,7 @@ def state_hit_count(hits, state_name):
 
 def build_fsm_coverage():
     result = {}
-    for fsm_name, spec in FSM_TABLES.items():
+    for fsm_name, spec in cfg.FSM_TABLES.items():
         hits = parse_annotated_hits(spec["file"])
         states = []
         for s in spec["states"]:
@@ -171,42 +153,12 @@ def parse_hier_report():
 
 LINT_WARNING_RE = re.compile(r"^%Warning-([A-Z]+): (\S+):(\d+):\d+: (.*)$")
 
-# Manual triage of every lint finding category still present after the
-# dead-code fixes (see docs/project_retrospective.md's Phase 7 addendum).
-CATEGORY_RULES = [
-    (re.compile(r"Bits of signal are not used: 's_(aw|ar)addr'"), "benign-address-decode",
-     "Upper address bits unused -- the crossbar already decodes/routes before presenting to this slave; only the local register-offset bits matter here."),
-    (re.compile(r"Signal is not used: 's_wstrb'"), "benign-no-byte-strobe",
-     "Byte-strobe writes aren't supported on control/status registers -- every register here is written as a full 32-bit word in practice."),
-    (re.compile(r"Signal is not used: 's_bready'"), "documented-limitation-bready",
-     "AXI response channel doesn't check BREADY before dropping BVALID -- works correctly against this project's own crossbar timing, not strictly AXI4-compliant in general. Documented in docs/architecture.md."),
-    (re.compile(r"Signal is not used: 's_rready'"), "documented-limitation-rready",
-     "AXI response channel doesn't check RREADY before dropping RVALID -- same as the BREADY case above."),
-    (re.compile(r"Signal is not used: 'm_bresp'"), "documented-limitation-bresp",
-     "dma_engine's own burst master doesn't check dma_ram's write response code -- same class of limitation as picorv32_axi not checking BRESP/RRESP."),
-    (re.compile(r"Signal is not used: 'm_rresp'"), "documented-limitation-rresp",
-     "dma_engine's own burst master doesn't check dma_ram's read response code."),
-    (re.compile(r"Signal is not used: 's_(aw|ar)(size|burst)'"), "benign-burst-subset",
-     "This project's AXI4 burst subset is INCR-only, fixed 4-byte beats (see rtl/include/axi4.vh) -- these fields are assumed constant by convention, not read at runtime."),
-    (re.compile(r"Bits of function variable are not used: 'addr'"), "benign-decode-function",
-     "The crossbar's decode_addr() function only inspects the specific bit ranges needed for region/peripheral selection."),
-    (re.compile(r"Signal is not used: 's_awaddr'$|Signal is not used: 's_wdata'$"), "benign-readonly-ignores-write",
-     "boot_rom is read-only (writes are rejected with SLVERR) -- it never needs the write address or data at all, not even partially."),
-    (re.compile(r"Bits of signal are not used: 's_wdata'\[31:8\]"), "benign-narrow-register-width",
-     "TXDATA is an 8-bit register (one UART byte) -- the upper 24 bits of a 32-bit AXI word are never meaningful here."),
-    (re.compile(r"Parameter is not used: 'MODE_ECB'"), "benign-documentation-constant",
-     "MODE_ECB documents aes_chain's mode encoding for aes.v's register interface; ECB itself is handled as the implicit default (not CBC, not CTR), so the constant is never directly compared."),
-    (re.compile(r"Signal is not used: '(core|chain)_busy'"), "benign-unused-status-signal",
-     "A busy/done status wire from the instantiated sub-block; the consuming FSM only needs the done pulse (busy is informational only, safe to leave unread)."),
-]
-
 
 def categorize_lint_line(file, message):
-    if file == "picorv32.v":
-        return ("vendored-picorv32-style",
-                "PicoRV32 is vendored unmodified (project policy) -- this finding is in the "
-                "vendored core itself, not this project's RTL. See rtl/core/lint/lint_report.txt "
-                "for the full, unsuppressed picture.")
+    if file in cfg.VENDORED_FILES:
+        return ("vendored",
+                f"{file} is vendored unmodified (project policy) -- this finding is in the "
+                "vendored IP itself, not this project's RTL.")
     for pattern, category, note in CATEGORY_RULES:
         if pattern.search(message):
             return category, note
@@ -232,32 +184,23 @@ def parse_lint_reports():
     return findings
 
 
-FILE_TO_BLOCK = {
-    "timer.v": "timer", "watchdog.v": "watchdog", "uart.v": "uart",
-    "sram.v": "sram", "boot_rom.v": "boot_rom", "i2c_master.v": "i2c",
-    "spi_master.v": "spi", "jtag_tap.v": "jtag", "jtag_dtm.v": "jtag",
-    "jtag_axi_bridge.v": "jtag", "aes_key_expand.v": "aes", "aes_core.v": "aes",
-    "aes_chain.v": "aes", "aes.v": "aes", "axi_lite_xbar.v": "axi_lite_xbar",
-    "dma_ram.v": "dma", "dma_engine.v": "dma", "soc_top.v": "soc_top",
-    "picorv32.v": "picorv32 (vendored)",
-}
-
-# Test-only harnesses excluded from the per-file RTL coverage table --
-# real deliverable RTL only.
-EXCLUDE_FILES = {
-    "xbar_testtop.v", "spi_testtop.v", "i2c_testtop.v", "jtag_chain_testtop.v",
-    "dma_engine_testtop.v", "fake_spi_slave.v", "fake_i2c_slave.v",
-    "fake_axi_lite_slave.v", "aes_pkg.vh",
-}
-
-
 def per_file_line_coverage():
     """Computes line-coverage % directly per annotated source file (not
     per hierarchy instance, which double-counts shared sub-modules under
-    every test that instantiates them)."""
+    every test that instantiates them). Only real .v module files
+    discovered under blocks/*/rtl/ (per FILE_TO_BLOCK) are included --
+    test-only harnesses (testtop.v tops, fake_* BFMs, shared tb/common/
+    helpers) live outside blocks/*/rtl/ by convention, so they fall out of
+    this table automatically without needing an exclude list. `.vh`
+    headers are always excluded here even if they contain executable
+    statements (e.g. shared combinational functions): Verilog-2001 has no
+    package/import mechanism, so a `.vh` is meant to be `include`d
+    (pasted) into whichever module body needs it -- reporting it as its
+    own row would double-count/misattribute coverage that's really the
+    including module's."""
     results = []
-    for path in sorted(ANNOTATED.glob("*.v")) + sorted(ANNOTATED.glob("*.vh")):
-        if path.name in EXCLUDE_FILES:
+    for path in sorted(ANNOTATED.glob("*.v")):
+        if path.name not in FILE_TO_BLOCK:
             continue
         covered = 0
         total = 0
@@ -272,7 +215,7 @@ def per_file_line_coverage():
             continue
         results.append({
             "file": path.name,
-            "block": FILE_TO_BLOCK.get(path.name, "?"),
+            "block": FILE_TO_BLOCK[path.name],
             "covered": covered, "total": total,
             "pct": round(100.0 * covered / total, 1),
         })
@@ -281,11 +224,6 @@ def per_file_line_coverage():
 
 TOGGLE_WAIVERS_FILE = COV_DIR / "toggle_waivers.txt"
 MERGED_DAT = COV_DIR / "merged.dat"
-
-# The same substring filter as EXCLUDE_FILES/EXCLUDE_PATH_SUBSTR above, but
-# matched against the full path recorded in merged.dat (vendored PicoRV32 and
-# test-only harnesses are excluded from this project's own toggle numbers).
-TOGGLE_EXCLUDE_PATH_SUBSTR = ["picorv32.v", "testtop.v", "fake_", "aes_pkg.vh"]
 
 OUTER_RE = re.compile(r"^C '(.*)' (\d+)\s*$")
 
@@ -323,7 +261,7 @@ def parse_toggle_bits():
     """Parses merged.dat directly instead of relying on verilator_coverage's
     own --report summary: that report counts the same underlying source-code
     toggle point once per hierarchy instantiation of a shared sub-module
-    (e.g. aes_core.v is instantiated in 5 different places across the merged
+    (e.g. a core instantiated in several different places across the merged
     suite), inflating the denominator without inflating actual stimulus
     diversity. This reads every raw toggle point, keyed by (file, line,
     signal), and keeps the max hit count seen for each 0->1/1->0 direction
@@ -356,7 +294,10 @@ def parse_toggle_bits():
             if fields.get("t") != "toggle":
                 continue
             file = fields.get("f", "")
-            if any(s in file for s in TOGGLE_EXCLUDE_PATH_SUBSTR):
+            # `.vh` headers are pasted via `include` into whichever module
+            # needs them (see per_file_line_coverage's docstring) -- same
+            # reasoning applies to toggle points recorded against them.
+            if file.endswith(".vh") or any(s in file for s in cfg.TOGGLE_EXCLUDE_PATH_SUBSTR):
                 continue
             lineno = int(fields.get("l", "0"))
             o = fields.get("o", "")
@@ -390,7 +331,7 @@ def build_toggle_waiver_report():
     residual = []
 
     for (file, line, signal), d in bits.items():
-        rel = file.split("RISCV_SOC/")[-1] if "RISCV_SOC/" in file else file
+        rel = file.split(ROOT.name + "/")[-1] if ROOT.name + "/" in file else file
         fname = Path(rel).name
         block = FILE_TO_BLOCK.get(fname, fname)
         covered = d["0->1"] > 0 and d["1->0"] > 0
@@ -446,7 +387,8 @@ def main():
     summary["lint_findings"] = parse_lint_reports()
     summary["toggle_waiver_report"] = build_toggle_waiver_report()
 
-    own_rtl = [f for f in summary["coverage_by_file"] if f["block"] != "picorv32 (vendored)"]
+    vendored_blocks = set(cfg.VENDORED_FILES.values())
+    own_rtl = [f for f in summary["coverage_by_file"] if f["block"] not in vendored_blocks]
     covered = sum(f["covered"] for f in own_rtl)
     total = sum(f["total"] for f in own_rtl)
     summary["coverage_own_rtl_line_pct"] = round(100.0 * covered / total, 1) if total else 0.0
