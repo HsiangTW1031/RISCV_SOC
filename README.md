@@ -203,15 +203,27 @@ plan and `docs/project_retrospective.md` for the full bug/debugging history.
 
 ## Running things
 
-The easiest way to check everything at once:
+First time on a new machine? See `TOOLCHAIN.md` for exact tool versions,
+install commands, and how to point the flow at a Nangate45 PDK. Then run:
+
+```bash
+./scripts/bootstrap_check.sh   # verifies every tool + PDK env var is in place
+./scripts/reproduce_all.sh     # firmware -> lint -> regression -> coverage
+                                # -> synth+STA (if PDK present) -> dashboard
+```
+
+The easiest way to check everything at once (assumes tools are already set up):
 
 ```bash
 ./scripts/run_regression.sh
 ```
 
-This rebuilds and runs all 18 block testbenches fresh (no incremental-build
+This rebuilds and runs all 19 block testbenches fresh (no incremental-build
 assumptions) and prints a PASS/FAIL summary table — the same script used to
-sign off Phase 7 (see `docs/verification_summary.md`).
+sign off Phase 7 (see `docs/verification_summary.md`). `soc_top`'s testbench
+needs `blocks/soc_top/dv/firmware.hex` to exist first; `run_regression.sh`
+now builds and copies it automatically from `fw/` if missing or stale
+(requires the RISC-V toolchain from `TOOLCHAIN.md` on `$PATH`).
 
 There's also a dedicated, independent lint-only pass per block (separate
 from whatever warnings a given simulation build happens to suppress):
@@ -266,9 +278,17 @@ verilator -Wall -Wno-UNUSEDSIGNAL -Wno-UNUSEDPARAM -Wno-WIDTHEXPAND -Wno-WIDTHTR
 ./obj_dir/soc_sim
 
 # whole-SoC synthesis + STA (Nangate45; memories blackboxed, see
-# docs/performance.md for why)
-cd blocks/soc_top/syn && yosys synth.ys
+# docs/performance.md for why). Requires NANGATE45_LIB (and, for
+# sta_mcmm.tcl, NANGATE45_SLOW_LIB/NANGATE45_FAST_LIB) exported first --
+# see TOOLCHAIN.md. The .ys files are templates (Yosys scripts have no
+# native env-var expansion), so use the run_*.sh wrappers, not `yosys
+# synth.ys` directly:
+cd blocks/soc_top/syn && ./run_synth.sh
 cd ../sta && sta sta.tcl
+
+# formal LEC (slow, best-effort on soc_top -- see docs/lec_report.md);
+# requires run_synth.sh to have already produced soc_top_out.v
+cd blocks/soc_top/syn && ./run_lec.sh
 
 # rebuild firmware after editing fw/main.c or fw/start.S
 cd fw && make && cp firmware.hex ../blocks/soc_top/dv/firmware.hex

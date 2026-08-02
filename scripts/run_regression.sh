@@ -16,6 +16,35 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VFLAGS="-Wall -Wno-UNUSEDSIGNAL -Wno-UNUSEDPARAM -Wno-WIDTHEXPAND -Wno-WIDTHTRUNC -Wno-BLKSEQ -Wno-DECLFILENAME -Wno-GENUNNAMED -Wno-PINCONNECTEMPTY"
 BFM_INC="-CFLAGS -I${ROOT}/tb/common"
 
+# soc_top's testbench needs blocks/soc_top/dv/firmware.hex, which is
+# gitignored (regenerable) and not built by anything else in this repo --
+# a fresh clone has no firmware.hex at all. Build it from fw/ if it's
+# missing or older than the firmware sources, so a fresh clone doesn't
+# fail on the soc_top target with no explanation.
+FW_DIR="$ROOT/fw"
+FW_HEX_DST="$ROOT/blocks/soc_top/dv/firmware.hex"
+need_fw_build=0
+if [ ! -f "$FW_HEX_DST" ]; then
+  need_fw_build=1
+else
+  for src in "$FW_DIR"/main.c "$FW_DIR"/start.S "$FW_DIR"/custom_ops.S "$FW_DIR"/linker.ld "$FW_DIR"/Makefile; do
+    if [ "$src" -nt "$FW_HEX_DST" ]; then
+      need_fw_build=1
+    fi
+  done
+fi
+if [ "$need_fw_build" -eq 1 ]; then
+  echo "=== firmware.hex missing or stale -- building from fw/ ==="
+  if ! ( cd "$FW_DIR" && make ) ; then
+    echo "ERROR: firmware build failed. Is the RISC-V toolchain" >&2
+    echo "(TOOLCHAIN_PREFIX=riscv-none-elf- by default) on \$PATH? See TOOLCHAIN.md." >&2
+    exit 1
+  fi
+  cp "$FW_DIR/firmware.hex" "$FW_HEX_DST"
+  echo "firmware.hex rebuilt and copied to blocks/soc_top/dv/"
+  echo
+fi
+
 declare -a NAMES=()
 declare -a RESULTS=()
 declare -a DETAILS=()

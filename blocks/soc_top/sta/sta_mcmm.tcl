@@ -15,10 +15,18 @@
 # TAPCELL_X1, a physical-only tap cell never inferred by logic synthesis,
 # so it has no effect on this netlist.
 #
+# Requires NANGATE45_SLOW_LIB / NANGATE45_FAST_LIB set (see TOOLCHAIN.md).
+#
 # Run from blocks/soc_top/sta/:
 #   sta sta_mcmm.tcl
-read_liberty -max /Users/shunghsiangwu/eda/src/OpenSTA/test/nangate45/Nangate45_slow.lib
-read_liberty -min /Users/shunghsiangwu/eda/src/OpenSTA/test/nangate45/Nangate45_fast.lib
+foreach v {NANGATE45_SLOW_LIB NANGATE45_FAST_LIB} {
+    if {![info exists ::env($v)]} {
+        puts stderr "ERROR: $v is not set. See TOOLCHAIN.md."
+        exit 1
+    }
+}
+read_liberty -max $::env(NANGATE45_SLOW_LIB)
+read_liberty -min $::env(NANGATE45_FAST_LIB)
 read_verilog ../syn/mem_blackboxes.v
 read_verilog ../syn/soc_top_out.v
 link_design soc_top

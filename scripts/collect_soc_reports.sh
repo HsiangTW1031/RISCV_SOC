@@ -17,6 +17,18 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="$ROOT/reports/sign_off"
 mkdir -p "$OUT"
 
+# Synthesis + STA need a Nangate45 liberty file, which can't be vendored
+# into this repo (licensing) -- see TOOLCHAIN.md. Without NANGATE45_LIB
+# set, skip those two steps gracefully instead of failing the whole run;
+# regression/lint/coverage/dashboard don't need a PDK at all.
+if [ -n "${NANGATE45_LIB:-}" ] && [ -f "${NANGATE45_LIB}" ]; then
+  HAVE_PDK=1
+else
+  HAVE_PDK=0
+  echo "NOTE: NANGATE45_LIB not set (or file missing) -- synthesis and STA" >&2
+  echo "      will be SKIPPED. See TOOLCHAIN.md to set up the Nangate45 PDK." >&2
+fi
+
 echo "=== 1/6: full regression (scripts/run_regression.sh) ==="
 "$ROOT/scripts/run_regression.sh" > "$OUT/simulation_regression.txt" 2>&1
 regr_rc=$?
@@ -35,19 +47,24 @@ tail -20 "$OUT/lint_summary.txt"
 echo
 echo "=== 3/6: synthesis (blocks/soc_top/syn/synth.ys) ==="
 SYNTH_FULL_LOG="$ROOT/blocks/soc_top/syn/synth_log.txt"
-( cd "$ROOT/blocks/soc_top/syn" && yosys synth.ys > "$SYNTH_FULL_LOG" 2>&1 )
-synth_rc=$?
-# The full Yosys log runs into the tens of MB (every intermediate opt/
-# techmap pass over PicoRV32's hierarchy) -- not worth committing. Keep
-# just the final `stat` report (area/cell-count breakdown) here; the full
-# log stays local at blocks/soc_top/syn/synth_log.txt (gitignored).
-{
-  echo "# Whole-SoC synthesis area report (Yosys, Nangate45)"
-  echo "# Full verbose log (all optimization passes) kept locally at"
-  echo "# blocks/soc_top/syn/synth_log.txt -- not committed (tens of MB)."
-  echo
-  tail -80 "$SYNTH_FULL_LOG"
-} > "$OUT/synthesis_area.txt"
+if [ "$HAVE_PDK" -eq 1 ]; then
+  ( cd "$ROOT/blocks/soc_top/syn" && ./run_synth.sh > "$SYNTH_FULL_LOG" 2>&1 )
+  synth_rc=$?
+  # The full Yosys log runs into the tens of MB (every intermediate opt/
+  # techmap pass over PicoRV32's hierarchy) -- not worth committing. Keep
+  # just the final `stat` report (area/cell-count breakdown) here; the full
+  # log stays local at blocks/soc_top/syn/synth_log.txt (gitignored).
+  {
+    echo "# Whole-SoC synthesis area report (Yosys, Nangate45)"
+    echo "# Full verbose log (all optimization passes) kept locally at"
+    echo "# blocks/soc_top/syn/synth_log.txt -- not committed (tens of MB)."
+    echo
+    tail -80 "$SYNTH_FULL_LOG"
+  } > "$OUT/synthesis_area.txt"
+else
+  synth_rc=2
+  echo "SKIPPED (no NANGATE45_LIB)" > "$OUT/synthesis_area.txt"
+fi
 tail -15 "$OUT/synthesis_area.txt"
 
 # OpenSTA's simplified Verilog reader can't parse a few things Yosys's
@@ -74,8 +91,13 @@ fi
 
 echo
 echo "=== 4/6: STA (blocks/soc_top/sta/sta.tcl) ==="
-( cd "$ROOT/blocks/soc_top/sta" && sta sta.tcl > "$OUT/timing_sta.txt" 2>&1 )
-sta_rc=$?
+if [ "$HAVE_PDK" -eq 1 ]; then
+  ( cd "$ROOT/blocks/soc_top/sta" && sta sta.tcl > "$OUT/timing_sta.txt" 2>&1 )
+  sta_rc=$?
+else
+  sta_rc=2
+  echo "SKIPPED (no NANGATE45_LIB)" > "$OUT/timing_sta.txt"
+fi
 tail -20 "$OUT/timing_sta.txt"
 
 echo
@@ -100,8 +122,8 @@ dashboard_rc=$?
   echo "|---|---|---|"
   echo "| Simulation regression (19 targets) | $([ $regr_rc -eq 0 ] && echo PASS || echo FAIL) | \`simulation_regression.txt\` |"
   echo "| Lint (per-block, lint-only) | $([ $lint_rc -eq 0 ] && echo CLEAN || echo "warnings present") | \`lint_summary.txt\`, \`soc_top_lint_full.txt\` |"
-  echo "| Synthesis (Yosys, Nangate45) | $([ $synth_rc -eq 0 ] && echo OK || echo FAIL) | \`synthesis_area.txt\` |"
-  echo "| STA (OpenSTA) | $([ $sta_rc -eq 0 ] && echo OK || echo FAIL) | \`timing_sta.txt\` |"
+  echo "| Synthesis (Yosys, Nangate45) | $([ $synth_rc -eq 0 ] && echo OK || ([ $synth_rc -eq 2 ] && echo "SKIPPED (no PDK)" || echo FAIL)) | \`synthesis_area.txt\` |"
+  echo "| STA (OpenSTA) | $([ $sta_rc -eq 0 ] && echo OK || ([ $sta_rc -eq 2 ] && echo "SKIPPED (no PDK)" || echo FAIL)) | \`timing_sta.txt\` |"
   echo "| Coverage (line/toggle/branch/FSM) | $([ $cov_rc -eq 0 ] && echo OK || echo FAIL) | \`coverage/merged.dat\`, \`dashboard_data.json\` |"
   echo "| HTML dashboard | $([ $dashboard_rc -eq 0 ] && echo OK || echo FAIL) | \`dashboard.html\` (open directly in a browser) |"
   echo

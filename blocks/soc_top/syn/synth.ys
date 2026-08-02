@@ -13,8 +13,11 @@
 # Fmax number in docs/performance.md a genuine logic-critical-path result,
 # not a memory-dominated one.
 #
-# Run from blocks/soc_top/syn/:
-#   yosys synth.ys
+# This is a template: @NANGATE45_LIB@ gets substituted with $NANGATE45_LIB
+# by run_synth.sh (Yosys .ys scripts have no native env-var expansion).
+#
+# Run from blocks/soc_top/syn/ (requires NANGATE45_LIB set, see TOOLCHAIN.md):
+#   ./run_synth.sh
 read_verilog -I../../../rtl/include -I../rtl \
     mem_blackboxes.v \
     ../rtl/picorv32.v \
@@ -37,11 +40,11 @@ read_verilog -I../../../rtl/include -I../rtl \
 hierarchy -check -top soc_top
 synth -top soc_top
 
-dfflibmap -liberty /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
-abc -liberty /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+dfflibmap -liberty @NANGATE45_LIB@
+abc -liberty @NANGATE45_LIB@
 
 clean
 write_verilog soc_top_out.v
 write_json soc_top_out.json
 
-stat -liberty /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+stat -liberty @NANGATE45_LIB@

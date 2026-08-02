@@ -5,9 +5,16 @@
 # with treating them as hardened SRAM macros outside this logic-only
 # timing view (see docs/performance.md for the rationale).
 #
+# Requires NANGATE45_LIB set (see TOOLCHAIN.md) -- OpenSTA's Tcl
+# interpreter can read env vars natively, no templating needed.
+#
 # Run from blocks/soc_top/sta/:
 #   sta sta.tcl
-read_liberty /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+if {![info exists ::env(NANGATE45_LIB)]} {
+    puts stderr "ERROR: NANGATE45_LIB is not set. See TOOLCHAIN.md."
+    exit 1
+}
+read_liberty $::env(NANGATE45_LIB)
 read_verilog ../syn/mem_blackboxes.v
 read_verilog ../syn/soc_top_out.v
 link_design soc_top

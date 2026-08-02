@@ -13,8 +13,11 @@
 # netlist's logic directly -- no separate functional Verilog model needed
 # for this step.
 #
-# Run from blocks/aes/syn/:
-#   yosys lec.ys
+# This is a template: @NANGATE45_LIB@ gets substituted with $NANGATE45_LIB
+# by run_lec.sh (Yosys .ys scripts have no native env-var expansion).
+#
+# Run from blocks/aes/syn/ (requires NANGATE45_LIB set, see TOOLCHAIN.md):
+#   ./run_lec.sh
 read_verilog -I../rtl ../rtl/aes_key_expand.v ../rtl/aes_core.v
 prep -flatten -top aes_core
 memory_collect
@@ -23,7 +26,7 @@ design -save gold
 
 design -reset
 read_verilog aes_core_out.v
-read_liberty -ignore_miss_func /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+read_liberty -ignore_miss_func @NANGATE45_LIB@
 prep -flatten -top aes_core
 design -save gate
 

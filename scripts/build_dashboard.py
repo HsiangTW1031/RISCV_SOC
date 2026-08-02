@@ -20,8 +20,8 @@ data = json.loads((REPORTS / "dashboard_data.json").read_text())
 
 # ---- pull a few more numbers out of the existing sign-off text reports ----
 sim_text = (REPORTS / "simulation_regression.txt").read_text()
-regression_pass = "ALL 18 regression targets PASS" in sim_text
 n_targets = len(re.findall(r"^(PASS|FAIL):", sim_text, re.M))
+regression_pass = bool(re.search(r"ALL \d+ regression targets PASS", sim_text))
 
 synth_text = (REPORTS / "synthesis_area.txt").read_text()
 m = re.search(r"Chip area for top module '\\?\w+': ([\d.]+)", synth_text)
@@ -41,6 +41,12 @@ fmax_mhz = round(1000.0 / crit_path_ns, 1) if crit_path_ns else None
 
 NAND2_AREA = 0.798
 gate_count = round(chip_area / NAND2_AREA) if chip_area else None
+
+# synth/STA are skipped when NANGATE45_LIB isn't set (see
+# scripts/collect_soc_reports.sh) -- fall back to a clear "no PDK" label
+# instead of crashing on a None value in the f-string below.
+fmax_display = f"{fmax_mhz} MHz" if fmax_mhz is not None else "N/A (no PDK)"
+gate_count_display = f"{gate_count:,}" if gate_count is not None else "N/A (no PDK)"
 
 cov = data["coverage_overall"]
 fsm = data["fsm_coverage"]
@@ -347,8 +353,8 @@ a {{ color: var(--accent); }}
     <div class="kpi"><div class="label">Regression</div><div class="value good">{n_targets}/{n_targets} PASS</div></div>
     <div class="kpi"><div class="label">Own-RTL line coverage</div><div class="value good">{data['coverage_own_rtl_line_pct']}%</div></div>
     <div class="kpi"><div class="label">FSM state coverage</div><div class="value good">11/11 FSMs @ 100%</div></div>
-    <div class="kpi"><div class="label">Whole-SoC Fmax</div><div class="value accent">{fmax_mhz} MHz</div></div>
-    <div class="kpi"><div class="label">Gate count (NAND2-eq)</div><div class="value accent">{gate_count:,}</div></div>
+    <div class="kpi"><div class="label">Whole-SoC Fmax</div><div class="value accent">{fmax_display}</div></div>
+    <div class="kpi"><div class="label">Gate count (NAND2-eq)</div><div class="value accent">{gate_count_display}</div></div>
     <div class="kpi"><div class="label">Lint findings</div><div class="value">{len(findings)} <span style="font-size:0.5em;color:var(--text-dim)">(all triaged)</span></div></div>
   </div>
 

@@ -26,8 +26,11 @@
 # this pass to replace the async reset inputs with equivalent
 # synchronous-modeled logic before the equivalence check runs.
 #
-# Run from blocks/soc_top/syn/:
-#   yosys lec.ys
+# This is a template: @NANGATE45_LIB@ gets substituted with $NANGATE45_LIB
+# by run_lec.sh (Yosys .ys scripts have no native env-var expansion).
+#
+# Run from blocks/soc_top/syn/ (requires NANGATE45_LIB set, see TOOLCHAIN.md):
+#   ./run_lec.sh
 read_verilog -I../../../rtl/include -I../rtl \
     ../rtl/picorv32.v \
     ../rtl/axi_lite_xbar.v \
@@ -55,7 +58,7 @@ design -save gold
 design -reset
 read_verilog mem_blackboxes.v
 read_verilog soc_top_out.v
-read_liberty -ignore_miss_func /Users/shunghsiangwu/eda/nangate45/lib/NangateOpenCellLibrary_typical.lib
+read_liberty -ignore_miss_func @NANGATE45_LIB@
 prep -flatten -top soc_top
 async2sync
 memory_collect
