@@ -256,10 +256,17 @@ style, not from this project's RTL.
 
 ## Layout
 
-Each block under `blocks/` has its own `rtl/lint/sdc/syn/sta/sim` —
-independent enough to lint/synthesize/STA on its own (done for `aes`: see
-`blocks/aes/syn/synth.ys` and `blocks/aes/sta/sta.tcl`; and for the whole
-SoC: see `blocks/soc_top/syn/synth.ys` and `blocks/soc_top/sta/sta.tcl`).
+Each block under `blocks/` has its own `rtl/lint/sim`. Only `aes` and
+`soc_top` also have `sdc/syn/sta` — every other block is small enough that
+a standalone synthesis/STA run wasn't worth doing on its own; their real
+timing signoff happens once, for real, as part of the whole-SoC synthesis
+(see `blocks/soc_top/syn/synth.ys` and `blocks/soc_top/sta/sta.tcl`, or
+`blocks/aes/syn/synth.ys` / `blocks/aes/sta/sta.tcl` for the standalone AES
+core numbers cited in `docs/aes_report.md`). Empty, never-used `sdc/syn/sta`
+scaffold directories for the other blocks (plus a fully-empty leftover
+`blocks/jtag_tap/` from before `blocks/jtag/` existed) were removed —
+`git status` showed no change from deleting them, confirming git never
+tracked empty directories in the first place.
 `soc_top`'s `rtl/` is a set of symlinks into every other block's canonical
 source, so there's exactly one copy of each module. See
 `docs/phase_plan.md` for the full rationale.
