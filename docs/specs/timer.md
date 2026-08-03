@@ -33,7 +33,7 @@ flowchart LR
 
 | Signal | Dir | Width | 說明 |
 |---|---|---|---|
-| `clk`, `rst` | in | 1 | 同步 clock、非同步 active-high reset |
+| `clk`, `resetn` | in | 1 | 同步 clock、同步 active-low reset(resetn) |
 | `s_awvalid/awready/awaddr` | - | 1/1/32 | Write address channel |
 | `s_wvalid/wready/wdata/wstrb` | - | 1/1/32/4 | Write data channel |
 | `s_bvalid/bready/bresp` | - | 1/1/2 | Write response channel |

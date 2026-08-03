@@ -5,7 +5,7 @@
 // wired in. Not a synthesizable deliverable — lives in sim/, not rtl/.
 module xbar_testtop (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s0_awvalid,
     output wire        s0_awready,
@@ -98,7 +98,7 @@ module xbar_testtop (
   wire [1:0]  dma_bresp, dma_rresp;
 
   axi_lite_xbar u_xbar (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s0_awvalid(s0_awvalid), .s0_awready(s0_awready), .s0_awaddr(s0_awaddr),
       .s0_wvalid(s0_wvalid),   .s0_wready(s0_wready),   .s0_wdata(s0_wdata), .s0_wstrb(s0_wstrb),
       .s0_bvalid(s0_bvalid),   .s0_bready(s0_bready),   .s0_bresp(s0_bresp),
@@ -167,7 +167,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_rom (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(rom_awvalid), .s_awready(rom_awready), .s_awaddr(rom_awaddr),
       .s_wvalid(rom_wvalid),   .s_wready(rom_wready),   .s_wdata(rom_wdata), .s_wstrb(rom_wstrb),
       .s_bvalid(rom_bvalid),   .s_bready(rom_bready),   .s_bresp(rom_bresp),
@@ -176,7 +176,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_ram (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(ram_awvalid), .s_awready(ram_awready), .s_awaddr(ram_awaddr),
       .s_wvalid(ram_wvalid),   .s_wready(ram_wready),   .s_wdata(ram_wdata), .s_wstrb(ram_wstrb),
       .s_bvalid(ram_bvalid),   .s_bready(ram_bready),   .s_bresp(ram_bresp),
@@ -185,7 +185,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_timer (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(timer_awvalid), .s_awready(timer_awready), .s_awaddr(timer_awaddr),
       .s_wvalid(timer_wvalid),   .s_wready(timer_wready),   .s_wdata(timer_wdata), .s_wstrb(timer_wstrb),
       .s_bvalid(timer_bvalid),   .s_bready(timer_bready),   .s_bresp(timer_bresp),
@@ -194,7 +194,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_wdt (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(wdt_awvalid), .s_awready(wdt_awready), .s_awaddr(wdt_awaddr),
       .s_wvalid(wdt_wvalid),   .s_wready(wdt_wready),   .s_wdata(wdt_wdata), .s_wstrb(wdt_wstrb),
       .s_bvalid(wdt_bvalid),   .s_bready(wdt_bready),   .s_bresp(wdt_bresp),
@@ -203,7 +203,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_uart (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(uart_awvalid), .s_awready(uart_awready), .s_awaddr(uart_awaddr),
       .s_wvalid(uart_wvalid),   .s_wready(uart_wready),   .s_wdata(uart_wdata), .s_wstrb(uart_wstrb),
       .s_bvalid(uart_bvalid),   .s_bready(uart_bready),   .s_bresp(uart_bresp),
@@ -212,7 +212,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_i2c (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(i2c_awvalid), .s_awready(i2c_awready), .s_awaddr(i2c_awaddr),
       .s_wvalid(i2c_wvalid),   .s_wready(i2c_wready),   .s_wdata(i2c_wdata), .s_wstrb(i2c_wstrb),
       .s_bvalid(i2c_bvalid),   .s_bready(i2c_bready),   .s_bresp(i2c_bresp),
@@ -221,7 +221,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_spi (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(spi_awvalid), .s_awready(spi_awready), .s_awaddr(spi_awaddr),
       .s_wvalid(spi_wvalid),   .s_wready(spi_wready),   .s_wdata(spi_wdata), .s_wstrb(spi_wstrb),
       .s_bvalid(spi_bvalid),   .s_bready(spi_bready),   .s_bresp(spi_bresp),
@@ -230,7 +230,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_aes (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(aes_awvalid), .s_awready(aes_awready), .s_awaddr(aes_awaddr),
       .s_wvalid(aes_wvalid),   .s_wready(aes_wready),   .s_wdata(aes_wdata), .s_wstrb(aes_wstrb),
       .s_bvalid(aes_bvalid),   .s_bready(aes_bready),   .s_bresp(aes_bresp),
@@ -239,7 +239,7 @@ module xbar_testtop (
   );
 
   fake_axi_lite_slave u_dma (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(dma_awvalid), .s_awready(dma_awready), .s_awaddr(dma_awaddr),
       .s_wvalid(dma_wvalid),   .s_wready(dma_wready),   .s_wdata(dma_wdata), .s_wstrb(dma_wstrb),
       .s_bvalid(dma_bvalid),   .s_bready(dma_bready),   .s_bresp(dma_bresp),

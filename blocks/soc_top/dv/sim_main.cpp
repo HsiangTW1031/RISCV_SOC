@@ -43,9 +43,26 @@ int main(int argc, char** argv) {
 
   dut->tck = 0; dut->tms = 1; dut->tdi = 0; // hold the JTAG TAP in Test-Logic-Reset while idle
 
-  dut->rst = 1;
+  // Verilator zero-initializes dut->resetn, which for an active-low signal
+  // already reads as "reset asserted" -- explicitly driving it high first
+  // guarantees a genuine 1->0 transition below, so the async-assert reset
+  // synchronizers (soc_top.v) see a real negedge instead of silently never
+  // triggering (they'd otherwise sit at their own zero-initialized value
+  // until the tck/clk domain's first real clock edge, which for tck can be
+  // deep into the JTAG section below).
+  dut->resetn = 1;
+  dut->resetn = 0;
   for (int i = 0; i < 4; i++) clock();
-  dut->rst = 0;
+  dut->resetn = 1;
+
+  // tck never toggles during firmware boot (only clk drives it), so the
+  // tck-domain reset synchronizer's synchronous release -- normally 2 real
+  // tck edges after resetn goes high -- would otherwise not complete until
+  // the JTAG section below starts sending real tck edges, holding the JTAG
+  // chain "still in reset" for its first couple of edges. Pump a few no-op
+  // tck edges now (tms=1 keeps the TAP correctly in Test-Logic-Reset) so
+  // the tck domain is already released by the time real JTAG traffic starts.
+  for (int i = 0; i < 4; i++) { dut->tck = 1; dut->eval(); dut->tck = 0; dut->eval(); }
 
   const std::string expected = "Hello World\nTimer IRQs: 5\n";
   std::string got;

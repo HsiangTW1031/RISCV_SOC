@@ -10,13 +10,15 @@ Dashboard 呈現:`reports/sign_off/dashboard.html` 的「Toggle Coverage Waivers
 
 | 統計方式 | Toggle coverage | 說明 |
 |---|---|---|
-| Raw aggregate(`verilator_coverage --report summary`) | **65.0%**(48316/74290) | 沿用至今的舊數字。同一個 source-level toggle point,只要被多個 hierarchy instance 引用(例如 `aes_core.v` 在合併後的測試套件中被 5 個不同路徑實例化),就會被重複計數,分母被灌水但沒有對應的多樣性增加。 |
-| Deduped per-bit,**waive 前** | **80.3%**(9153/11405 bits) | 直接 parse `merged.dat` 原始資料,以 (file, line, signal) 去重複,每個實際存在的 bit 只算一次(任一 instance 有覆蓋就算覆蓋)。比 raw aggregate 更誠實,單純修正重複計數的問題,還沒套用任何 waiver。 |
-| Deduped per-bit,**waive 後** | **92.2%**(9153/9925 bits) | 套用 36 條 waiver rule,排除 1480 個「結構上不可能 toggle」的 bit(從分子分母同時移除)之後的最終 sign-off 數字。 |
+| Raw aggregate(`verilator_coverage --report summary`) | **65.0%**(48252/74288) | 沿用至今的舊數字。同一個 source-level toggle point,只要被多個 hierarchy instance 引用(例如 `aes_core.v` 在合併後的測試套件中被 5 個不同路徑實例化),就會被重複計數,分母被灌水但沒有對應的多樣性增加。 |
+| Deduped per-bit,**waive 前** | **80.1%**(9132/11404 bits) | 直接 parse `merged.dat` 原始資料,以 (file, line, signal) 去重複,每個實際存在的 bit 只算一次(任一 instance 有覆蓋就算覆蓋)。比 raw aggregate 更誠實,單純修正重複計數的問題,還沒套用任何 waiver。 |
+| Deduped per-bit,**waive 後** | **92.0%**(9132/9924 bits) | 套用 36 條 waiver rule,排除 1480 個「結構上不可能 toggle」的 bit(從分子分母同時移除)之後的最終 sign-off 數字。 |
 
-**waive 前後對照:80.3% → 92.2%,+11.9 個百分點,分母從 11405 bits 縮減到 9925 bits(移除 1480 bits)。**
+**waive 前後對照:80.1% → 92.0%,+11.9 個百分點,分母從 11404 bits 縮減到 9924 bits(移除 1480 bits)。**
 
-（這是加測試向量、把 residual gap 從 1966 bits 補到 772 bits 之後的數字——見第 5 節「加測試向量把 residual gap 從 80.1% 推到 92.2%」。covered bit 數在那一輪從 7926 上升到 9153；waiver 本身邏輯不變，waive 不會讓任何東西「變成 covered」，純粹是把「本來就不該被拿來衡量」的 bit 移出評分範圍——waived bit 數從 1513 降到 1480，是因為部分先前「未覆蓋但符合 waiver 規則」的 bit 現在被新測試直接覆蓋了，不再需要被 waive。）
+（這是加測試向量、把 residual gap 從 1966 bits 補到 772 bits 之後的數字——見第 5 節「加測試向量把 residual gap 從 80.1% 推到 92.2%」。covered bit 數在那一輪從 7926 上升到 9153;waiver 本身邏輯不變,waive 不會讓任何東西「變成 covered」,純粹是把「本來就不該被拿來衡量」的 bit 移出評分範圍——waived bit 數從 1513 降到 1480,是因為部分先前「未覆蓋但符合 waiver 規則」的 bit 現在被新測試直接覆蓋了,不再需要被 waive。
+
+**這裡的數字比第 5 節記錄的 92.2%/9153 又略降到 92.0%/9132**——active-low reset retrofit(見 `docs/project_retrospective.md`)改變了 `soc_top` testbench 裡 JTAG tck domain reset 釋放的確切時序(修掉了一個先前從沒被注意到的模擬層級問題,見 retrospective),連帶讓 JTAG 相關電路在開機階段實際經歷的 toggle 序列跟之前不完全一樣,covered bit 數從 9153 變成 9132。這不是測試向量變少或變差,是同一組測試在時序修正後,實際命中的 bit 組合略有不同——仍然遠高於 90% 的目標,沒有進一步處理。）
 
 （這幾個數字比最初版本多了 4 個 bit，是後來在 `soc_top.v` 加了 reset synchronizer 新增的 4 個正反器，見 `docs/cdc_report.md`——多出來的 bit 全部落在 soc_top 自己的分類裡，不影響任何一條 waiver rule 或其他 block 的數字。）
 

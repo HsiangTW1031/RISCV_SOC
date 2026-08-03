@@ -73,10 +73,10 @@ int main(int argc, char** argv) {
   };
 
   // ---- reset both domains, then TLR -> RUN_TEST_IDLE ----
-  dut->rst = 1; dut->tck_rst = 1;
+  dut->resetn = 0; dut->tck_resetn = 0;
   dut->tms = 1; dut->tck = 0; dut->eval();
   for (int i = 0; i < 4; i++) { dut->tck = !dut->tck; dut->eval(); clk_step(); clk_step(); }
-  dut->rst = 0; dut->tck_rst = 0;
+  dut->resetn = 1; dut->tck_resetn = 1;
   tap_edge(0, 0); // TEST_LOGIC_RESET -> RUN_TEST_IDLE
 
   // ---- IDCODE sanity: LSB must be 1 (IEEE 1149.1 requirement) ----

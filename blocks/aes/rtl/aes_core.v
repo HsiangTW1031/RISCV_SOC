@@ -28,7 +28,7 @@
 // round structure as encrypt.)
 module aes_core (
     input  wire         clk,
-    input  wire         rst,
+    input  wire         resetn,
 
     input  wire         start,       // pulse: begin one block operation
     input  wire         encdec,      // 0 = encrypt, 1 = decrypt; latched at start
@@ -56,7 +56,7 @@ module aes_core (
   wire [1407:0] round_keys;
 
   aes_key_expand u_key_expand (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .start(ke_start),
       .key_in(key_in),
       .done(ke_done),
@@ -184,7 +184,7 @@ module aes_core (
   wire [127:0] dec_final_next = sub_shift_dec ^ rk_sel;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       state <= ST_IDLE;
       busy  <= 1'b0;
       done  <= 1'b0;

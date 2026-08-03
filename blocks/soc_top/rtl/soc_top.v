@@ -7,19 +7,20 @@
 // axi_lite_xbar.v's header comment).
 //
 // `tck`/`tms`/`tdi`/`tdo` are a real, separate clock domain from `clk`
-// (matching actual JTAG hardware). `rst` itself is treated as coming from
-// a genuinely asynchronous external source (a real POR circuit or reset
-// button would be) -- feeding it directly into either domain's
+// (matching actual JTAG hardware). `resetn` itself is treated as coming
+// from a genuinely asynchronous external source (a real POR circuit or
+// reset button would be) -- feeding it directly into either domain's
 // synchronous logic risks a metastable release edge, the reset-domain
 // equivalent of the CDC problem `jtag_axi_bridge.v` already handles for
-// data (see docs/cdc_report.md). `rst_clk_sync`/`rst_tck_sync` below are
-// each domain's own "asynchronous assert, synchronous de-assert" 2-flop
-// reset synchronizer -- every clk-domain instance uses rst_clk_sync,
-// every tck-domain one (jtag_tap/jtag_dtm, and jtag_axi_bridge's tck_rst
-// input) uses rst_tck_sync. This is the one deliberate exception to this
-// project's synchronous-reset convention: a reset synchronizer's own
-// flops must have `rst` in their sensitivity list to assert immediately,
-// which is exactly what it's for.
+// data (see docs/cdc_report.md). `resetn_clk_sync`/`resetn_tck_sync`
+// below are each domain's own "asynchronous assert, synchronous
+// de-assert" 2-flop reset synchronizer -- every clk-domain instance uses
+// resetn_clk_sync, every tck-domain one (jtag_tap/jtag_dtm, and
+// jtag_axi_bridge's tck_resetn input) uses resetn_tck_sync. This is the
+// one deliberate exception to this project's synchronous-reset
+// convention: a reset synchronizer's own flops must have `resetn` in
+// their sensitivity list to assert immediately, which is exactly what
+// it's for.
 //
 // Known limitation (unchanged from Phase 1): picorv32_axi's mem_axi_b*/r*
 // ports have no BRESP/RRESP pins at all — this adapter never checks for
@@ -37,7 +38,7 @@ module soc_top #(
     parameter FIRMWARE_HEX = "firmware.hex"
 ) (
     input  wire clk,
-    input  wire rst,
+    input  wire resetn,
     output wire uart_tx,
     output wire wdog_reset_req,
     output wire i2c_scl,
@@ -52,29 +53,27 @@ module soc_top #(
     output wire tdo
 );
   // ---- Reset synchronizers, one per clock domain (see header comment) ----
-  reg rst_clk_meta, rst_clk_sync;
-  always @(posedge clk or posedge rst) begin
-    if (rst) begin
-      rst_clk_meta <= 1'b1;
-      rst_clk_sync <= 1'b1;
+  reg resetn_clk_meta, resetn_clk_sync;
+  always @(posedge clk or negedge resetn) begin
+    if (!resetn) begin
+      resetn_clk_meta <= 1'b0;
+      resetn_clk_sync <= 1'b0;
     end else begin
-      rst_clk_meta <= 1'b0;
-      rst_clk_sync <= rst_clk_meta;
+      resetn_clk_meta <= 1'b1;
+      resetn_clk_sync <= resetn_clk_meta;
     end
   end
 
-  reg rst_tck_meta, rst_tck_sync;
-  always @(posedge tck or posedge rst) begin
-    if (rst) begin
-      rst_tck_meta <= 1'b1;
-      rst_tck_sync <= 1'b1;
+  reg resetn_tck_meta, resetn_tck_sync;
+  always @(posedge tck or negedge resetn) begin
+    if (!resetn) begin
+      resetn_tck_meta <= 1'b0;
+      resetn_tck_sync <= 1'b0;
     end else begin
-      rst_tck_meta <= 1'b0;
-      rst_tck_sync <= rst_tck_meta;
+      resetn_tck_meta <= 1'b1;
+      resetn_tck_sync <= resetn_tck_meta;
     end
   end
-
-  wire resetn = !rst_clk_sync;
 
   // ---- CPU AXI4-Lite master ----
   wire        cpu_awvalid, cpu_awready;
@@ -107,7 +106,7 @@ module soc_top #(
       .PROGADDR_IRQ(32'h0000_0010)
   ) u_cpu (
       .clk(clk),
-      .resetn(resetn),
+      .resetn(resetn_clk_sync),
       .trap(),
 
       .mem_axi_awvalid(cpu_awvalid), .mem_axi_awready(cpu_awready), .mem_axi_awaddr(cpu_awaddr), .mem_axi_awprot(),
@@ -199,7 +198,7 @@ module soc_top #(
   wire        jtag_rvalid,  jtag_rready;  wire [31:0] jtag_rdata; wire [1:0] jtag_rresp;
 
   axi_lite_xbar u_xbar (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
 
       .s0_awvalid(cpu_awvalid), .s0_awready(cpu_awready), .s0_awaddr(cpu_awaddr),
       .s0_wvalid(cpu_wvalid),   .s0_wready(cpu_wready),   .s0_wdata(cpu_wdata), .s0_wstrb(cpu_wstrb),
@@ -269,7 +268,7 @@ module soc_top #(
   );
 
   boot_rom #(.HEXFILE(FIRMWARE_HEX)) u_rom (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(rom_awvalid), .s_awready(rom_awready), .s_awaddr(rom_awaddr),
       .s_wvalid(rom_wvalid),   .s_wready(rom_wready),   .s_wdata(rom_wdata), .s_wstrb(rom_wstrb),
       .s_bvalid(rom_bvalid),   .s_bready(rom_bready),   .s_bresp(rom_bresp),
@@ -278,7 +277,7 @@ module soc_top #(
   );
 
   sram u_ram (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(ram_awvalid), .s_awready(ram_awready), .s_awaddr(ram_awaddr),
       .s_wvalid(ram_wvalid),   .s_wready(ram_wready),   .s_wdata(ram_wdata), .s_wstrb(ram_wstrb),
       .s_bvalid(ram_bvalid),   .s_bready(ram_bready),   .s_bresp(ram_bresp),
@@ -287,7 +286,7 @@ module soc_top #(
   );
 
   timer u_timer (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(timer_awvalid), .s_awready(timer_awready), .s_awaddr(timer_awaddr),
       .s_wvalid(timer_wvalid),   .s_wready(timer_wready),   .s_wdata(timer_wdata), .s_wstrb(timer_wstrb),
       .s_bvalid(timer_bvalid),   .s_bready(timer_bready),   .s_bresp(timer_bresp),
@@ -297,7 +296,7 @@ module soc_top #(
   );
 
   watchdog u_wdt (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(wdt_awvalid), .s_awready(wdt_awready), .s_awaddr(wdt_awaddr),
       .s_wvalid(wdt_wvalid),   .s_wready(wdt_wready),   .s_wdata(wdt_wdata), .s_wstrb(wdt_wstrb),
       .s_bvalid(wdt_bvalid),   .s_bready(wdt_bready),   .s_bresp(wdt_bresp),
@@ -308,7 +307,7 @@ module soc_top #(
   );
 
   uart u_uart (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(uartx_awvalid), .s_awready(uartx_awready), .s_awaddr(uartx_awaddr),
       .s_wvalid(uartx_wvalid),   .s_wready(uartx_wready),   .s_wdata(uartx_wdata), .s_wstrb(uartx_wstrb),
       .s_bvalid(uartx_bvalid),   .s_bready(uartx_bready),   .s_bresp(uartx_bresp),
@@ -318,7 +317,7 @@ module soc_top #(
   );
 
   i2c_master u_i2c (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(i2cx_awvalid), .s_awready(i2cx_awready), .s_awaddr(i2cx_awaddr),
       .s_wvalid(i2cx_wvalid),   .s_wready(i2cx_wready),   .s_wdata(i2cx_wdata), .s_wstrb(i2cx_wstrb),
       .s_bvalid(i2cx_bvalid),   .s_bready(i2cx_bready),   .s_bresp(i2cx_bresp),
@@ -329,7 +328,7 @@ module soc_top #(
   );
 
   spi_master u_spi (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(spix_awvalid), .s_awready(spix_awready), .s_awaddr(spix_awaddr),
       .s_wvalid(spix_wvalid),   .s_wready(spix_wready),   .s_wdata(spix_wdata), .s_wstrb(spix_wstrb),
       .s_bvalid(spix_bvalid),   .s_bready(spix_bready),   .s_bresp(spix_bresp),
@@ -340,7 +339,7 @@ module soc_top #(
   );
 
   aes u_aes (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(aesx_awvalid), .s_awready(aesx_awready), .s_awaddr(aesx_awaddr),
       .s_wvalid(aesx_wvalid),   .s_wready(aesx_wready),   .s_wdata(aesx_wdata), .s_wstrb(aesx_wstrb),
       .s_bvalid(aesx_bvalid),   .s_bready(aesx_bready),   .s_bresp(aesx_bresp),
@@ -351,7 +350,7 @@ module soc_top #(
 
   // ---- Phase 6: DMA engine + its private burst-capable memory ----
   dma_engine u_dma (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(dmax_awvalid), .s_awready(dmax_awready), .s_awaddr(dmax_awaddr),
       .s_wvalid(dmax_wvalid),   .s_wready(dmax_wready),   .s_wdata(dmax_wdata), .s_wstrb(dmax_wstrb),
       .s_bvalid(dmax_bvalid),   .s_bready(dmax_bready),   .s_bresp(dmax_bresp),
@@ -368,7 +367,7 @@ module soc_top #(
   );
 
   dma_ram u_dma_ram (
-      .clk(clk), .rst(rst_clk_sync),
+      .clk(clk), .resetn(resetn_clk_sync),
       .s_awvalid(dma_m_awvalid), .s_awready(dma_m_awready), .s_awaddr(dma_m_awaddr), .s_awlen(dma_m_awlen), .s_awsize(dma_m_awsize), .s_awburst(dma_m_awburst),
       .s_wvalid(dma_m_wvalid),   .s_wready(dma_m_wready),   .s_wdata(dma_m_wdata), .s_wstrb(dma_m_wstrb), .s_wlast(dma_m_wlast),
       .s_bvalid(dma_m_bvalid),   .s_bready(dma_m_bready),   .s_bresp(dma_m_bresp),
@@ -383,13 +382,13 @@ module soc_top #(
   wire [31:0] jtag_rdata_tck;
 
   jtag_dtm u_jtag_dtm (
-      .tck(tck), .rst(rst_tck_sync), .tms(tms), .tdi(tdi), .tdo(tdo),
+      .tck(tck), .resetn(resetn_tck_sync), .tms(tms), .tdi(tdi), .tdo(tdo),
       .bridge_busy_tck(jtag_busy_tck), .bridge_resp_ok_tck(jtag_resp_ok_tck), .bridge_rdata_tck(jtag_rdata_tck),
       .start_pulse_tck(jtag_start_pulse_tck), .rw_tck(jtag_rw_tck), .addr_tck(jtag_addr_tck), .wdata_tck(jtag_wdata_tck)
   );
 
   jtag_axi_bridge u_jtag_bridge (
-      .clk(clk), .rst(rst_clk_sync), .tck(tck), .tck_rst(rst_tck_sync),
+      .clk(clk), .resetn(resetn_clk_sync), .tck(tck), .tck_resetn(resetn_tck_sync),
       .start_pulse_tck(jtag_start_pulse_tck), .rw_tck(jtag_rw_tck), .addr_tck(jtag_addr_tck), .wdata_tck(jtag_wdata_tck),
       .busy_tck(jtag_busy_tck), .resp_ok_tck(jtag_resp_ok_tck), .rdata_tck(jtag_rdata_tck),
       .m_awvalid(jtag_awvalid), .m_awready(jtag_awready), .m_awaddr(jtag_awaddr),

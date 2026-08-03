@@ -41,7 +41,7 @@
 // per-block), same LATCHED_IRQ rationale as every other peripheral here.
 module dma_engine (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     // ---- AXI4-Lite slave: CPU control port ----
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
@@ -134,7 +134,7 @@ module dma_engine (
   end
 
   aes_chain u_chain (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .load_iv(chain_load_iv), .iv_in(iv_reg),
       .start(chain_start), .encdec(ctrl_encdec), .mode(ctrl_mode),
       .key_in(key_reg), .data_in(rd_block),
@@ -142,7 +142,7 @@ module dma_engine (
   );
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       state         <= ST_IDLE;
       status_busy   <= 1'b0;
       irq_pulse     <= 1'b0;
@@ -258,7 +258,7 @@ module dma_engine (
   // CPU-facing AXI4-Lite register interface
   // =====================================================================
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       src_addr_reg <= 32'h0;
       dst_addr_reg <= 32'h0;
       len_reg      <= 32'h0;

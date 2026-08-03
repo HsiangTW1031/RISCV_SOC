@@ -365,3 +365,47 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 - 過程中沒有修改任何 RTL——全部是在既有 testbench 裡加測試向量(i2c/spi divider、DMA 第二組 key/IV + 窮舉暫存器覆蓋、`axi_lite_xbar`/JTAG bridge 的第三組資料值、`soc_top` 透過 JTAG 對其餘周邊的窮舉 poke)。
 - 19 個 regression targets、135 個 lint finding、chip area(129847.1)、Fmax(91.2MHz)全部沒變——純粹是驗證廣度的提升,不影響任何功能或時序數字。
 - 還剩的 772 bits 主要是 DMA 內部的搬移進度計數器(`cur_src`/`cur_dst`/`blocks_left`,需要真的跑一次不同長度/位址的搬移才能補)跟 `soc_top` 層級的 SPI/I2C 整合測試(原本規劃的第四項,42 bits,優先度較低沒動),詳見 `docs/coverage_waiver_report.md` 第 5 節。
+
+### 再往下一層:全專案 reset 極性從 active-high 改成 active-low(resetn)
+
+Levi 看 RTL 時發現一個實務經驗上的落差:這個專案自己寫的周邊全部用 active-high `rst`,但真實業界(尤其是 AMBA/AXI 規範的 `ARESETn`)更常見 active-low。查證後發現這個落差是真的、有具體理由,不是單純習慣問題:
+
+- AMBA/AXI 規範明訂 reset 訊號是 `ARESETn`,active-low 是官方 spec 慣例。
+- 這個專案實際合成用的 Nangate45 cell library 本身也是 active-low 慣例——查了 `DFFR_X1`/`DFFS_X1` 這些帶硬體 reset/set pin 的 cell,reset pin 命名是 `RN`(Reset-Not),function 定義是 `!RN` 觸發。
+- 專案自己 vendor 進來、完全沒改過的 PicoRV32 CPU 原生就是 active-low(`resetn`)——`soc_top.v` 原本得自己做一次 `wire resetn = !rst_clk_sync;` 反相橋接,兩種慣例並存在同一個檔案裡。
+
+決定全專案統一改成 `resetn`(而不是 `rst_n`),理由是直接對齊 PicoRV32 的既有命名,順便讓 `soc_top.v` 不用再做反相橋接。範圍:18 個 RTL 檔案(每個周邊 + `axi_lite_xbar`/`dma_ram`/`dma_engine`/JTAG 全家族 + `soc_top.v`)、5 個 testtop wrapper、共用的 `tb/common/fake_axi_lite_slave.v`、19 個 testbench、SDC 的 `set_false_path` 目標、還有 CDC report/各 IP spec doc。逐個 block 改完 RTL + 對應 testbench 就跑一次 regression,不是全部改完才一次驗證。
+
+#### `soc_top.v` 的 reset synchronizer 是唯一需要真的重新設計的地方
+
+其餘所有周邊都是機械式的 `if (rst)` → `if (!resetn)` 反相,邏輯完全等價。但 `soc_top.v` 自己的 RDC reset synchronizer(見 `docs/cdc_report.md` 第 6 節)是這個專案唯一真正的 async reset 邏輯,不能只做字面反相——原本是 `posedge rst` 觸發、async SET;改成鏡像等價的 `negedge resetn` 觸發、async CLEAR。
+
+#### 抓到的第一個真問題:`mem_blackboxes.v` 忘記改
+
+全部 RTL/testbench 改完、跑 regression 全綠之後,以為完工了,結果重新合成 `soc_top` 時 Yosys 直接報錯:「`dma_ram` 沒有叫 `resetn` 的 port」。查了才發現 `blocks/soc_top/syn/mem_blackboxes.v`(合成用的記憶體 blackbox 替身,`boot_rom`/`sram`/`dma_ram` 三個)還是舊的 `rst` port 宣告——這個檔案不會被 Verilator regression 讀到,只有真的跑合成才會踩到,所以 regression 全綠完全沒發現這個漏網之魚。這是這次改動範圍盤點時漏掉的一類檔案:**合成專用的輔助檔案(blackbox、generic netlist 等)不會被一般測試流程覆蓋到,retrofit 這類「改介面」的工作時,清單要包含這些檔案,不能只看 `rtl/`+`dv/`**。修正後重新合成成功。
+
+#### 抓到的第二個真問題:Verilator 的 zero-init 對 active-low 訊號是個陷阱
+
+`soc_top` 的 testbench 一開始把 `dut->resetn` 直接設成 0 表示 reset asserted——但 Verilator 預設把訊號 zero-init,對 active-low 訊號來說「預設值」剛好就是「reset asserted」的值,所以這行沒有產生真正的訊號 edge。開機期間 `tck` 完全沒有 toggle 過(firmware boot 只靠 `clk`),導致 tck domain 的 async reset synchronizer 從來沒被真正觸發、也從來沒有機會完成同步釋放,一路卡到測試最後第一次真正送 JTAG 訊號時才發作(前兩個 JTAG 操作失敗:寫 RAM、讀回都失敗)。
+
+這個 bug 很值得記錄的地方:**它在 active-high 的舊版本裡不會發生**,因為舊版本第一行是 `dut->rst = 1;`——`rst` 同樣 zero-init 成 0,但 0 對 active-high 訊號來說是「未 reset」,所以這一行(0→1)是一次真正的 transition,`posedge rst` 正常觸發。同一套「先明確設初始值再翻轉」的寫法,在改成 active-low 之後,恰好因為預設值語意改變而失效——**改變一個訊號的極性,不能只改 RTL 跟穩態邏輯,連 testbench 裡「怎麼製造出第一次 reset edge」都要重新檢查,不能假設原本的初始化順序在新極性下還一樣安全**。
+
+修法:先明確把 `dut->resetn` 設成 1(製造出真正的 1→0 transition),並在 reset 釋放後、真正的 JTAG 流程開始前,手動 pump 幾個 no-op 的 `tck` edge(`tms=1` 讓 TAP 停在 Test-Logic-Reset,不影響邏輯),讓 tck domain 提前完成同步釋放。修完 19 個 regression 全部 PASS。
+
+#### 意外發現:Fmax 從 91.2MHz 掉到 67.5MHz,原因不在 AES 或 PicoRV32 的邏輯
+
+全部功能驗證通過後,重新合成+STA 發現一個意外结果:whole-SoC 的 critical path 從原本的 `aes_key_expand`(10.966ns)整個換到 `u_cpu/picorv32_core` 內部一段完全沒改過的邏輯(14.821ns)。追查後確認:
+
+- `aes_core` 獨立合成的數字幾乎沒變(38.219ns→38.399ns,正常合成雜訊範圍),證實 AES 邏輯本身沒問題。
+- PicoRV32 是完全沒改過一行的 vendored 檔案,餵給它的 `resetn` 訊號邏輯行為跟改之前完全等價。
+- Chip area 反而略降(129847.1→129373.6,少了一顆反相器),不是邏輯變多了。
+
+跟 Levi 確認後,結論是**誠實記錄現狀,不再深挖**:這很可能是 Yosys/abc 的技術對應(technology mapping)演算法對 netlist 結構變動的敏感度造成的——全專案大量訊號改名、少一顆反相器,這類結構性變動會改變 abc 內部啟發式優化的決策順序,連帶影響到邏輯上完全無關模組的合成結果,是已知但很難精準預測的合成工具行為。完整數字跟推論寫在 `docs/performance.md` 第 1、7 節。**這是這次 retrofit 最重要的教訓**:就算改動本身邏輯上完全等價、經過完整 regression + LEC 驗證,合成後的時序數字仍然可能因為工具的非局部優化行為而改變——「邏輯等價」不等於「時序不變」,兩者要分開驗證,不能只看 regression 綠燈就假設 Fmax 這類數字也不受影響。
+
+#### 最後的結果
+
+- 19 個 regression targets 全部 PASS,135 個 lint finding 數量不變。
+- Toggle coverage 微幅變動(92.2%→92.0%,9153→9132 covered bits)——JTAG reset 釋放時序修正後,開機階段實際命中的 toggle 組合略有不同,不是測試變少,仍遠高於 90% 目標。
+- Chip area 129373.6(略降),Fmax 67.5MHz(見上,已知且記錄清楚的變化,不是邏輯缺陷)。
+- CDC/RDC 的結構性 review 結論不變(synchronizer 級數、topology 都是鏡像等價的重新設計),multi-corner STA 的 hold 依然完全乾淨。
+- **這次改動全程沒有動到 `scripts/` 目錄底下任何一個腳本,也沒有動到任何一個 block 的 `testlist.sh`/`lintlist.sh`**——convention-over-configuration 的自動化引擎(`ic-verification-scaffold` skill 的原型)在一次觸及全專案介面命名的大改動下完全不用跟著改,只有實際的 RTL/testbench/文件內容變了,證實這套自動化設計是真的跟專案細節解耦的。

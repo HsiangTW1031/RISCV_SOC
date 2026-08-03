@@ -36,7 +36,7 @@ flowchart LR
 
 | Signal | Dir | Width | 說明 |
 |---|---|---|---|
-| `clk`, `rst` | in | 1 | 同步 clock、非同步 active-high reset |
+| `clk`, `resetn` | in | 1 | 同步 clock、同步 active-low reset(resetn) |
 | `s_aw*` / `s_w*` / `s_b*` / `s_ar*` / `s_r*` | - | - | 標準 AXI4-Lite slave（同 timer.v） |
 | `irq` | out | 1 | WARNING 的**單一 cycle pulse** |
 | `wdog_reset_req` | out | 1 | Reset 請求，**level** 訊號，持續到下次 KICK 或 restart |

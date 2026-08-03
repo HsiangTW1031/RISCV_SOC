@@ -43,9 +43,9 @@ int main(int argc, char** argv) {
   auto clock = [&]() { tick_half(); tick_half(); };
   auto cycles_now = [&]() { return tick_count / 2; };
 
-  dut->rst = 1;
+  dut->resetn = 0;
   bfm.clock(); bfm.clock();
-  dut->rst = 0;
+  dut->resetn = 1;
   bfm.clock();
 
   int fail_count = 0;

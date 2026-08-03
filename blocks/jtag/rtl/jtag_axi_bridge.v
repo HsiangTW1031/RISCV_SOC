@@ -39,9 +39,9 @@
 // already-synchronized control signal" pattern.
 module jtag_axi_bridge (
     input  wire clk,
-    input  wire rst,
+    input  wire resetn,
     input  wire tck,
-    input  wire tck_rst,
+    input  wire tck_resetn,
 
     // ---- tck-domain side (from jtag_dtm.v) ----
     input  wire        start_pulse_tck,
@@ -62,13 +62,13 @@ module jtag_axi_bridge (
   // ==== tck -> clk: toggle synchronizer for the START event ====
   reg start_toggle_tck;
   always @(posedge tck) begin
-    if (tck_rst) start_toggle_tck <= 1'b0;
+    if (!tck_resetn) start_toggle_tck <= 1'b0;
     else if (start_pulse_tck) start_toggle_tck <= ~start_toggle_tck;
   end
 
   reg start_toggle_sync1, start_toggle_sync2, start_toggle_sync2_d;
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       start_toggle_sync1 <= 1'b0; start_toggle_sync2 <= 1'b0; start_toggle_sync2_d <= 1'b0;
     end else begin
       start_toggle_sync1   <= start_toggle_tck;
@@ -102,7 +102,7 @@ module jtag_axi_bridge (
   assign m_rready  = (state == RD_R);
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       state           <= IDLE;
       done_toggle_clk <= 1'b0;
     end else begin
@@ -156,7 +156,7 @@ module jtag_axi_bridge (
   reg resp_ok_sync1, resp_ok_sync2;
   reg [31:0] rdata_sync1, rdata_sync2;
   always @(posedge tck) begin
-    if (tck_rst) begin
+    if (!tck_resetn) begin
       done_toggle_sync1 <= 1'b0; done_toggle_sync2 <= 1'b0;
       resp_ok_sync1 <= 1'b0; resp_ok_sync2 <= 1'b0;
     end else begin

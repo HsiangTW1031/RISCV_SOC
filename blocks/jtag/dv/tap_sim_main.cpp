@@ -55,10 +55,10 @@ int main(int argc, char** argv) {
     if (!cond) { printf("FAIL: %s\n", what); fail_count++; }
   };
 
-  dut->rst = 1;
+  dut->resetn = 0;
   tck(); tck();
   check("reset -> TEST_LOGIC_RESET", dut->state == TEST_LOGIC_RESET && dut->test_logic_reset == 1);
-  dut->rst = 0;
+  dut->resetn = 1;
 
   int model_state = TEST_LOGIC_RESET;
 
@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
   // from any state. Drive to each of the 16 states via a fresh reset +
   // random walk, then check.
   for (int target_walk_len = 0; target_walk_len < 30; target_walk_len++) {
-    dut->rst = 1; tck(); dut->rst = 0;
+    dut->resetn = 0; tck(); dut->resetn = 1;
     model_state = TEST_LOGIC_RESET;
     for (int i = 0; i < target_walk_len; i++) {
       int tms = bit(rng);
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 
   // ---- directed sanity walk covering every state at least once ----
   {
-    dut->rst = 1; tck(); dut->rst = 0;
+    dut->resetn = 0; tck(); dut->resetn = 1;
     const int walk[] = {0,1,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1,0}; // tms sequence
     model_state = TEST_LOGIC_RESET;
     for (int t : walk) {

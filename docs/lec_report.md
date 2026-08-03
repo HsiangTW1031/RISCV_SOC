@@ -30,7 +30,7 @@ rnum(round counter, 4 bits) → sub_shift_enc/sub_shift_dec(128 bits each)
 
 ## 3. soc_top:為什麼只跑 equiv_simple,不跑 equiv_induct
 
-soc_top 含完整的 PicoRV32 CPU,`docs/performance.md` 記錄的 cell count 是 78649 個 standard cell——比 aes_core 的 465 個本地 cell 大了兩個數量級。aes_core 一個 block 光是 `equiv_induct` 就要跑到十幾分鐘還沒完全收斂,同樣的 sequential induction 直接套用到含一整顆 CPU 的整個 SoC,實務上不可能在合理時間內跑完,而且這也不是真實業界的標準做法——**含嵌入式 CPU 的整顆晶片做 full-chip formal equivalence,即使在真正的商用 EDA 工具上都是出了名的難題**,業界的標準解法是「block-level formal + full-chip simulation」,不是「full-chip formal」。這個專案現在剛好就是這個標準組合:
+soc_top 含完整的 PicoRV32 CPU,`docs/performance.md` 記錄的 cell count 是 78446 個 standard cell——比 aes_core 的 465 個本地 cell 大了兩個數量級。aes_core 一個 block 光是 `equiv_induct` 就要跑到十幾分鐘還沒完全收斂,同樣的 sequential induction 直接套用到含一整顆 CPU 的整個 SoC,實務上不可能在合理時間內跑完,而且這也不是真實業界的標準做法——**含嵌入式 CPU 的整顆晶片做 full-chip formal equivalence,即使在真正的商用 EDA 工具上都是出了名的難題**,業界的標準解法是「block-level formal + full-chip simulation」,不是「full-chip formal」。這個專案現在剛好就是這個標準組合:
 
 - Block-level formal:`blocks/aes/syn/lec.ys`(上面第 2 節)
 - Full-chip simulation:`scripts/run_gatelevel_sim.sh`(soc_top 在 gate-level netlist 上跑過完整開機+中斷+UART+JTAG+DMA,全部 PASS)

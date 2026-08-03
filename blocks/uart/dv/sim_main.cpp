@@ -29,9 +29,9 @@ int main(int argc, char** argv) {
   auto tick_half = [&]() { dut->clk = !dut->clk; dut->eval(); };
   AxiLiteBfm bfm(sig, tick_half);
 
-  dut->rst = 1;
+  dut->resetn = 0;
   bfm.clock(); bfm.clock();
-  dut->rst = 0;
+  dut->resetn = 1;
   bfm.clock();
 
   int fail_count = 0;

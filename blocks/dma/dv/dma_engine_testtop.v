@@ -3,7 +3,7 @@
 // before soc_top wiring. Not a synthesizable deliverable.
 module dma_engine_testtop (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -37,7 +37,7 @@ module dma_engine_testtop (
   wire        eng_rvalid, eng_rready; wire [31:0] eng_rdata; wire [1:0] eng_rresp; wire eng_rlast;
 
   dma_engine u_engine (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(s_awvalid), .s_awready(s_awready), .s_awaddr(s_awaddr),
       .s_wvalid(s_wvalid),   .s_wready(s_wready),   .s_wdata(s_wdata), .s_wstrb(s_wstrb),
       .s_bvalid(s_bvalid),   .s_bready(s_bready),   .s_bresp(s_bresp),
@@ -106,7 +106,7 @@ module dma_engine_testtop (
   assign eng_rlast   = ram_s_rlast;
 
   dma_ram u_ram (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(ram_s_awvalid), .s_awready(ram_s_awready), .s_awaddr(ram_s_awaddr),
       .s_awlen(ram_s_awlen), .s_awsize(ram_s_awsize), .s_awburst(ram_s_awburst),
       .s_wvalid(ram_s_wvalid), .s_wready(ram_s_wready), .s_wdata(ram_s_wdata), .s_wstrb(ram_s_wstrb), .s_wlast(ram_s_wlast),

@@ -32,7 +32,7 @@ flowchart LR
 
 | Signal | Dir | Width | 說明 |
 |---|---|---|---|
-| `clk`, `rst` | in | 1 | 同步 clock、非同步 active-high reset |
+| `clk`, `resetn` | in | 1 | 同步 clock、同步 active-low reset(resetn) |
 | `s_aw*` / `s_w*` / `s_b*` / `s_ar*` / `s_r*` | - | - | 標準 AXI4-Lite slave |
 | `scl` | out | 1 | I2C clock，本模組直接驅動（無 clock stretching，故不用 inout） |
 | `sda` | inout | 1 | I2C data，open-drain：只會驅動低電位或釋放為 `1'bz`，靠外部 pull-up 讀回高電位 |

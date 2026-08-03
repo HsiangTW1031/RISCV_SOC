@@ -37,7 +37,7 @@
 // answered directly with SLVERR by the crossbar itself.
 module axi_lite_xbar (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     // ---- upstream master 0: the CPU ----
     input  wire        s0_awvalid,
@@ -307,7 +307,7 @@ module axi_lite_xbar (
                          (w_sel == `SLAVE_DMA) ? dma_bresp : `AXI_RESP_SLVERR;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       w_state    <= W_IDLE;
       w_have_aw  <= 1'b0;
       w_have_w   <= 1'b0;
@@ -468,7 +468,7 @@ module axi_lite_xbar (
                          (r_sel == `SLAVE_DMA) ? dma_rresp : `AXI_RESP_SLVERR;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       r_state  <= R_IDLE;
       s_rvalid <= 1'b0;
       r_grant  <= 1'b1;

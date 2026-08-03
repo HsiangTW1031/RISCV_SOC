@@ -16,7 +16,7 @@ module uart #(
     parameter CLKS_PER_BIT = 4
 ) (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -44,7 +44,7 @@ module uart #(
   reg [7:0] start_byte;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       tx_state <= TX_IDLE;
       tx       <= 1'b1;
       clk_cnt  <= 8'd0;
@@ -108,7 +108,7 @@ module uart #(
   wire [3:0] ar_offset = s_araddr[3:0];
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       s_bvalid    <= 1'b0;
       s_rvalid    <= 1'b0;
       do_start_tx <= 1'b0;

@@ -3,7 +3,7 @@
 // lives in tb/common alongside the BFM, not under blocks/.
 module fake_axi_lite_slave (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid,
     output wire        s_awready,
@@ -44,7 +44,7 @@ module fake_axi_lite_slave (
   // latch unconditionally whenever *valid is seen, and pulse the response
   // valid for exactly one cycle per transaction.
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       s_bvalid <= 1'b0;
       s_rvalid <= 1'b0;
     end else begin

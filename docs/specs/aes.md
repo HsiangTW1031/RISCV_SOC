@@ -37,7 +37,7 @@ flowchart LR
 
 | Signal | Dir | Width | 說明 |
 |---|---|---|---|
-| `clk`, `rst` | in | 1 | 同步 clock、非同步 active-high reset |
+| `clk`, `resetn` | in | 1 | 同步 clock、同步 active-low reset(resetn) |
 | `s_aw*` / `s_w*` / `s_b*` / `s_ar*` / `s_r*` | - | - | 標準 AXI4-Lite slave |
 | `irq` | out | 1 | 一個 block 運算完成時的**單一 cycle pulse** |
 

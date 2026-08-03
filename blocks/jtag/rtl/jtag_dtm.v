@@ -29,7 +29,7 @@
 // configuration.
 module jtag_dtm (
     input  wire tck,
-    input  wire rst,
+    input  wire resetn,
     input  wire tms,
     input  wire tdi,
     output wire tdo,
@@ -61,7 +61,7 @@ module jtag_dtm (
   wire capture_dr, shift_dr, update_dr, capture_ir, shift_ir, update_ir, test_logic_reset;
 
   jtag_tap u_tap (
-      .tck(tck), .rst(rst), .tms(tms),
+      .tck(tck), .resetn(resetn), .tms(tms),
       .state(),
       .test_logic_reset(test_logic_reset),
       .run_test_idle(), .select_dr_scan(), .capture_dr(capture_dr), .shift_dr(shift_dr),
@@ -82,7 +82,7 @@ module jtag_dtm (
   assign tdo = (ir_reg == IR_BYPASS) ? bypass_reg : dr_shift[0];
 
   always @(posedge tck) begin
-    if (rst || test_logic_reset) begin
+    if (!resetn || test_logic_reset) begin
       ir_reg           <= IR_IDCODE;
       start_pulse_tck  <= 1'b0;
       bridge_busy_prev <= 1'b0;

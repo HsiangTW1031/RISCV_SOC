@@ -28,7 +28,7 @@
 //   keystream, regardless of the chain's own encdec setting.
 module aes_chain (
     input  wire         clk,
-    input  wire         rst,
+    input  wire         resetn,
 
     input  wire         load_iv,     // pulse: latch iv_in as the running IV/counter (start of a new message)
     input  wire [127:0] iv_in,
@@ -79,7 +79,7 @@ module aes_chain (
   wire [127:0] core_data_out;
 
   aes_core u_core (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .start(core_start), .encdec(core_encdec),
       .key_in(key_in), .data_in(core_data_in),
       .busy(core_busy), .done(core_done), .data_out(core_data_out)
@@ -91,7 +91,7 @@ module aes_chain (
   assign iv_out   = iv_reg;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       state    <= ST_IDLE;
       done_reg <= 1'b0;
       iv_reg   <= 128'h0;

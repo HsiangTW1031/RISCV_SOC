@@ -5,7 +5,7 @@
 // note as boot_rom.v applies.
 module sram (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -25,7 +25,7 @@ module sram (
   wire [14:0] rd_idx = s_araddr[16:2];
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       s_bvalid <= 1'b0;
       s_rvalid <= 1'b0;
     end else begin

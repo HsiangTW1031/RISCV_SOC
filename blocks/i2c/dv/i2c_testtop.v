@@ -4,7 +4,7 @@
 // device exists. Not a synthesizable deliverable.
 module i2c_testtop (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -27,7 +27,7 @@ module i2c_testtop (
   pullup (sda);
 
   i2c_master u_i2c (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(s_awvalid), .s_awready(s_awready), .s_awaddr(s_awaddr),
       .s_wvalid(s_wvalid),   .s_wready(s_wready),   .s_wdata(s_wdata), .s_wstrb(s_wstrb),
       .s_bvalid(s_bvalid),   .s_bready(s_bready),   .s_bresp(s_bresp),

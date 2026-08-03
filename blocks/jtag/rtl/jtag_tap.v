@@ -9,21 +9,21 @@
 // itself -- this module only implements the FSM and TDO shift-register
 // plumbing, all still in the tck domain.
 //
-// `rst` here is a synchronous-to-tck, active-high reset -- deliberately
-// NOT the traditional active-low TRST# pin, to stay consistent with this
-// project's one reset convention everywhere else. This is a reasonable
-// deviation: TRST# is an *optional* pin in IEEE 1149.1 (many real JTAG
-// implementations omit it entirely) precisely because the TAP always has
-// a reliable, mandatory reset path anyway -- 5 consecutive TMS=1 cycles
-// return the FSM to Test-Logic-Reset from ANY state (proven by the
-// transition table below: Test-Logic-Reset and Run-Test/Idle are always
-// at most a few TMS=1 hops from anywhere, and the FSM has no state that
-// can indefinitely dodge TMS=1). Real debug probes rely on this "TMS reset"
-// path as the normal way to force a known state, `rst` here is just for
-// simulation/power-on convenience.
+// `resetn` here is a synchronous-to-tck, active-low reset -- this project's
+// one reset convention everywhere else (see docs/architecture.md), which
+// also happens to match the traditional TRST# pin's own polarity. TRST#
+// is an *optional* pin in IEEE 1149.1 (many real JTAG implementations omit
+// it entirely) precisely because the TAP always has a reliable, mandatory
+// reset path anyway -- 5 consecutive TMS=1 cycles return the FSM to
+// Test-Logic-Reset from ANY state (proven by the transition table below:
+// Test-Logic-Reset and Run-Test/Idle are always at most a few TMS=1 hops
+// from anywhere, and the FSM has no state that can indefinitely dodge
+// TMS=1). Real debug probes rely on this "TMS reset" path as the normal
+// way to force a known state, `resetn` here is just for simulation/
+// power-on convenience.
 module jtag_tap (
     input  wire tck,
-    input  wire rst,
+    input  wire resetn,
     input  wire tms,
 
     output wire [3:0] state,
@@ -91,7 +91,7 @@ module jtag_tap (
   endfunction
 
   always @(posedge tck) begin
-    if (rst) state_r <= TEST_LOGIC_RESET;
+    if (!resetn) state_r <= TEST_LOGIC_RESET;
     else     state_r <= next_state(state_r, tms);
   end
 

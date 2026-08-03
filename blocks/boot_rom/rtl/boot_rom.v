@@ -10,7 +10,7 @@ module boot_rom #(
     parameter HEXFILE = "" // path for $readmemh; empty = all-zero memory
 ) (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -36,7 +36,7 @@ module boot_rom #(
   wire [13:0] rd_idx = s_araddr[15:2];
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       s_bvalid <= 1'b0;
       s_rvalid <= 1'b0;
     end else begin

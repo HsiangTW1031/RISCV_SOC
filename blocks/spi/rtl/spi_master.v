@@ -37,7 +37,7 @@
 // choice for any downstream sampler.
 module spi_master (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -101,7 +101,7 @@ module spi_master (
   wire       do_start  = do_write && (aw_offset == REG_CTRL) && s_wdata[0] && !busy;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       state       <= IDLE;
       sclk        <= 1'b0;
       cs_n        <= 1'b1;
@@ -191,7 +191,7 @@ module spi_master (
   // TXDATA is a plain read/write register, latched into tx_shift at START.
   reg [7:0] txdata_reg;
   always @(posedge clk) begin
-    if (rst) txdata_reg <= 8'h0;
+    if (!resetn) txdata_reg <= 8'h0;
     else if (do_write && aw_offset == REG_TXDATA) txdata_reg <= s_wdata[7:0];
   end
 endmodule

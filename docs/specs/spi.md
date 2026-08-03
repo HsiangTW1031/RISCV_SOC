@@ -34,7 +34,7 @@ flowchart LR
 
 | Signal | Dir | Width | 說明 |
 |---|---|---|---|
-| `clk`, `rst` | in | 1 | 同步 clock、非同步 active-high reset |
+| `clk`, `resetn` | in | 1 | 同步 clock、同步 active-low reset(resetn) |
 | `s_aw*` / `s_w*` / `s_b*` / `s_ar*` / `s_r*` | - | - | 標準 AXI4-Lite slave |
 | `sclk` | out | 1 | SPI clock，idle 電位由 CPOL 決定 |
 | `mosi` | out | 1 | Master-out-slave-in，genuinely registered（非 combinational `assign`） |

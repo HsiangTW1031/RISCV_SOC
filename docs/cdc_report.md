@@ -67,28 +67,30 @@ set_clock_groups -asynchronous -group {clk} -group {tck}
 
 ## 6. Reset domain(RDC, Reset Domain Crossing)
 
-CDC 處理的是「資料訊號跨時脈」,還有一個同一類、但不同的問題:**reset 訊號本身跨時脈**。原本 `soc_top.v` 的寫法是把外部 `rst` 這一個訊號,未經任何同步,直接餵給 `clk` domain 跟 `tck` domain 的每一個模組(`jtag_axi_bridge.v` 的 `tck_rst` 埠也直接接 `rst`)——RTL 原本的註解甚至明講這是「刻意的簡化」。問題在於:真實晶片的 reset 訊號通常來自外部電路(POR、reset 按鈕),本質上是非同步的,直接餵給同步邏輯取樣,有可能在 reset 訊號上升/下降的瞬間造成 metastability。
+CDC 處理的是「資料訊號跨時脈」,還有一個同一類、但不同的問題:**reset 訊號本身跨時脈**。原本(retrofit 成 active-low 之前的版本)`soc_top.v` 的寫法是把外部 `rst` 這一個訊號,未經任何同步,直接餵給 `clk` domain 跟 `tck` domain 的每一個模組(`jtag_axi_bridge.v` 的 `tck_rst` 埠也直接接 `rst`)——RTL 原本的註解甚至明講這是「刻意的簡化」。問題在於:真實晶片的 reset 訊號通常來自外部電路(POR、reset 按鈕),本質上是非同步的,直接餵給同步邏輯取樣,有可能在 reset 訊號上升/下降的瞬間造成 metastability。
 
-修法:在 `soc_top.v` 裡加了兩個 reset synchronizer,各自負責一個 domain,標準的「非同步 assert、同步 de-assert」2-flop 寫法:
+修法:在 `soc_top.v` 裡加了兩個 reset synchronizer,各自負責一個 domain,標準的「非同步 assert、同步 de-assert」2-flop 寫法(這裡是 retrofit 成 active-low 之後的版本——原本是 active-high、`posedge rst` 觸發、async SET;業界更常見的 active-low 慣例改成 `negedge resetn` 觸發、async CLEAR,邏輯上是鏡像等價,詳見 `docs/project_retrospective.md` 的 active-low retrofit 章節):
 
 ```verilog
-reg rst_clk_meta, rst_clk_sync;
-always @(posedge clk or posedge rst) begin
-  if (rst) begin
-    rst_clk_meta <= 1'b1;
-    rst_clk_sync <= 1'b1;
+reg resetn_clk_meta, resetn_clk_sync;
+always @(posedge clk or negedge resetn) begin
+  if (!resetn) begin
+    resetn_clk_meta <= 1'b0;
+    resetn_clk_sync <= 1'b0;
   end else begin
-    rst_clk_meta <= 1'b0;
-    rst_clk_sync <= rst_clk_meta;
+    resetn_clk_meta <= 1'b1;
+    resetn_clk_sync <= resetn_clk_meta;
   end
 end
 ```
 
-(`tck` domain同一套邏輯,換成 `rst_tck_sync`)。這是這個專案「一律 synchronous reset」慣例的**唯一刻意例外**——同步器自己的暫存器必須把 `rst`放進 sensitivity list 才能立即 assert,這正是同步器存在的目的。所有 clk domain 的模組(CPU、crossbar、每個周邊、AES、DMA、`jtag_axi_bridge` 的 clk 側)改吃 `rst_clk_sync`;`jtag_tap`/`jtag_dtm`/`jtag_axi_bridge` 的 `tck_rst` 改吃 `rst_tck_sync`。
+(`tck` domain 同一套邏輯,換成 `resetn_tck_sync`)。這是這個專案「一律 synchronous reset」慣例的**唯一刻意例外**——同步器自己的暫存器必須把 `resetn` 放進 sensitivity list 才能立即 assert,這正是同步器存在的目的。所有 clk domain 的模組(CPU、crossbar、每個周邊、AES、DMA、`jtag_axi_bridge` 的 clk 側)改吃 `resetn_clk_sync`;`jtag_tap`/`jtag_dtm`/`jtag_axi_bridge` 的 `tck_resetn` 改吃 `resetn_tck_sync`。
 
 改完重跑過 lint(乾淨,新加的訊號沒有觸發任何新警告)跟全部 19 個 regression 測試(全線 PASS,包含唯一會受影響的 `soc_top`——多出來的 2-cycle reset 釋放延遲沒有讓任何 cycle-accurate 的檢查失敗)。
 
-**注意**:這個改動只動了 `soc_top.v` 這個整合層級的檔案,單一 block 的獨立測試(`timer`/`watchdog`/...)都是直接 instantiate 各自的 RTL、自己驅動 `rst`,不經過 `soc_top.v` 的這層同步器,所以完全不受影響——這也是為什麼可以直接在頂層加,不用去動每個周邊自己的 RTL。
+**注意**:這個改動只動了 `soc_top.v` 這個整合層級的檔案,單一 block 的獨立測試(`timer`/`watchdog`/...)都是直接 instantiate 各自的 RTL、自己驅動 `resetn`,不經過 `soc_top.v` 的這層同步器,所以完全不受影響——這也是為什麼可以直接在頂層加,不用去動每個周邊自己的 RTL。
+
+**Active-low retrofit 時額外踩到的一個坑(純模擬層級,跟上面的 RTL/STA 內容無關)**:soc_top 的 testbench 一開始把 `dut->resetn` 直接設成 0 來表示 reset asserted——但 Verilator 預設把訊號 zero-init,對 active-low 訊號來說「預設值」剛好就是「reset asserted」的值,所以這一行沒有產生真正的訊號 edge。開機期間 `tck` 完全沒有 toggle 過(只有 `clk` 在走),導致 tck domain 的 async reset synchronizer 從來沒被真正觸發、也從來沒有機會完成同步釋放,一路卡到測試最後才第一次真正送 JTAG 訊號時才發作(前兩個 JTAG 操作失敗)。修法是先明確把 `dut->resetn` 設成 1 製造一次真正的 1→0 transition,並在 reset 釋放後、真正的 JTAG 流程開始前,先手動 pump 幾個 no-op 的 `tck` edge(`tms=1` 讓 TAP 停在 Test-Logic-Reset,不影響邏輯),讓 tck domain 提前完成同步釋放。
 
 ### 重新跑 multi-corner STA 之後,真的抓到一個新的 hold(準確講是 removal check)違規
 

@@ -24,7 +24,7 @@
 // doesn't work for that direction anyway.
 module aes_key_expand (
     input  wire         clk,
-    input  wire         rst,
+    input  wire         resetn,
     input  wire         start,
     input  wire [127:0] key_in,
     output reg          done,        // single-cycle pulse when round_keys is valid
@@ -87,7 +87,7 @@ module aes_key_expand (
   wire [31:0] new_w3 = new_w2 ^ prev_w3;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       state     <= ST_IDLE;
       round_idx <= 4'd0;
       done      <= 1'b0;

@@ -45,14 +45,15 @@ flowchart LR
 | Signal | Dir | Width | Domain | 說明 |
 |---|---|---|---|---|
 | `tck` | in | 1 | - | JTAG clock, independent of `clk` |
-| `rst` | in | 1 | both | shared power-on reset (see note below) |
+| `resetn` | in | 1 | clk | active-low reset for the clk-domain half (`jtag_axi_bridge`'s own logic) |
+| `tck_resetn` | in | 1 | tck | active-low reset for the tck-domain half (`jtag_tap`/`jtag_dtm`, see note below) |
 | `tms` | in | 1 | tck | Test Mode Select |
 | `tdi` | in | 1 | tck | Test Data In |
 | `tdo` | out | 1 | tck | Test Data Out |
 | `clk` | in | 1 | - | system clock (bridge only) |
 | `m_*` (AXI4-Lite master) | - | - | clk | the bridge's AXI4-Lite master port, wired to the crossbar's `s1_*` |
 
-`rst` 目前 tck 域跟 clk 域共用同一條線,沒有各自獨立、經過同步處理的 reset——這個專案裡兩者都只是 power-on 用的模擬 reset,不是需要嚴謹 CDC (clock-domain crossing) 處理的訊號,所以這是刻意的簡化,不是疏漏。
+在這個 block 自己的獨立測試(`jtag_chain_testtop.v`)裡,`resetn`/`tck_resetn` 是兩條各自獨立、由 testbench 直接驅動的訊號,沒有內建的 CDC (clock-domain crossing) 同步邏輯——這是刻意的簡化,因為 block-level 測試只需要模擬 power-on reset,不需要驗證跨時脈域的 reset 同步。真正需要嚴謹處理的 reset domain crossing(異步輸入、雙 flop 同步器)是在 `soc_top.v` 整合層級做的:`resetn_clk_sync`/`resetn_tck_sync` 各自是 clk 域跟 tck 域獨立的同步版本,詳見 `docs/cdc_report.md` 的 RDC (Reset Domain Crossing) 章節。
 
 ## 4. Register Map (JTAG DR content, selected via IR)
 

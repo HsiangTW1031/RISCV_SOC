@@ -19,7 +19,7 @@ module dma_ram #(
     parameter SIZE_WORDS = 2048
 ) (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     // ---- AXI4 write address ----
     input  wire        s_awvalid,
@@ -74,7 +74,7 @@ module dma_ram #(
   assign s_wready  = (w_state == W_BURST);
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       w_state  <= W_IDLE;
       s_bvalid <= 1'b0;
     end else begin
@@ -123,7 +123,7 @@ module dma_ram #(
   assign s_arready = (r_state == R_IDLE);
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       r_state  <= R_IDLE;
       s_rvalid <= 1'b0;
     end else begin

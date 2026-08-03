@@ -46,7 +46,7 @@
 // rationale as every other peripheral here (see timer.v's header comment).
 module aes (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -103,7 +103,7 @@ module aes (
   wire       do_load_iv  = do_write && (aw_offset == REG_CTRL) && s_wdata[4] && !core_busy;
 
   aes_chain u_chain (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .load_iv(do_load_iv), .iv_in(iv_reg),
       .start(do_start),
       .encdec(s_wdata[1]),
@@ -118,7 +118,7 @@ module aes (
   wire [127:0] iv_reg_next;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       key_reg     <= 128'h0;
       data_reg    <= 128'h0;
       iv_reg      <= 128'h0;
@@ -187,7 +187,7 @@ module aes (
   // itself latches internally), purely so CTRL reads back the most
   // recently started operation's direction/mode.
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       encdec_reg <= 1'b0;
       mode_reg   <= 2'b0;
     end else if (do_start) begin

@@ -5,9 +5,9 @@
 // deliverable; lives in sim/, not rtl/.
 module jtag_chain_testtop (
     input  wire clk,
-    input  wire rst,
+    input  wire resetn,
     input  wire tck,
-    input  wire tck_rst,
+    input  wire tck_resetn,
     input  wire tms,
     input  wire tdi,
     output wire tdo
@@ -18,7 +18,7 @@ module jtag_chain_testtop (
   wire [31:0] rdata_tck;
 
   jtag_dtm u_dtm (
-      .tck(tck), .rst(tck_rst), .tms(tms), .tdi(tdi), .tdo(tdo),
+      .tck(tck), .resetn(tck_resetn), .tms(tms), .tdi(tdi), .tdo(tdo),
       .bridge_busy_tck(busy_tck), .bridge_resp_ok_tck(resp_ok_tck), .bridge_rdata_tck(rdata_tck),
       .start_pulse_tck(start_pulse_tck), .rw_tck(rw_tck), .addr_tck(addr_tck), .wdata_tck(wdata_tck)
   );
@@ -30,7 +30,7 @@ module jtag_chain_testtop (
   wire        m_rvalid,  m_rready;  wire [31:0] m_rdata; wire [1:0] m_rresp;
 
   jtag_axi_bridge u_bridge (
-      .clk(clk), .rst(rst), .tck(tck), .tck_rst(tck_rst),
+      .clk(clk), .resetn(resetn), .tck(tck), .tck_resetn(tck_resetn),
       .start_pulse_tck(start_pulse_tck), .rw_tck(rw_tck), .addr_tck(addr_tck), .wdata_tck(wdata_tck),
       .busy_tck(busy_tck), .resp_ok_tck(resp_ok_tck), .rdata_tck(rdata_tck),
       .m_awvalid(m_awvalid), .m_awready(m_awready), .m_awaddr(m_awaddr),
@@ -41,7 +41,7 @@ module jtag_chain_testtop (
   );
 
   fake_axi_lite_slave u_slave (
-      .clk(clk), .rst(rst),
+      .clk(clk), .resetn(resetn),
       .s_awvalid(m_awvalid), .s_awready(m_awready), .s_awaddr(m_awaddr),
       .s_wvalid(m_wvalid),   .s_wready(m_wready),   .s_wdata(m_wdata), .s_wstrb(m_wstrb),
       .s_bvalid(m_bvalid),   .s_bready(m_bready),   .s_bresp(m_bresp),

@@ -53,7 +53,7 @@ flowchart LR
 
 | Signal | Dir | Width | 說明 |
 |---|---|---|---|
-| `clk`, `rst` | in | 1 | 同步 clock、非同步 active-high reset |
+| `clk`, `resetn` | in | 1 | 同步 clock、同步 active-low reset(resetn) |
 | `s_aw*` / `s_w*` / `s_b*` / `s_ar*` / `s_r*` | - | - | AXI4-**Lite** slave（控制埠,接主 crossbar) |
 | `m_aw*` / `m_w*` / `m_b*` / `m_ar*` / `m_r*` | - | - | AXI4（完整版)burst master（接 `dma_ram.v`,固定 4-byte beat、INCR burst,見 `rtl/include/axi4.vh`) |
 | `irq` | out | 1 | **整個**多 block 操作做完的單一 cycle pulse（不是每個 block 都 pulse 一次)，跟專案裡其他周邊一樣的 LATCHED_IRQ 慣例 |

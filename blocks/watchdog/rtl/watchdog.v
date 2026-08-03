@@ -29,7 +29,7 @@ module watchdog #(
     parameter WARN_MARGIN = 4  // cycles remaining when WARNING first fires
 ) (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -67,7 +67,7 @@ module watchdog #(
   wire       restart       = write_ctrl_en || write_kick;
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       ctrl_en          <= 1'b0;
       timeout_reg      <= 32'hFFFFFFFF;
       count            <= 32'hFFFFFFFF;

@@ -51,9 +51,9 @@ int main(int argc, char** argv) {
     dut->clk = 1; dut->eval();
   };
 
-  dut->rst = 1;
+  dut->resetn = 0;
   clock(); clock();
-  dut->rst = 0;
+  dut->resetn = 1;
   clock();
 
   int fail_count = 0;

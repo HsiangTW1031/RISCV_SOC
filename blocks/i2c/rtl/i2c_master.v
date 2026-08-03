@@ -31,7 +31,7 @@
 // back high.
 module i2c_master (
     input  wire        clk,
-    input  wire        rst,
+    input  wire        resetn,
 
     input  wire        s_awvalid, output wire s_awready, input wire [31:0] s_awaddr,
     input  wire        s_wvalid,  output wire s_wready,  input wire [31:0] s_wdata, input wire [3:0] s_wstrb,
@@ -91,7 +91,7 @@ module i2c_master (
   wire tick = (div_cnt == divider_reg - 1);
 
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       state         <= ST_IDLE;
       scl            <= 1'b1;
       sda_drive_low  <= 1'b0;
@@ -316,7 +316,7 @@ module i2c_master (
   reg [6:0] addr_reg;
   reg [7:0] txdata_reg;
   always @(posedge clk) begin
-    if (rst) begin
+    if (!resetn) begin
       addr_reg   <= 7'h0;
       txdata_reg <= 8'h0;
     end else begin
