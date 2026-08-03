@@ -1,0 +1,246 @@
+OpenSTA 3.1.0 5be03c5cca Copyright (c) 2026, Parallax Software, Inc.
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+
+This is free software, and you are free to change and redistribute it
+under certain conditions; type `show_copying' for details. 
+This program comes with ABSOLUTELY NO WARRANTY; for details type `show_warranty'.
+Warning 441: soc_top.sdc line 14, set_input_delay relative to a clock defined on the same port/pin not allowed.
+=== Setup (max delay, slow corner) ===
+Startpoint: u_aes/u_chain/_6134_
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint: u_aes/u_chain/_6259_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+     Cap     Slew    Delay     Time   Description
+---------------------------------------------------------------------------
+            0.000    0.000    0.000   clock clk (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+            0.000    0.000    0.000 ^ u_aes/u_chain/_6134_/CK (DFF_X1)
+   2.964    0.037    0.308    0.308 ^ u_aes/u_chain/_6134_/Q (DFF_X1)
+            0.037    0.000    0.308 ^ u_aes/u_chain/_3613_/A (CLKBUF_X2)
+  12.041    0.058    0.120    0.427 ^ u_aes/u_chain/_3613_/Z (CLKBUF_X2)
+            0.058    0.000    0.427 ^ u_aes/u_chain/_4573_/A3 (AND4_X4)
+   7.103    0.036    0.169    0.596 ^ u_aes/u_chain/_4573_/ZN (AND4_X4)
+            0.036    0.000    0.596 ^ u_aes/u_chain/_4574_/A4 (AND4_X4)
+   7.756    0.037    0.164    0.760 ^ u_aes/u_chain/_4574_/ZN (AND4_X4)
+            0.037    0.000    0.760 ^ u_aes/u_chain/_4575_/A4 (AND4_X4)
+   7.756    0.037    0.165    0.925 ^ u_aes/u_chain/_4575_/ZN (AND4_X4)
+            0.037    0.000    0.925 ^ u_aes/u_chain/_4576_/A4 (AND4_X4)
+   9.138    0.040    0.168    1.093 ^ u_aes/u_chain/_4576_/ZN (AND4_X4)
+            0.040    0.000    1.093 ^ u_aes/u_chain/_4577_/A4 (NAND4_X4)
+  10.815    0.060    0.101    1.194 v u_aes/u_chain/_4577_/ZN (NAND4_X4)
+            0.060    0.000    1.194 v u_aes/u_chain/_4578_/A4 (NOR4_X4)
+   9.138    0.192    0.370    1.565 ^ u_aes/u_chain/_4578_/ZN (NOR4_X4)
+            0.192    0.000    1.565 ^ u_aes/u_chain/_4579_/A4 (NAND4_X4)
+  10.815    0.060    0.141    1.706 v u_aes/u_chain/_4579_/ZN (NAND4_X4)
+            0.060    0.000    1.706 v u_aes/u_chain/_4580_/A4 (NOR4_X4)
+   6.816    0.170    0.345    2.050 ^ u_aes/u_chain/_4580_/ZN (NOR4_X4)
+            0.170    0.000    2.050 ^ u_aes/u_chain/_4581_/A4 (AND4_X4)
+   9.130    0.040    0.206    2.257 ^ u_aes/u_chain/_4581_/ZN (AND4_X4)
+            0.040    0.000    2.257 ^ u_aes/u_chain/_4582_/A4 (NAND4_X4)
+  10.815    0.060    0.102    2.358 v u_aes/u_chain/_4582_/ZN (NAND4_X4)
+            0.060    0.000    2.358 v u_aes/u_chain/_4583_/A4 (NOR4_X4)
+   9.138    0.192    0.370    2.728 ^ u_aes/u_chain/_4583_/ZN (NOR4_X4)
+            0.192    0.000    2.728 ^ u_aes/u_chain/_4584_/A4 (NAND4_X4)
+  10.815    0.060    0.141    2.870 v u_aes/u_chain/_4584_/ZN (NAND4_X4)
+            0.060    0.000    2.870 v u_aes/u_chain/_4585_/A4 (NOR4_X4)
+   9.138    0.192    0.370    3.240 ^ u_aes/u_chain/_4585_/ZN (NOR4_X4)
+            0.192    0.000    3.240 ^ u_aes/u_chain/_4586_/A4 (NAND4_X4)
+  10.815    0.060    0.141    3.381 v u_aes/u_chain/_4586_/ZN (NAND4_X4)
+            0.060    0.000    3.381 v u_aes/u_chain/_4587_/A4 (NOR4_X4)
+   9.138    0.192    0.370    3.751 ^ u_aes/u_chain/_4587_/ZN (NOR4_X4)
+            0.192    0.000    3.751 ^ u_aes/u_chain/_4588_/A4 (NAND4_X4)
+  10.815    0.060    0.141    3.892 v u_aes/u_chain/_4588_/ZN (NAND4_X4)
+            0.060    0.000    3.892 v u_aes/u_chain/_4589_/A4 (NOR4_X4)
+   9.138    0.192    0.370    4.262 ^ u_aes/u_chain/_4589_/ZN (NOR4_X4)
+            0.192    0.000    4.262 ^ u_aes/u_chain/_4590_/A4 (NAND4_X4)
+  10.815    0.060    0.141    4.404 v u_aes/u_chain/_4590_/ZN (NAND4_X4)
+            0.060    0.000    4.404 v u_aes/u_chain/_4591_/A4 (NOR4_X4)
+   5.075    0.153    0.325    4.729 ^ u_aes/u_chain/_4591_/ZN (NOR4_X4)
+            0.153    0.000    4.729 ^ u_aes/u_chain/_4592_/A4 (AND4_X2)
+   9.138    0.058    0.230    4.959 ^ u_aes/u_chain/_4592_/ZN (AND4_X2)
+            0.058    0.000    4.959 ^ u_aes/u_chain/_4593_/A4 (NAND4_X4)
+  10.815    0.060    0.107    5.067 v u_aes/u_chain/_4593_/ZN (NAND4_X4)
+            0.060    0.000    5.067 v u_aes/u_chain/_4594_/A4 (NOR4_X4)
+   9.138    0.192    0.370    5.437 ^ u_aes/u_chain/_4594_/ZN (NOR4_X4)
+            0.192    0.000    5.437 ^ u_aes/u_chain/_4595_/A4 (NAND4_X4)
+  10.815    0.060    0.141    5.578 v u_aes/u_chain/_4595_/ZN (NAND4_X4)
+            0.060    0.000    5.578 v u_aes/u_chain/_4596_/A4 (NOR4_X4)
+   6.902    0.170    0.346    5.924 ^ u_aes/u_chain/_4596_/ZN (NOR4_X4)
+            0.170    0.000    5.924 ^ u_aes/u_chain/_4597_/A4 (NAND4_X2)
+   8.524    0.070    0.153    6.077 v u_aes/u_chain/_4597_/ZN (NAND4_X2)
+            0.070    0.000    6.077 v u_aes/u_chain/_4598_/A4 (NOR4_X4)
+   3.225    0.135    0.310    6.386 ^ u_aes/u_chain/_4598_/ZN (NOR4_X4)
+            0.135    0.000    6.386 ^ u_aes/u_chain/_4599_/A4 (AND4_X2)
+   9.130    0.058    0.226    6.612 ^ u_aes/u_chain/_4599_/ZN (AND4_X2)
+            0.058    0.000    6.612 ^ u_aes/u_chain/_4600_/A4 (NAND4_X4)
+  10.815    0.060    0.107    6.719 v u_aes/u_chain/_4600_/ZN (NAND4_X4)
+            0.060    0.000    6.719 v u_aes/u_chain/_4601_/A4 (NOR4_X4)
+   9.138    0.192    0.370    7.089 ^ u_aes/u_chain/_4601_/ZN (NOR4_X4)
+            0.192    0.000    7.089 ^ u_aes/u_chain/_4602_/A4 (NAND4_X4)
+  10.815    0.060    0.141    7.230 v u_aes/u_chain/_4602_/ZN (NAND4_X4)
+            0.060    0.000    7.230 v u_aes/u_chain/_4603_/A4 (NOR4_X4)
+   5.075    0.153    0.325    7.556 ^ u_aes/u_chain/_4603_/ZN (NOR4_X4)
+            0.153    0.000    7.556 ^ u_aes/u_chain/_4604_/A4 (AND4_X2)
+   9.138    0.058    0.230    7.786 ^ u_aes/u_chain/_4604_/ZN (AND4_X2)
+            0.058    0.000    7.786 ^ u_aes/u_chain/_4605_/A4 (NAND4_X4)
+  10.815    0.060    0.107    7.893 v u_aes/u_chain/_4605_/ZN (NAND4_X4)
+            0.060    0.000    7.893 v u_aes/u_chain/_4606_/A4 (NOR4_X4)
+   9.396    0.194    0.373    8.266 ^ u_aes/u_chain/_4606_/ZN (NOR4_X4)
+            0.194    0.000    8.266 ^ u_aes/u_chain/_4607_/A4 (NAND4_X4)
+  10.815    0.060    0.142    8.408 v u_aes/u_chain/_4607_/ZN (NAND4_X4)
+            0.060    0.000    8.408 v u_aes/u_chain/_4608_/A4 (NOR4_X4)
+   5.311    0.155    0.328    8.736 ^ u_aes/u_chain/_4608_/ZN (NOR4_X4)
+            0.155    0.000    8.736 ^ u_aes/u_chain/_4609_/A4 (NAND4_X2)
+   8.524    0.069    0.149    8.886 v u_aes/u_chain/_4609_/ZN (NAND4_X2)
+            0.069    0.000    8.886 v u_aes/u_chain/_4610_/A4 (NOR4_X4)
+   5.749    0.159    0.337    9.223 ^ u_aes/u_chain/_4610_/ZN (NOR4_X4)
+            0.159    0.000    9.223 ^ u_aes/u_chain/_4611_/A4 (AND4_X2)
+   7.756    0.053    0.225    9.448 ^ u_aes/u_chain/_4611_/ZN (AND4_X2)
+            0.053    0.000    9.448 ^ u_aes/u_chain/_4612_/A4 (AND4_X4)
+   7.756    0.037    0.170    9.618 ^ u_aes/u_chain/_4612_/ZN (AND4_X4)
+            0.037    0.000    9.618 ^ u_aes/u_chain/_4613_/A4 (AND4_X4)
+   8.953    0.040    0.168    9.786 ^ u_aes/u_chain/_4613_/ZN (AND4_X4)
+            0.040    0.000    9.786 ^ u_aes/u_chain/_4617_/A4 (NAND4_X1)
+   3.113    0.056    0.103    9.889 v u_aes/u_chain/_4617_/ZN (NAND4_X1)
+            0.056    0.000    9.889 v u_aes/u_chain/_6020_/A2 (OR2_X1)
+   1.401    0.030    0.201   10.090 v u_aes/u_chain/_6020_/ZN (OR2_X1)
+            0.030    0.000   10.090 v u_aes/u_chain/_6022_/B1 (AOI21_X1)
+   3.031    0.105    0.126   10.216 ^ u_aes/u_chain/_6022_/ZN (AOI21_X1)
+            0.105    0.000   10.216 ^ u_aes/u_chain/_6023_/B1 (OAI22_X2)
+   1.030    0.039    0.072   10.288 v u_aes/u_chain/_6023_/ZN (OAI22_X2)
+            0.039    0.000   10.288 v u_aes/u_chain/_6259_/D (DFF_X1)
+                             10.288   data arrival time
+
+            0.000    2.000    2.000   clock clk (rise edge)
+                     0.000    2.000   clock network delay (ideal)
+                     0.000    2.000   clock reconvergence pessimism
+                              2.000 ^ u_aes/u_chain/_6259_/CK (DFF_X1)
+                    -0.169    1.831   library setup time
+                              1.831   data required time
+---------------------------------------------------------------------------
+                              1.831   data required time
+                            -10.288   data arrival time
+---------------------------------------------------------------------------
+                             -8.457   slack (VIOLATED)
+
+
+Startpoint: u_jtag_dtm/u_tap/_122_
+            (rising edge-triggered flip-flop clocked by tck)
+Endpoint: u_jtag_dtm/_889_ (rising edge-triggered flip-flop clocked by tck)
+Path Group: tck
+Path Type: max
+
+     Cap     Slew    Delay     Time   Description
+---------------------------------------------------------------------------
+            0.000    0.000    0.000   clock tck (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+            0.000    0.000    0.000 ^ u_jtag_dtm/u_tap/_122_/CK (DFF_X1)
+   0.935    0.023    0.295    0.295 ^ u_jtag_dtm/u_tap/_122_/Q (DFF_X1)
+            0.023    0.000    0.295 ^ u_jtag_dtm/u_tap/_054_/A (BUF_X1)
+  11.314    0.101    0.146    0.441 ^ u_jtag_dtm/u_tap/_054_/Z (BUF_X1)
+            0.101    0.000    0.441 ^ u_jtag_dtm/u_tap/_061_/A (INV_X1)
+   5.668    0.032    0.062    0.503 v u_jtag_dtm/u_tap/_061_/ZN (INV_X1)
+            0.032    0.000    0.503 v u_jtag_dtm/u_tap/_080_/A2 (NAND2_X1)
+   6.406    0.070    0.102    0.604 ^ u_jtag_dtm/u_tap/_080_/ZN (NAND2_X1)
+            0.070    0.000    0.604 ^ u_jtag_dtm/u_tap/_083_/A2 (NOR2_X1)
+   0.835    0.018    0.035    0.640 v u_jtag_dtm/u_tap/_083_/ZN (NOR2_X1)
+            0.018    0.000    0.640 v u_jtag_dtm/_471_/A (BUF_X1)
+  13.249    0.039    0.126    0.766 v u_jtag_dtm/_471_/Z (BUF_X1)
+            0.039    0.000    0.766 v u_jtag_dtm/_472_/A1 (NOR2_X1)
+   4.857    0.115    0.156    0.922 ^ u_jtag_dtm/_472_/ZN (NOR2_X1)
+            0.115    0.000    0.922 ^ u_jtag_dtm/_495_/A2 (NAND2_X1)
+   2.808    0.032    0.073    0.995 v u_jtag_dtm/_495_/ZN (NAND2_X1)
+            0.032    0.000    0.995 v u_jtag_dtm/_496_/A3 (NOR4_X1)
+   6.591    0.353    0.519    1.513 ^ u_jtag_dtm/_496_/ZN (NOR4_X1)
+            0.353    0.000    1.513 ^ u_jtag_dtm/_695_/A (BUF_X1)
+  18.935    0.163    0.285    1.798 ^ u_jtag_dtm/_695_/Z (BUF_X1)
+            0.163    0.000    1.798 ^ u_jtag_dtm/_703_/S (MUX2_X1)
+   1.030    0.032    0.237    2.035 v u_jtag_dtm/_703_/Z (MUX2_X1)
+            0.032    0.000    2.035 v u_jtag_dtm/_889_/D (DFF_X1)
+                              2.035   data arrival time
+
+            0.000   20.000   20.000   clock tck (rise edge)
+                     0.000   20.000   clock network delay (ideal)
+                     0.000   20.000   clock reconvergence pessimism
+                             20.000 ^ u_jtag_dtm/_889_/CK (DFF_X1)
+                    -0.166   19.834   library setup time
+                             19.834   data required time
+---------------------------------------------------------------------------
+                             19.834   data required time
+                             -2.035   data arrival time
+---------------------------------------------------------------------------
+                             17.800   slack (MET)
+
+
+
+wns max -8.46
+tns max -19168.08
+
+=== Hold (min delay, fast corner) ===
+Startpoint: spi_miso (input port clocked by clk)
+Endpoint: u_spi/_1415_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+     Cap     Slew    Delay     Time   Description
+---------------------------------------------------------------------------
+            0.000    0.000    0.000   clock clk (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+                     0.000    0.000 ^ input external delay
+   0.968    0.000    0.000    0.000 ^ spi_miso (in)
+            0.000    0.000    0.000 ^ u_spi/_1147_/B (MUX2_X1)
+   1.158    0.005    0.021    0.021 ^ u_spi/_1147_/Z (MUX2_X1)
+            0.005    0.000    0.021 ^ u_spi/_1415_/D (DFF_X1)
+                              0.021   data arrival time
+
+            0.000    0.000    0.000   clock clk (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+                     0.000    0.000   clock reconvergence pessimism
+                              0.000 ^ u_spi/_1415_/CK (DFF_X1)
+                     0.003    0.003   library hold time
+                              0.003   data required time
+---------------------------------------------------------------------------
+                              0.003   data required time
+                             -0.021   data arrival time
+---------------------------------------------------------------------------
+                              0.018   slack (MET)
+
+
+Startpoint: tdi (input port clocked by tck)
+Endpoint: u_jtag_dtm/_845_ (rising edge-triggered flip-flop clocked by tck)
+Path Group: tck
+Path Type: min
+
+     Cap     Slew    Delay     Time   Description
+---------------------------------------------------------------------------
+            0.000    0.000    0.000   clock tck (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+                     0.000    0.000 ^ input external delay
+   3.320    0.000    0.000    0.000 ^ tdi (in)
+            0.000    0.000    0.000 ^ u_jtag_dtm/_728_/A (INV_X1)
+   2.889    0.003    0.005    0.005 v u_jtag_dtm/_728_/ZN (INV_X1)
+            0.003    0.000    0.005 v u_jtag_dtm/_729_/A1 (NOR2_X1)
+   0.968    0.006    0.009    0.014 ^ u_jtag_dtm/_729_/ZN (NOR2_X1)
+            0.006    0.000    0.014 ^ u_jtag_dtm/_731_/B (MUX2_X1)
+   1.158    0.005    0.022    0.036 ^ u_jtag_dtm/_731_/Z (MUX2_X1)
+            0.005    0.000    0.036 ^ u_jtag_dtm/_845_/D (DFF_X1)
+                              0.036   data arrival time
+
+            0.000    0.000    0.000   clock tck (rise edge)
+                     0.000    0.000   clock network delay (ideal)
+                     0.000    0.000   clock reconvergence pessimism
+                              0.000 ^ u_jtag_dtm/_845_/CK (DFF_X1)
+                     0.003    0.003   library hold time
+                              0.003   data required time
+---------------------------------------------------------------------------
+                              0.003   data required time
+                             -0.036   data arrival time
+---------------------------------------------------------------------------
+                              0.033   slack (MET)
+
+
+
+wns min 0.00
+tns min 0.00

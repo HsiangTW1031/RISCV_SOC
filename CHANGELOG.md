@@ -4,6 +4,54 @@ Maps each git tag to what changed and why. Commit messages have the "what";
 `docs/project_retrospective.md` has the full bug-by-bug story behind most of
 these — this file is the short index between the two.
 
+## [v2.1.0] - 2026-08-03
+
+Recovers (and exceeds) the Fmax regression documented as a "known effect"
+in v2.0.0. Root cause: `blocks/soc_top/syn/synth.ys`'s `abc -liberty
+$NANGATE45_LIB` call never passed `-constr`, so abc's default script never
+ran its `buffer`/`upsize`/`dnsize` gate-sizing passes -- this SoC's
+synthesis flow had never actually done timing-driven sizing, from Phase 7
+onward. The v2.0.0 regression just exposed a pre-existing gap.
+
+### Changed
+- `blocks/soc_top/syn/synth.ys`: `dfflibmap`/`abc` now target
+  `$NANGATE45_SLOW_LIB` (not the typical-corner lib used everywhere else
+  in the file) with a new `constr.txt` (`-constr`) and `-D 10000`, so
+  abc's sizing decisions are computed against the worst-case setup corner
+  -- Yosys/abc has no true MMMC optimization, so this is the closest
+  available approximation
+- `scripts/render_liberty_template.sh`: now also substitutes
+  `@NANGATE45_SLOW_LIB@`/`@NANGATE45_FAST_LIB@` placeholders when a
+  template references them (conditionally -- other blocks' `.ys` files
+  that only use `@NANGATE45_LIB@` are unaffected)
+- `scripts/collect_soc_reports.sh`: synth/STA skip condition now also
+  requires `NANGATE45_SLOW_LIB`
+- New committed report: `reports/sign_off/timing_mcmm.txt` (3-corner STA
+  raw output)
+
+### Known-good result (verified, not just re-tuned for one corner)
+- Typical corner: critical path 14.821ns -> 2.881ns, Fmax 67.5MHz ->
+  **347.1MHz**, critical path moved from PicoRV32 back to the AES chain --
+  better than even the pre-v2.0.0 baseline (91.2MHz)
+- Slow corner: 51.837ns -> 10.288ns, Fmax 19.3MHz -> **97.2MHz**
+- Fast corner hold: still 0 violations (TNS = 0.00)
+- Chip area +4.76% (129373.6 -> 135530.2) -- sizing trades area for timing
+- Best-effort LEC (`equiv_simple`): identical proven-checkpoint count
+  before/after (36014) -- sizing doesn't touch logic, confirmed no new
+  equivalence gaps introduced
+- 19/19 regression and 135 lint findings unchanged (neither touches
+  synthesis)
+
+A tempting-but-wrong intermediate attempt (flattening the hierarchy with
+`synth -top soc_top -flatten` so abc would see one global netlist) was
+tried and rejected: it made the critical path *worse* (14.821ns ->
+38.364ns) -- abc's heuristics degrade on a single ~127k-cell flat netlist
+compared to running per-submodule, so this project's existing
+non-flattened synthesis is kept deliberately. See
+`docs/project_retrospective.md` for the full investigation, including the
+git-worktree-isolated experiments that preceded applying this to the
+committed tree.
+
 ## [v2.0.0] - 2026-08-03
 
 **Breaking**: every module's reset port renamed from active-high `rst` to

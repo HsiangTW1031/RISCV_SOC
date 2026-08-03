@@ -70,7 +70,7 @@ echo "=== Optional: needed only for synthesis / STA / formal LEC ==="
 check_optional "Yosys" yosys "yosys -V"
 check_optional "OpenSTA" sta "sta -version"
 check_env_file NANGATE45_LIB "typical corner, see TOOLCHAIN.md"
-check_env_file NANGATE45_SLOW_LIB "multi-corner STA only"
+check_env_file NANGATE45_SLOW_LIB "multi-corner STA + soc_top synth gate sizing"
 check_env_file NANGATE45_FAST_LIB "multi-corner STA only"
 
 echo

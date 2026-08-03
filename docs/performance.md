@@ -8,14 +8,22 @@
 
 三塊純記憶體陣列（`boot_rom` 64KB、`sram` 128KB、`dma_ram` 8KB)換成 blackbox stub（`blocks/soc_top/syn/mem_blackboxes.v`)——真實 ASIC flow 裡這些會是硬 IP SRAM macro,不是真的拿 flip-flop 湊出來的,讓 Yosys 把一個 32K-word 的陣列展開成百萬顆 flip-flop 既不真實也慢到不划算。除了這三塊,**PicoRV32、手刻 crossbar、每個周邊的控制/資料路徑、AES core + CBC/CTR chaining、DMA engine 全部都是真的合成**——這是為什麼下面這個 Fmax 數字反映的是真正的邏輯關鍵路徑,不是被記憶體模型撐大的假象。
 
-- **Chip area**（Nangate45 單位):129373.6,其中 sequential elements 佔 36.78%(47588.2,正反器數量本身沒變)——比 active-low reset retrofit(見 `docs/project_retrospective.md`)之前略降(129373.6 vs. 129847.1),少了原本 `soc_top.v` 裡橋接 PicoRV32 用的一顆反相器(`wire resetn = !rst_clk_sync;`,retrofit 後不再需要)
-- **Cell count**:78446 個 standard cell instance
-- **關鍵路徑**:2.0ns 時脈假設下 WNS = -9.02ns,實際關鍵路徑延遲 **10.966ns**(reset synchronizer 前後完全沒變,符合預期——reset 分配邏輯跟 AES key expansion 這條臨界路徑毫無關係)
-- **關鍵路徑位置**:`u_cpu/picorv32_core` 內部(PicoRV32 自己的解碼/ALU 邏輯)。
+- **Chip area**（Nangate45 單位):135530.2,其中 sequential elements 佔 35.11%(47588.2,正反器數量本身沒變,比例下降只是分母變大)——比 active-low reset retrofit 剛完成時(129373.6)多了 4.76%,原因見下面的 sizing 說明
+- **Cell count**:85893 個 standard cell instance(flatten 後統計;比 retrofit 剛完成時的 78446 多,同樣是新增的 buffer/放大後 cell)
+- **關鍵路徑**:2.0ns 時脈假設下 WNS = -0.92ns,實際關鍵路徑延遲 **2.881ns**
+- **關鍵路徑位置**:`u_aes/u_chain` 內部(AES CBC/CTR chaining 邏輯)
 
-**Fmax ≈ 1 / 14.821ns ≈ 67.5 MHz**
+**Fmax ≈ 1 / 2.881ns ≈ 347.1 MHz**
 
-**這個數字是 active-low reset retrofit 之後才出現的變化,誠實記錄清楚**:retrofit 之前,關鍵路徑一直是 `u_aes/u_chain/u_core/u_key_expand`(AES key expansion 組合邏輯,10.966ns、Fmax≈91.2MHz,跟 Phase 4 單獨合成 `aes_core` 的 10.153ns/98.5MHz 幾乎是同一個瓶頸)。Retrofit 只把 reset 訊號的命名和極性做了鏡像等價的轉換(`if(rst)`→`if(!resetn)`),**沒有動到 PicoRV32 任何一行程式碼**,PicoRV32 收到的 `resetn` 訊號在邏輯行為上跟 retrofit 前完全等價(已用完整 regression + LEC 交叉驗證過,不是功能問題)。但重新合成後,關鍵路徑整個換位置換到 PicoRV32 內部一段完全沒改過的邏輯上,新的瓶頸比原本的 AES 瓶頸還慢(14.821ns vs. 10.966ns)。合理的推測是:retrofit 讓全專案大量訊號改名、少了一顆反相器,這類結構性變動改變了 Yosys/abc 技術對應(technology mapping)過程中的內部啟發式決策順序,連帶影響到邏輯上完全無關模組的優化結果——這是已知但很難精準預測的合成工具行為,不是 retrofit 引入了真正的邏輯或時序缺陷。這個結論沒有再進一步深挖驗證(例如嘗試不同的 abc 參數看能不能把時序拉回來),留作已知現象記錄。
+**這個數字經過兩個階段才到這裡,完整記錄如下**:
+
+1. **active-low reset retrofit 剛完成時的規律**(已在上一版記錄過,細節見 `docs/project_retrospective.md`):retrofit 前關鍵路徑一直是 `u_aes/u_chain/u_core/u_key_expand`(AES key expansion,10.966ns、Fmax≈91.2MHz)。Retrofit 只把 reset 訊號的命名和極性做了鏡像等價的轉換,沒有動到 PicoRV32 任何一行程式碼,但重新合成後關鍵路徑整個換位置換到 PicoRV32 內部,新的瓶頸比原本的 AES 瓶頸還慢(14.821ns,Fmax≈67.5MHz)。
+2. **根因追查後找到的真正原因**:`blocks/soc_top/syn/synth.ys` 原本的 `abc -liberty $NANGATE45_LIB` 呼叫**從來沒有帶 `-constr`**——查證 Yosys 的 `abc` pass 說明才發現,abc 內建的預設 script 只有在給了 `-constr`(driving cell/load 假設)之後,才會執行 `buffer`/`upsize`/`dnsize` 這幾個真正做 gate sizing 的 pass;沒有 `-constr` 的話,不管加不加 `-D`(delay target)都只做純面積導向的技術對應,完全不會針對任何一條路徑做尺寸調整。也就是說:從專案一開始,這個 SoC 的合成流程就從未真正做過 timing-driven sizing,retrofit 只是把這個一直存在的盲點暴露出來而已,不是 retrofit 本身造成的新缺陷。
+   - **先試過、被否決的方向**:把 hierarchy 攤平(`synth -top soc_top -flatten`)讓 abc 用單一全域網表跑,結果是反效果(關鍵路徑 14.821ns→38.364ns)——abc 的 heuristic 在單一 ~127K cell 的巨大平面網表上表現反而比按 submodule 分開跑更差,所以維持現有的非攤平 hierarchy 是刻意的選擇,不是漏做。
+   - **實際生效的做法**:保留 per-module hierarchy,新增 `blocks/soc_top/syn/constr.txt`(`set_driving_cell BUF_X1` + `set_load 10.0`,標準的假設值,重點是「有 -constr」而不是這兩個數字本身)並加上 `-D 10000`,啟用 abc 的 sizing pass。
+   - **用 slow corner library 而非 typical 做 sizing 判斷**:`dfflibmap`/`abc` 這兩行改成吃 `$NANGATE45_SLOW_LIB` 而不是 `$NANGATE45_LIB`——因為 Yosys/abc 沒有真正的 MMMC(Multi-Mode Multi-Corner)最佳化能力,只能在單一 corner 的時序模型下做 sizing 決策;用 slow corner(worst-case setup)當作 sizing 依據,決策會偏保守,比用 typical corner sizing 更接近真實 signoff flow「對 setup 最壞情況做最佳化」的做法。（最終報告面積/typical Fmax 時仍然用 `$NANGATE45_LIB` 算,因為 cell 面積本身不隨 corner 改變,只有 sizing 決策的依據不同。）
+
+結果:典型 corner 關鍵路徑從 14.821ns 降到 2.881ns,關鍵路徑位置也從 PicoRV32 換回 AES chain,而且比 retrofit 之前的 AES 瓶頸(10.966ns)還快很多——**不只補回 retrofit 掉的頻率,還比原本(未 retrofit)的版本更好**,代價是 chip area 多了 4.76%。用 best-effort LEC(`equiv_simple`)驗證過沒有引入新的邏輯偏差(見 `docs/lec_report.md`),19 個 regression target 全過、135 個 lint finding 不變。
 
 ## 2. AES 加密吞吐量
 
@@ -75,16 +83,16 @@
 
 ## 7. Multi-corner STA(setup at slow corner、hold at fast corner)
 
-第 1 節的 67.5MHz(retrofit 前是 91.2MHz)是**單一 typical corner**下量到的數字——真正的 signoff 應該要同時查 setup(worst-case,通常在 slow corner)跟 hold(worst-case,通常在 fast corner),只看 typical 只能當初步估算,不是簽核依據。`blocks/{aes,soc_top}/sta/sta_mcmm.tcl` 補上這一步:同一份 netlist,分別用 OpenSTA 自帶的 Nangate45 slow/fast corner library(跟合成用的 `NangateOpenCellLibrary_typical.lib` 驗證過是同一個 cell family,239/241 顆 cell 完全一致,只差一顆跟邏輯無關的物理 tap cell `TAPCELL_X1`)重新算一次:
+第 1 節的 347.1MHz(retrofit 剛完成、還沒補 sizing 的階段是 67.5MHz;更早的 retrofit 前是 91.2MHz)是**單一 typical corner**下量到的數字——真正的 signoff 應該要同時查 setup(worst-case,通常在 slow corner)跟 hold(worst-case,通常在 fast corner),只看 typical 只能當初步估算,不是簽核依據。`blocks/{aes,soc_top}/sta/sta_mcmm.tcl` 補上這一步:同一份 netlist,分別用 OpenSTA 自帶的 Nangate45 slow/fast corner library(跟合成用的 `NangateOpenCellLibrary_typical.lib` 驗證過是同一個 cell family,239/241 顆 cell 完全一致,只差一顆跟邏輯無關的物理 tap cell `TAPCELL_X1`)重新算一次:
 
 | | Setup(slow corner,max delay) | Hold(fast corner,min delay) |
 |---|---|---|
-| **soc_top** | 關鍵路徑 51.837ns(`u_cpu/picorv32_core` 內部,retrofit 前是同一個 `u_key_expand` 瓶頸、43.128ns)→ **slow corner Fmax ≈ 19.3MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
-| **aes_core**(獨立合成,不受 retrofit 影響) | 關鍵路徑 38.399ns → **slow corner Fmax ≈ 26.0MHz**(retrofit 前 38.219ns/26.2MHz,差異在正常合成雜訊範圍內) | 全設計 0 個 hold 違規(TNS = 0.00) |
+| **soc_top** | 關鍵路徑 10.288ns(`u_aes/u_chain` 內部)→ **slow corner Fmax ≈ 97.2MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
+| **aes_core**(獨立合成,這次的 sizing 改動只動了 `blocks/soc_top/syn/synth.ys`,不影響這裡) | 關鍵路徑 38.399ns → **slow corner Fmax ≈ 26.0MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
 
-Setup 用的 SDC 時脈週期(2.0ns/500MHz)本來就是刻意設定得比實際能達到的頻率更緊(見 `constraints/*.sdc` 註解)——目的是讓 `report_checks` 直接印出關鍵路徑的真實 data arrival time,再自己算 Fmax,不是為了衝一個特定頻率,所以 setup 報告顯示大量違規是預期中的,不代表真的有時序問題;唯一有意義的數字是 data arrival time 換算出來的 slow-corner Fmax,這才是兩個 corner 一起看才拿得到的、比第 1 節保守的真實數字。Hold 完全乾淨(fast corner 下 TNS 剛好 0.00,沒有任何一個 endpoint 違規)——這是加上 reset synchronizer、並且補上對應的 SDC exception(`set_false_path -from [get_ports resetn]`)之後的結果,過程跟理由見 `docs/cdc_report.md`。
+Setup 用的 SDC 時脈週期(2.0ns/500MHz)本來就是刻意設定得比實際能達到的頻率更緊(見 `constraints/*.sdc` 註解)——目的是讓 `report_checks` 直接印出關鍵路徑的真實 data arrival time,再自己算 Fmax,不是為了衝一個特定頻率,所以 setup 報告顯示大量違規是預期中的,不代表真的有時序問題;唯一有意義的數字是 data arrival time 換算出來的 slow-corner Fmax,這才是兩個 corner 一起看才拿得到的、比第 1 節保守的真實數字。Hold 完全乾淨(fast corner 下 TNS 剛好 0.00,沒有任何一個 endpoint 違規)——加上第 1 節的 sizing 改動之後重新確認過,hold 依然完全沒有被 sizing 拖垮,原始報告存在 `reports/sign_off/timing_mcmm.txt`。
 
-**`aes_core` 獨立合成的數字幾乎沒變**(38.219ns→38.399ns,差 0.18ns,正常合成雜訊範圍),證實 retrofit 真的沒有動到 AES 邏輯本身——第 1 節提到的 Fmax 大幅下降(91.2→67.5MHz)是 `soc_top` 整體合成的 critical path 從 AES 換到 PicoRV32 內部造成的,是合成工具對整個 netlist 結構變動的技術對應(technology mapping)反應,不是 AES 或 PicoRV32 任一邊邏輯真的變慢了。
+**`soc_top` 這次的 slow corner Fmax(97.2MHz)比 retrofit 前(43.128ns/≈23.2MHz)、retrofit 剛完成時(51.837ns/19.3MHz)都好很多**——第 1 節提到的 sizing 改動(`abc -constr` + slow corner library)在三個 corner 上都是全面改善,不是只針對 typical corner 調參數湊出來的數字。`aes_core` 獨立合成的數字完全沒變,因為這次的改動範圍刻意只限縮在 `blocks/soc_top/syn/synth.ys`。
 
 ## 8. Signoff 範圍界限(刻意的取捨,不是漏掉)
 

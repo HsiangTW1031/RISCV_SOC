@@ -13,10 +13,12 @@
 # Fmax number in docs/performance.md a genuine logic-critical-path result,
 # not a memory-dominated one.
 #
-# This is a template: @NANGATE45_LIB@ gets substituted with $NANGATE45_LIB
-# by run_synth.sh (Yosys .ys scripts have no native env-var expansion).
+# This is a template: @NANGATE45_LIB@/@NANGATE45_SLOW_LIB@ get substituted
+# with $NANGATE45_LIB/$NANGATE45_SLOW_LIB by run_synth.sh (Yosys .ys scripts
+# have no native env-var expansion).
 #
-# Run from blocks/soc_top/syn/ (requires NANGATE45_LIB set, see TOOLCHAIN.md):
+# Run from blocks/soc_top/syn/ (requires NANGATE45_LIB and NANGATE45_SLOW_LIB
+# set, see TOOLCHAIN.md):
 #   ./run_synth.sh
 read_verilog -I../../../rtl/include -I../rtl \
     mem_blackboxes.v \
@@ -40,8 +42,35 @@ read_verilog -I../../../rtl/include -I../rtl \
 hierarchy -check -top soc_top
 synth -top soc_top
 
-dfflibmap -liberty @NANGATE45_LIB@
-abc -liberty @NANGATE45_LIB@
+# Gate sizing (the `buffer`/`upsize`/`dnsize` passes in abc's default
+# script) only activates when a -constr file is given -- without one,
+# `abc -liberty ...` alone only did area-focused technology mapping and
+# never adjusted drive strength for high-fanout nets. That's why the
+# active-low reset retrofit's Fmax regression (91.2->67.5MHz typical
+# corner, docs/performance.md section 1) went unnoticed by re-running abc
+# with different `-D` delay targets alone: `-D` without `-constr` is a
+# no-op in this design (confirmed empirically -- identical netlist with
+# or without it). Adding -constr (constr.txt: an assumed BUF_X1 driving
+# cell / 10fF load, standard placeholder values -- what matters is that a
+# -constr file is present at all, not these specific numbers) recovered
+# the lost timing and then some (critical path 14.821ns->2.881ns typical
+# corner). See docs/performance.md sections 1 and 7 for the full story.
+#
+# Also tried and REJECTED: flattening the hierarchy first (`synth -top
+# soc_top -flatten`) so abc would see one global netlist instead of
+# per-submodule scopes. That made things worse (14.821ns->38.364ns) --
+# abc's heuristics degrade on a single ~127k-cell flat netlist compared
+# to running per-submodule, so the existing non-flattened hierarchy is
+# kept deliberately.
+#
+# Mapped against the SLOW corner library here (not the typical-corner
+# @NANGATE45_LIB@ used everywhere else in this file/for the `stat` report
+# below) so abc's sizing decisions are biased toward the worst-case PVT
+# corner -- Yosys/abc has no true MMMC (multi-mode multi-corner)
+# optimization, so this is the closest approximation to "size for the
+# corner that actually has to meet setup" available in this toolchain.
+dfflibmap -liberty @NANGATE45_SLOW_LIB@
+abc -liberty @NANGATE45_SLOW_LIB@ -constr constr.txt -D 10000
 
 clean
 write_verilog soc_top_out.v

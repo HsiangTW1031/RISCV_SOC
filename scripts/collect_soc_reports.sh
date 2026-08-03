@@ -20,16 +20,21 @@ export PROJECT_NAME PROJECT_REPO_URL PROJECT_TAGLINE
 OUT="$ROOT/reports/sign_off"
 mkdir -p "$OUT"
 
-# Synthesis + STA need a Nangate45 liberty file, which can't be vendored
-# into this repo (licensing) -- see TOOLCHAIN.md. Without NANGATE45_LIB
-# set, skip those two steps gracefully instead of failing the whole run;
+# Synthesis + STA need Nangate45 liberty files, which can't be vendored
+# into this repo (licensing) -- see TOOLCHAIN.md. Without them set, skip
+# those two steps gracefully instead of failing the whole run;
 # regression/lint/coverage/dashboard don't need a PDK at all.
-if [ -n "${NANGATE45_LIB:-}" ] && [ -f "${NANGATE45_LIB}" ]; then
+# NANGATE45_SLOW_LIB is required here too (not just for sta_mcmm.tcl) --
+# blocks/soc_top/syn/synth.ys's abc -constr gate-sizing pass maps against
+# the slow corner (see docs/performance.md section 7).
+if [ -n "${NANGATE45_LIB:-}" ] && [ -f "${NANGATE45_LIB}" ] \
+   && [ -n "${NANGATE45_SLOW_LIB:-}" ] && [ -f "${NANGATE45_SLOW_LIB}" ]; then
   HAVE_PDK=1
 else
   HAVE_PDK=0
-  echo "NOTE: NANGATE45_LIB not set (or file missing) -- synthesis and STA" >&2
-  echo "      will be SKIPPED. See TOOLCHAIN.md to set up the Nangate45 PDK." >&2
+  echo "NOTE: NANGATE45_LIB and/or NANGATE45_SLOW_LIB not set (or file" >&2
+  echo "      missing) -- synthesis and STA will be SKIPPED. See" >&2
+  echo "      TOOLCHAIN.md to set up the Nangate45 PDK." >&2
 fi
 
 echo "=== 1/6: full regression (scripts/run_regression.sh) ==="

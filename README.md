@@ -168,11 +168,12 @@ each tagged release and why, see [`CHANGELOG.md`](CHANGELOG.md).
 - [x] Whole-SoC Yosys synthesis + OpenSTA timing (Nangate45; the three
       plain memory arrays blackboxed as SRAM macros, everything else —
       PicoRV32, the crossbar, every peripheral, AES, DMA — synthesized for
-      real): **Fmax ≈ 67.5 MHz**, critical path inside PicoRV32's core
-      (see `docs/performance.md` §1 — this moved from AES key expansion
-      after the active-low reset retrofit, likely a synthesis
-      technology-mapping sensitivity to netlist-wide structural changes,
-      not a real logic change in either module)
+      real): **Fmax ≈ 347.1 MHz** (typical corner), critical path inside
+      the AES chain (see `docs/performance.md` §1 and §7 — the active-low
+      reset retrofit had regressed this to 67.5MHz via a critical path
+      that moved into PicoRV32's core; recovered and then some by enabling
+      `abc`'s gate-sizing pass, which the synthesis script had never
+      actually activated)
 - [x] Measured (not estimated) performance data: AES throughput ≈ 69.5 MB/s,
       DMA throughput ≈ 37.4 MB/s (39 cycles/block average), interrupt
       latency 3-14 cycles (avg 8.6) measured directly from a VCD trace

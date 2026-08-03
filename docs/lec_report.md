@@ -9,7 +9,7 @@
 | Block | 方法 | 結果 |
 |---|---|---|
 | **aes_core** | `equiv_simple` + `equiv_induct -seq 12`(完整流程,含 sequential induction) | **97.7% 證明完成**(22126/22646 個 equiv 檢查點),剩餘 520 個(2.3%)集中在同一條訊號鏈,見下方分析 |
-| **soc_top** | 只跑 `equiv_simple`(刻意不跑 `equiv_induct`,見第 3 節理由) | **60.1% 證明完成**(36014/59870 個 equiv 檢查點)——這是「純組合邏輯等價性」的證明覆蓋率,不含任何跨 cycle 的 sequential 證明。加入 reset synchronizer 後數字幾乎沒變(60.2%→60.1%,多了 6 個 equiv 檢查點),需要額外加一個 `async2sync` pass 才能處理新加入的非同步 reset 正反器,見第 3 節 |
+| **soc_top** | 只跑 `equiv_simple`(刻意不跑 `equiv_induct`,見第 3 節理由) | **60.2% 證明完成**(36014/59868 個 equiv 檢查點)——這是「純組合邏輯等價性」的證明覆蓋率,不含任何跨 cycle 的 sequential 證明。加入 `blocks/soc_top/syn/synth.ys` 的 `abc -constr` gate-sizing 改動(`docs/performance.md` §1)後重跑,**證明的 checkpoint 數量完全沒變(還是 36014 個)**,只有分母有 2 個檢查點的誤差——sizing 只調整 cell 尺寸不改邏輯,這個結果符合預期,確認沒有引入新的等價性問題 |
 
 ## 2. aes_core:剩餘 520 個未證明點的分析
 
@@ -30,14 +30,14 @@ rnum(round counter, 4 bits) → sub_shift_enc/sub_shift_dec(128 bits each)
 
 ## 3. soc_top:為什麼只跑 equiv_simple,不跑 equiv_induct
 
-soc_top 含完整的 PicoRV32 CPU,`docs/performance.md` 記錄的 cell count 是 78446 個 standard cell——比 aes_core 的 465 個本地 cell 大了兩個數量級。aes_core 一個 block 光是 `equiv_induct` 就要跑到十幾分鐘還沒完全收斂,同樣的 sequential induction 直接套用到含一整顆 CPU 的整個 SoC,實務上不可能在合理時間內跑完,而且這也不是真實業界的標準做法——**含嵌入式 CPU 的整顆晶片做 full-chip formal equivalence,即使在真正的商用 EDA 工具上都是出了名的難題**,業界的標準解法是「block-level formal + full-chip simulation」,不是「full-chip formal」。這個專案現在剛好就是這個標準組合:
+soc_top 含完整的 PicoRV32 CPU,`docs/performance.md` 記錄的 cell count 是 85893 個 standard cell——比 aes_core 的 465 個本地 cell 大了兩個數量級。aes_core 一個 block 光是 `equiv_induct` 就要跑到十幾分鐘還沒完全收斂,同樣的 sequential induction 直接套用到含一整顆 CPU 的整個 SoC,實務上不可能在合理時間內跑完,而且這也不是真實業界的標準做法——**含嵌入式 CPU 的整顆晶片做 full-chip formal equivalence,即使在真正的商用 EDA 工具上都是出了名的難題**,業界的標準解法是「block-level formal + full-chip simulation」,不是「full-chip formal」。這個專案現在剛好就是這個標準組合:
 
 - Block-level formal:`blocks/aes/syn/lec.ys`(上面第 2 節)
 - Full-chip simulation:`scripts/run_gatelevel_sim.sh`(soc_top 在 gate-level netlist 上跑過完整開機+中斷+UART+JTAG+DMA,全部 PASS)
 
-`blocks/soc_top/syn/lec.ys` 因此刻意縮小範圍,只跑 `equiv_simple`(單次 SAT call,不做多步歸納)當作 best-effort 的部分驗證——60.1% 是「純組合邏輯」的證明覆蓋率,凡是需要跨 cycle 才能證明的暫存器等價性(也就是整個 CPU pipeline、周邊的狀態機)都沒有被這個部分證明涵蓋到。**這 60.1% 不是「signoff 通過」的數字,是誠實標注這一步做到哪裡的部分結果**,真正驗證 soc_top 整體行為正確性的是上面提到的 gate-level simulation。
+`blocks/soc_top/syn/lec.ys` 因此刻意縮小範圍,只跑 `equiv_simple`(單次 SAT call,不做多步歸納)當作 best-effort 的部分驗證——60.2% 是「純組合邏輯」的證明覆蓋率,凡是需要跨 cycle 才能證明的暫存器等價性(也就是整個 CPU pipeline、周邊的狀態機)都沒有被這個部分證明涵蓋到。**這 60.2% 不是「signoff 通過」的數字,是誠實標注這一步做到哪裡的部分結果**,真正驗證 soc_top 整體行為正確性的是上面提到的 gate-level simulation。
 
-加入 `docs/cdc_report.md` 的 reset synchronizer 之後,`equiv_simple` 一開始直接報錯:「No SAT model available for async FF cell ... Consider running `async2sync`」——這個設計唯一真正非同步 reset 的正反器就是新加的 reset synchronizer 本身,SAT 沒有現成模型處理。在 gold/gate 兩邊的 `prep -flatten` 之後都加上 Yosys 內建的 `async2sync` pass(把非同步 FF 輸入轉換成行為等價的同步電路)解決,加完之後數字幾乎不變(60.2%→60.1%),確認這個 reset 相關的新增邏輯本身沒有引入新的等價性問題。
+加入 `docs/cdc_report.md` 的 reset synchronizer 之後,`equiv_simple` 一開始直接報錯:「No SAT model available for async FF cell ... Consider running `async2sync`」——這個設計唯一真正非同步 reset 的正反器就是新加的 reset synchronizer 本身,SAT 沒有現成模型處理。在 gold/gate 兩邊的 `prep -flatten` 之後都加上 Yosys 內建的 `async2sync` pass(把非同步 FF 輸入轉換成行為等價的同步電路)解決,加完之後數字幾乎不變,確認這個 reset 相關的新增邏輯本身沒有引入新的等價性問題。之後 `blocks/soc_top/syn/synth.ys` 加上 gate-sizing(`docs/performance.md` §1)重跑一次,證明的 checkpoint 數量原封不動,同樣的道理:sizing 不改邏輯,不該也沒有影響證明覆蓋率。
 
 ## 4. 如何重跑
 

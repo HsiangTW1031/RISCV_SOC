@@ -2,22 +2,11 @@
 # Full verbose log (all optimization passes) kept locally at
 # blocks/soc_top/syn/synth_log.txt -- not committed (tens of MB).
 
-    17127 2.16E+04     aes_core
-     7766 1.77E+04       aes_key_expand
-      702  1207.64 i2c_master
-      387  1150.45 jtag_axi_bridge
-      431  931.266 jtag_dtm
-       65    73.15   jtag_tap
-      697 1.27E+03 spi_master
-      512  878.598 timer
-      136  271.054 uart
-      497  865.564 watchdog
-
         +----------Count including submodules.
         |        +-Area including submodules.
         |        | 
-    80091        - wires
-   139666        - wire bits
+    87516        - wires
+   147091        - wire bits
      2628        - public wires
     61440        - public wire bits
       596        - ports
@@ -25,30 +14,41 @@
         -        - memories
         -        - memory bits
         -        - processes
-    78446 1.29E+05 cells
+    85871 1.36E+05 cells
       957 1.02E+03   AND2_X1
       448   595.84   AND3_X1
-      182  290.472   AND4_X1
+      160   255.36   AND4_X1
+        8   14.896   AND4_X2
+       14   48.412   AND4_X4
      2207  2935.31   AOI211_X1
      7699 8.19E+03   AOI21_X1
      2296 3.66E+03   AOI221_X1
       605  1287.44   AOI222_X1
      3208  4266.64   AOI22_X1
+     5441 4.34E+03   BUF_X1
+        2    2.128   BUF_X2
+     1978 1.58E+03   CLKBUF_X1
+        4    4.256   CLKBUF_X2
         4    21.28   DFFR_X1
     10519 4.76E+04   DFF_X1
      4458 2.37E+03   INV_X1
      8492 1.58E+04   MUX2_X1
      6300   5027.4   NAND2_X1
      3092 3.29E+03   NAND3_X1
-      547   727.51   NAND4_X1
+      517   687.61   NAND4_X1
+        4    9.576   NAND4_X2
+       26  124.488   NAND4_X4
      5867 4.68E+03   NOR2_X1
      2284 2.43E+03   NOR3_X1
-      364   484.12   NOR4_X1
+      334   444.22   NOR4_X1
+       30   143.64   NOR4_X4
      2042  2715.86   OAI211_X1
-     7878 8.38E+03   OAI21_X1
+     7876 8.38E+03   OAI21_X1
+        2    3.724   OAI21_X2
      1358 2.17E+03   OAI221_X1
       183  389.424   OAI222_X1
-     1218  1619.94   OAI22_X1
+     1216  1617.28   OAI22_X1
+        2    4.788   OAI22_X2
       191  355.642   OAI33_X1
       850    904.4   OR2_X1
       428   569.24   OR3_X1
@@ -58,27 +58,27 @@
         1        -   boot_rom
         1        -   dma_ram
         1        -   sram
-       11 1.29E+05 submodules
-        1 2.34E+04   $paramod$828f1c7597416f692f0385a43d1984abb84646fb\picorv32_axi
-        1 4.74E+04   aes
-        1 1.74E+03   axi_lite_xbar
-        1 5.02E+04   dma_engine
-        1  1207.64   i2c_master
-        1  1150.45   jtag_axi_bridge
-        1    1E+03   jtag_dtm
-        1 1.27E+03   spi_master
-        1  878.598   timer
-        1  271.054   uart
-        1  865.564   watchdog
+       11 1.36E+05 submodules
+        1 2.43E+04   $paramod$828f1c7597416f692f0385a43d1984abb84646fb\picorv32_axi
+        1 4.99E+04   aes
+        1 1.79E+03   axi_lite_xbar
+        1 5.27E+04   dma_engine
+        1 1.24E+03   i2c_master
+        1  1166.41   jtag_axi_bridge
+        1 1.03E+03   jtag_dtm
+        1  1292.76   spi_master
+        1  911.316   timer
+        1  273.448   uart
+        1  892.696   watchdog
 
    Area for cell type \boot_rom is unknown!
    Area for cell type \sram is unknown!
    Area for cell type \dma_ram is unknown!
 
-   Chip area for top module '\soc_top': 129373.622000
-     of which used for sequential elements: 47588.198000 (36.78%)
+   Chip area for top module '\soc_top': 135530.192000
+     of which used for sequential elements: 47588.198000 (35.11%)
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 0185ba4caa, time: 22.89s, user: 8.14s, system: 0.21s, MEM: 263.08 MB peak
+End of script. Logfile hash: 8062b2f000, time: 23.46s, user: 8.54s, system: 0.20s, MEM: 261.98 MB peak
 Yosys 0.67+post (git sha1 b8e7da6f40ae8f552c116bf6c359b07c6533e159, Release, AppleClang clang++ 21.0.0.21000099)
-Time spent: 67% 2x abc (15 sec), 6% 65x opt_expr (1 sec), ...
+Time spent: 68% 2x abc (16 sec), 6% 65x opt_expr (1 sec), ...

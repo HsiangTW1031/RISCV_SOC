@@ -409,3 +409,23 @@ Levi 看 RTL 時發現一個實務經驗上的落差:這個專案自己寫的周
 - Chip area 129373.6(略降),Fmax 67.5MHz(見上,已知且記錄清楚的變化,不是邏輯缺陷)。
 - CDC/RDC 的結構性 review 結論不變(synchronizer 級數、topology 都是鏡像等價的重新設計),multi-corner STA 的 hold 依然完全乾淨。
 - **這次改動全程沒有動到 `scripts/` 目錄底下任何一個腳本,也沒有動到任何一個 block 的 `testlist.sh`/`lintlist.sh`**——convention-over-configuration 的自動化引擎(`ic-verification-scaffold` skill 的原型)在一次觸及全專案介面命名的大改動下完全不用跟著改,只有實際的 RTL/testbench/文件內容變了,證實這套自動化設計是真的跟專案細節解耦的。
+
+### 再往下一層:追查 Fmax 掉了 26% 的原因,最後不只補回來還變更好
+
+上一節結尾誠實記錄了 Fmax 91.2→67.5MHz「不再深挖」,但這只是先按下不表,不是結案。Levi 後來還是想知道真正的原因,而且明確要求「查就好,不要動這一版本任何東西」——先用一個獨立的 `git worktree`(不影響目前這個已經 commit 的版本)重新合成當時的 v2.0.0 commit,確認:(1) 合成是 deterministic 的,重新跑一次數字跟 commit 時完全一樣;(2) 現在踩到的 PicoRV32 critical path,在 retrofit 之前的舊版本裡完全不在 top-5 worst path 裡;(3) PicoRV32 原始碼逐位元組沒有任何改變。三點合起來證實:這是 Yosys/abc 技術對應對 netlist 結構變動的敏感度造成的,不是邏輯缺陷、不是隨機雜訊、也不是這次 retrofit 本身做錯了什麼。
+
+問完「為什麼」之後,Levi 接著問「能不能用 abc 參數把 timing 拉回來」——這次同樣先在獨立 worktree 裡實驗,查證後找到真正的根因:**`blocks/soc_top/syn/synth.ys` 裡的 `abc -liberty $NANGATE45_LIB` 呼叫從頭到尾都沒有帶 `-constr`**。查 Yosys 的 `abc` pass 說明才發現,abc 內建的預設 script 只有在給了 `-constr`(driving cell/load 假設)之後才會執行 `buffer`/`upsize`/`dnsize` 這幾個真正做 gate sizing 的 pass——沒有 `-constr`,不管加不加 `-D`(delay target)都只做純面積導向的技術對應,完全不會針對任何一條路徑做尺寸調整(用 Yosys 的 log 直接比對過:加 `-D` 但不加 `-constr`,合成出來的網表位元對位元完全一樣,證實 `-D` 單獨用是 no-op)。也就是說,這個 SoC 從 Phase 7 一開始的合成流程,就從來沒有真正做過 timing-driven sizing——retrofit 只是把這個一直存在的盲點暴露出來而已。
+
+**過程中先試錯了一個看似合理、實際上更差的方向**:把整個 hierarchy 攤平(`synth -top soc_top -flatten`)讓 abc 用單一全域網表跑,理論上這樣 abc 才能看到跨 submodule 邊界的完整路徑。結果是反效果:critical path 從 14.821ns 惡化到 38.364ns。原因是這個專案原本(從 Phase 7 開始)就是「per-module abc」——`synth -top soc_top` 預設不會攤平 hierarchy,每個 submodule(AES、DMA、i2c 等)各自跑一次 abc,問題規模小,abc 的 heuristic 表現比較好;硬攤平成一個 ~127K cell 的巨大平面網表後,abc 的全域 heuristic 反而做出更差的決策。**這是一個違反直覺但值得記住的教訓:對這個規模的設計,把 hierarchy 攤平給合成工具「看到全貌」不一定是好事,工具本身的演算法規模效應可能比拿到更多資訊更重要**。
+
+真正生效的做法:保留原本的 per-module hierarchy,新增 `blocks/soc_top/syn/constr.txt` 並加上 `-D`,啟用 abc 的 sizing pass。Levi 追問「有 3 個 corner 嗎」以及「這裡跟業界不太一樣的地方」,點出一個更根本的問題:sizing 決策當時只用 typical corner library 算,不是真正業界 MMMC(Multi-Mode Multi-Corner)流程——真正的 signoff 工具會用 worst-case corner 或多 corner 同時感知去做 sizing,而不是先在 typical 上調完、再事後拿別的 corner 去驗證有沒有中獎。這個落差其實從專案一開始就存在(Yosys/abc 本身不支援 MMMC,是開源工具鏈的天花板),只是一直沒有做 sizing 的時候是「潛在」的,一旦真的開始 sizing,就變成「有可能影響決策」的。改成 `dfflibmap`/`abc` 都吃 `$NANGATE45_SLOW_LIB`(而非 typical)之後重新跑三個 corner,確認 setup 在 typical/slow 兩個 corner 都大幅改善、hold 在 fast corner 依然完全乾淨——這次剛好三個 corner 都變好,但這是驗證出來的結果,不是方法論本身保證的,值得記住「先合成後驗證」跟「合成時就對多 corner 負責」是兩種不同嚴謹程度的做法。
+
+**最終結果**(細節見 `docs/performance.md` §1、§7):
+- Typical corner critical path 14.821ns→2.881ns,Fmax 67.5MHz→**347.1MHz**,關鍵路徑從 PicoRV32 換回 AES chain——不只補回 retrofit 掉的頻率,還比 retrofit 之前(91.2MHz)更好。
+- Slow corner critical path 51.837ns→10.288ns,Fmax 19.3MHz→**97.2MHz**,同樣比 retrofit 前(≈23.2MHz)更好。
+- Fast corner hold 全程維持 0 違規。
+- 代價是 chip area 多了 4.76%(129373.6→135530.2)——sizing 為了改善時序會插入 buffer、放大 cell,面積上升是預期中的取捨,不是異常。
+- 用 best-effort LEC(`equiv_simple`)驗證過:sizing 前後的證明覆蓋率完全沒變(同樣 36014 個 checkpoint 被證明),確認這是純粹的 cell 尺寸調整,沒有引入任何邏輯偏差。
+- 19 個 regression targets 全部 PASS、135 個 lint finding 不變。
+
+**這次的教訓,跟上一節「邏輯等價不等於時序不變」互為表裡**:這次反過來證明了「時序退化不代表已經無解」——遇到合成工具的技術對應對結構變動敏感這種問題,不是只能「誠實記錄、放棄治療」,先搞懂工具的合成腳本實際上在做什麼(這裡是「沒帶 `-constr` 就不會做 sizing」這個具體機制),往往能找到真正的槓桿點,而不是盲目調參數碰運氣。整個過程(包含中間被否決的 flatten 實驗)全部先在獨立 `git worktree` 裡驗證過,確認方向正確、跑過三個 corner 的 STA、跑過 LEC 交叉驗證之後,才實際套用到這個已經 commit 的版本上——過程中沒有任何一步是「先套用再看行不行」。
