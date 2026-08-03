@@ -408,7 +408,7 @@ Levi 看 RTL 時發現一個實務經驗上的落差:這個專案自己寫的周
 - Toggle coverage 微幅變動(92.2%→92.0%,9153→9132 covered bits)——JTAG reset 釋放時序修正後,開機階段實際命中的 toggle 組合略有不同,不是測試變少,仍遠高於 90% 目標。
 - Chip area 129373.6(略降),Fmax 67.5MHz(見上,已知且記錄清楚的變化,不是邏輯缺陷)。
 - CDC/RDC 的結構性 review 結論不變(synchronizer 級數、topology 都是鏡像等價的重新設計),multi-corner STA 的 hold 依然完全乾淨。
-- **這次改動全程沒有動到 `scripts/` 目錄底下任何一個腳本,也沒有動到任何一個 block 的 `testlist.sh`/`lintlist.sh`**——convention-over-configuration 的自動化引擎(`ic-verification-scaffold` skill 的原型)在一次觸及全專案介面命名的大改動下完全不用跟著改,只有實際的 RTL/testbench/文件內容變了,證實這套自動化設計是真的跟專案細節解耦的。
+- **這次改動全程沒有動到 `scripts/` 目錄底下任何一個腳本,也沒有動到任何一個 block 的 `testlist.sh`/`lintlist.sh`**——convention-over-configuration 的自動化引擎(`ic-verification-signoff-scaffold` skill 的原型)在一次觸及全專案介面命名的大改動下完全不用跟著改,只有實際的 RTL/testbench/文件內容變了,證實這套自動化設計是真的跟專案細節解耦的。
 
 ### 再往下一層:追查 Fmax 掉了 26% 的原因,最後不只補回來還變更好
 

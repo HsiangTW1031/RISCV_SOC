@@ -101,7 +101,7 @@ needs updating -- this is why it's a major version bump, not a patch.
 review and multi-corner STA hold both still clean. None of `scripts/` or
 any block's `testlist.sh`/`lintlist.sh` needed to change -- the
 convention-over-configuration engine (also packaged as the
-`ic-verification-scaffold` skill) held up unmodified through a retrofit
+`ic-verification-signoff-scaffold` skill) held up unmodified through a retrofit
 touching every module's port list. See `docs/project_retrospective.md`
 for the full story.
 
@@ -188,7 +188,7 @@ adding its manifest files, not editing shared scripts.
   toolchain it doesn't need)
 
 This engine was also packaged as a reusable skill
-(`Levi-agent/.claude/skills/ic-verification-scaffold`) for scaffolding
+(`Levi-agent/.claude/skills/ic-verification-signoff-scaffold`) for scaffolding
 future IC/SoC projects with the same automation from day one — see that
 skill's `references/design-rationale.md` for the full story, including
 these two bugs.
