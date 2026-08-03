@@ -4,6 +4,59 @@ Maps each git tag to what changed and why. Commit messages have the "what";
 `docs/project_retrospective.md` has the full bug-by-bug story behind most of
 these — this file is the short index between the two.
 
+## [v2.0.0] - 2026-08-03
+
+**Breaking**: every module's reset port renamed from active-high `rst` to
+active-low `resetn`, matching AMBA/AXI's `ARESETn` convention, the
+Nangate45 cell library's own reset-pin polarity, and the vendored
+PicoRV32 core's native `resetn` (which no longer needs `soc_top.v`'s old
+inversion bridge). Any external code instantiating these modules directly
+needs updating -- this is why it's a major version bump, not a patch.
+
+### Changed
+- All peripheral RTL (`timer`/`watchdog`/`uart`/`sram`/`boot_rom`/
+  `i2c_master`/`spi_master`/`axi_lite_xbar`/`dma_ram`/`dma_engine`/AES
+  family/JTAG family): mechanical `if (rst)` -> `if (!resetn)` inversion,
+  logically equivalent
+- `soc_top.v`'s RDC reset synchronizer (the project's one genuinely
+  asynchronous-reset logic): mirrored from `posedge rst`/async-SET to
+  `negedge resetn`/async-CLEAR
+- 5 testtop wrappers, the shared `fake_axi_lite_slave.v` BFM, all 19
+  testbenches, the SDC `set_false_path` target, CDC report and per-IP
+  spec docs
+
+### Fixed
+- `blocks/soc_top/syn/mem_blackboxes.v` (synthesis-only blackbox
+  stand-ins) still declared the old `rst` port -- invisible to regression,
+  only surfaced on re-synthesis
+- `soc_top`'s testbench asserted reset via `dut->resetn = 0`, but
+  Verilator zero-initializes signals -- already the asserted value for an
+  active-low signal, so no real edge occurred, leaving the tck-domain
+  reset synchronizer never properly triggered/released until real JTAG
+  traffic began (first two JTAG operations failed). Fixed by explicitly
+  driving `resetn=1` before the real release transition, and pumping a
+  few no-op `tck` edges after release before real JTAG traffic starts.
+
+### Known effect (documented, not a defect)
+- Whole-SoC Fmax dropped 91.2MHz -> 67.5MHz; critical path moved from AES
+  key expansion to an unmodified section of PicoRV32's own core.
+  `aes_core`'s standalone synthesis numbers are essentially unchanged and
+  PicoRV32 is byte-for-byte unmodified, so this is attributed to Yosys/abc
+  technology-mapping sensitivity to netlist-wide structural changes, not a
+  real logic or timing defect -- see `docs/performance.md` §1/7.
+- Toggle coverage shifted slightly (92.2% -> 92.0%) since the JTAG
+  reset-release timing fix changes exactly which bits toggle during boot
+  -- still well above the 90% target.
+- Chip area dropped slightly (129847.1 -> 129373.6, one fewer inverter).
+
+19/19 regression and 135 lint findings unchanged. CDC/RDC structural
+review and multi-corner STA hold both still clean. None of `scripts/` or
+any block's `testlist.sh`/`lintlist.sh` needed to change -- the
+convention-over-configuration engine (also packaged as the
+`ic-verification-scaffold` skill) held up unmodified through a retrofit
+touching every module's port list. See `docs/project_retrospective.md`
+for the full story.
+
 ## [v1.3.0] - 2026-08-03
 
 Pushed deduped toggle coverage (after waivers) from 80.1% to 92.2% by
