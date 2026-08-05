@@ -21,7 +21,7 @@
 | 12 | `aes_chain` | CBC/CTR mode chaining,兩個方向 | NIST SP 800-38A Appendix F.2/F.5 官方向量 | PASS |
 | 13 | `aes_axi_wrapper` | 透過真正 AXI4-Lite 暫存器介面的 ECB/CBC | FIPS-197 + NIST SP800-38A 官方向量,額外驗證 KEY 唯讀、busy/no-queue | PASS |
 | 14 | `aes_diff` | 500 組隨機明文/金鑰 | Differential test,對一個獨立從零寫的 C++ AES-128 參考模型(自己也先過官方向量) | PASS |
-| 15 | `axi_lite_xbar` | 位址解碼路由到全部 9 個 slave、SLVERR on miss、2-master 仲裁(含競爭邊界情況) | 導向測試,對 8 個 `fake_axi_lite_slave.v` | PASS |
+| 15 | `axi_lite_xbar` | 位址解碼路由到全部 9 個 slave、decode-miss 回 `DECERR`(v2.2.0 前是 `SLVERR`)、CSR window 寫入回 `SLVERR`、2-master 仲裁(含競爭邊界情況) | 導向測試,對 8 個 `fake_axi_lite_slave.v` | PASS |
 | 16 | `dma_ram` | AXI4 INCR burst 讀寫、byte strobe、單拍 burst、連續 burst 互不干擾 | 導向測試 | PASS |
 | 17 | `dma_engine` | 多 block CBC encrypt/decrypt + CTR,透過真正 AXI4 burst + `aes_chain`,CPU 零介入 | 端到端測試,比對 NIST SP800-38A 向量,15 項個別檢查 | PASS |
 | 18 | `soc_top` | Firmware boot、5 次真實 Timer 中斷(經 PicoRV32 getq/setq/retirq)、UART 輸出、JTAG 透過真正 2-master crossbar 讀寫 RAM 與 DMA 控制暫存器 | 全 SoC 整合測試,執行真正編譯出來的韌體 | PASS |
@@ -40,10 +40,10 @@
 | 指標 | 結果 |
 |---|---|
 | Line coverage(這個專案自己寫的 RTL,不含 vendored PicoRV32) | **96.8%** |
-| Toggle coverage,raw aggregate(`verilator_coverage --report summary`) | 65.0%(48252/74288 points)——這個數字把同一個 source-level toggle point 依 hierarchy instance 重複計數(例如 `aes_core.v` 被 5 個不同路徑實例化),分母被灌水,詳見下方 |
-| Toggle coverage,deduped per-bit,**waive 前** | **80.1%**(9132/11404 bits) |
-| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1480 個結構上不可能 toggle 的 bit) | **92.0%**(9132/9924 bits) |
-| Branch coverage(全專案合併) | 79.8%(1551/1944 points) |
+| Toggle coverage,raw aggregate(`verilator_coverage --report summary`) | 64.8%(48332/74560 points)——這個數字把同一個 source-level toggle point 依 hierarchy instance 重複計數(例如 `aes_core.v` 被 5 個不同路徑實例化),分母被灌水,詳見下方 |
+| Toggle coverage,deduped per-bit,**waive 前** | **79.7%**(9142/11472 bits) |
+| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1474 個結構上不可能 toggle 的 bit) | **91.4%**(9142/9998 bits,v2.2.0 新增 CSR 相關暫存器/邏輯讓分母變大,見 `docs/coverage_waiver_report.md`) |
+| Branch coverage(全專案合併) | 79.8%(1561/1956 points) |
 | **FSM state coverage**（11 個 FSM:spi_master、i2c_master、uart、jtag_tap、aes_core、aes_chain、axi_lite_xbar 讀/寫、dma_ram 讀/寫、dma_engine) | **100%**(全部狀態都至少被進入過一次) |
 
 Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、waive 前後每個 block 的量化對照、以及刻意不 waive 的 residual gap 清單:`docs/coverage_waiver_report.md`。

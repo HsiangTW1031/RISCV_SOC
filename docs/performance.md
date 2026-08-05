@@ -29,10 +29,10 @@
 
 `aes_core` 的 iterative datapath 是 21 cycles/block（10 cycles key expansion + 1 initial AddRoundKey + 9 middle rounds + 1 final round,見 `docs/specs/aes.md`),128-bit = 16 bytes/block。
 
-在整體 SoC 的 Fmax(91.2 MHz,cycle time ≈ 10.966ns)下:
+在整體 SoC 目前的 Fmax(第 1 節,347.1 MHz,cycle time ≈ 2.881ns)下(這個數字會隨著第 1 節記錄的 Fmax 演進而變動,是同一套「cycles/block 是量出來的,乘上當時真正的 STA cycle time」算法,不是重新估算方法論):
 
-- 每個 block:21 × 10.966ns ≈ **230.3ns**
-- 吞吐量:16 bytes / 230.3ns ≈ **69.5 MB/s**
+- 每個 block:21 × 2.881ns ≈ **60.5ns**
+- 吞吐量:16 bytes / 60.5ns ≈ **264.5 MB/s**
 
 這是純 AES core 本身(CPU 逐 word 寫暫存器驅動)的數字,不含 DMA 的 burst overhead——DMA 版本見下一節。
 
@@ -42,10 +42,10 @@
 
 - **156 cycles / 4 blocks = 39.0 cycles/block**(平均,含 burst 讀 4 拍 + AES 21 cycles + burst 寫 4 拍 + 狀態機切換 overhead + 軟體 polling STATUS 暫存器本身的 bus cycle)
 
-在 Fmax 下:
+在目前的 Fmax(347.1 MHz,cycle time ≈ 2.881ns)下:
 
-- 每個 block:39 × 10.966ns ≈ **427.7ns**
-- 吞吐量:16 bytes / 427.7ns ≈ **37.4 MB/s**
+- 每個 block:39 × 2.881ns ≈ **112.4ns**
+- 吞吐量:16 bytes / 112.4ns ≈ **142.4 MB/s**
 
 比純 AES core 慢,原因很直接:每個 block 多花了 8 拍 burst（讀 4 + 寫 4)加上 FSM 狀態切換的固定 overhead,換來的是**這整段時間 CPU 完全不用碰任何一個 word**——這正是 DMA 存在的意義,用吞吐量換 CPU 週期。
 
