@@ -51,7 +51,15 @@ flowchart TB
     AES -.irq bit7.-> CPU
     DMACTRL -.irq bit8.-> CPU
     XBAR -.irq bit9 decode miss.-> CPU
+
+    classDef vendor fill:#3a3563,stroke:#8a7ce0,stroke-width:2px,color:#e8edf2;
+    classDef headline fill:#e08a3c,stroke:#e08a3c,color:#241206;
+
+    class CPU vendor
+    class AES,DMACTRL,DMABURST,DMARAM headline
 ```
+
+顏色對應跟 `images/architecture_versions/architecture_v3.html` 那份保持一致：`CPU`(唯一 vendored 的節點)用紫藍色、`AES`/`DMA` 這組 Phase 6 headline deliverable 用橘色，其餘手刻周邊維持預設色。
 
 ## 2. 匯流排：AXI4-Lite crossbar
 
