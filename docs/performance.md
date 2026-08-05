@@ -8,7 +8,7 @@
 
 三塊純記憶體陣列（`boot_rom` 64KB、`sram` 128KB、`dma_ram` 8KB)換成 blackbox stub（`blocks/soc_top/syn/mem_blackboxes.v`)——真實 ASIC flow 裡這些會是硬 IP SRAM macro,不是真的拿 flip-flop 湊出來的,讓 Yosys 把一個 32K-word 的陣列展開成百萬顆 flip-flop 既不真實也慢到不划算。除了這三塊,**PicoRV32、手刻 crossbar、每個周邊的控制/資料路徑、AES core + CBC/CTR chaining、DMA engine 全部都是真的合成**——這是為什麼下面這個 Fmax 數字反映的是真正的邏輯關鍵路徑,不是被記憶體模型撐大的假象。
 
-- **Chip area**（Nangate45 單位):135530.2,其中 sequential elements 佔 35.11%(47588.2,正反器數量本身沒變,比例下降只是分母變大)——比 active-low reset retrofit 剛完成時(129373.6)多了 4.76%,原因見下面的 sizing 說明
+- **Chip area**（Nangate45 單位):136510.1,其中 sequential elements 佔 35.14%(47968.0)——比 v2.1.0 gate-sizing 完成時(135530.2)多了 0.7%,是 v2.2.0 新增 `axi_lite_xbar` 診斷 CSR(兩個 32-bit 唯讀暫存器 + `decerr_irq` 相關邏輯)增加的真實邏輯,不是異常;比 active-low reset retrofit 剛完成時(129373.6)累計多了 5.5%,原因見下面的 sizing 說明
 - **Cell count**:85893 個 standard cell instance(flatten 後統計;比 retrofit 剛完成時的 78446 多,同樣是新增的 buffer/放大後 cell)
 - **關鍵路徑**:2.0ns 時脈假設下 WNS = -0.92ns,實際關鍵路徑延遲 **2.881ns**
 - **關鍵路徑位置**:`u_aes/u_chain` 內部(AES CBC/CTR chaining 邏輯)

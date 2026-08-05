@@ -6,6 +6,7 @@
 module xbar_testtop (
     input  wire        clk,
     input  wire        resetn,
+    output wire        decerr_irq,
 
     input  wire        s0_awvalid,
     output wire        s0_awready,
@@ -99,6 +100,7 @@ module xbar_testtop (
 
   axi_lite_xbar u_xbar (
       .clk(clk), .resetn(resetn),
+      .decerr_irq(decerr_irq),
       .s0_awvalid(s0_awvalid), .s0_awready(s0_awready), .s0_awaddr(s0_awaddr),
       .s0_wvalid(s0_wvalid),   .s0_wready(s0_wready),   .s0_wdata(s0_wdata), .s0_wstrb(s0_wstrb),
       .s0_bvalid(s0_bvalid),   .s0_bready(s0_bready),   .s0_bresp(s0_bresp),

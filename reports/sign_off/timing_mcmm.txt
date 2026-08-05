@@ -176,7 +176,7 @@ Path Type: max
 
 
 wns max -8.46
-tns max -19168.08
+tns max -19340.01
 
 === Hold (min delay, fast corner) ===
 Startpoint: spi_miso (input port clocked by clk)

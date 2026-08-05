@@ -1,9 +1,9 @@
 === verilator --lint-only --top-module soc_top ===
 Files: -Irtl/include -Iblocks/soc_top/rtl blocks/soc_top/rtl/picorv32.v blocks/soc_top/rtl/axi_lite_xbar.v blocks/soc_top/rtl/boot_rom.v blocks/soc_top/rtl/sram.v blocks/soc_top/rtl/timer.v blocks/soc_top/rtl/watchdog.v blocks/soc_top/rtl/uart.v blocks/soc_top/rtl/i2c_master.v blocks/soc_top/rtl/spi_master.v blocks/soc_top/rtl/aes_key_expand.v blocks/soc_top/rtl/aes_core.v blocks/soc_top/rtl/aes_chain.v blocks/soc_top/rtl/aes.v blocks/soc_top/rtl/dma_ram.v blocks/soc_top/rtl/dma_engine.v blocks/soc_top/rtl/jtag_tap.v blocks/soc_top/rtl/jtag_dtm.v blocks/soc_top/rtl/jtag_axi_bridge.v blocks/soc_top/rtl/soc_top.v
 
-%Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/axi_lite_xbar.v:159:18: Bits of function variable are not used: 'addr'[27:16,11:0]
+%Warning-UNUSEDSIGNAL: blocks/soc_top/rtl/axi_lite_xbar.v:183:18: Bits of function variable are not used: 'addr'[27:16,11:0]
                                                                                                                             : ... note: In instance 'soc_top.u_xbar'
-  159 |     input [31:0] addr;
+  183 |     input [31:0] addr;
       |                  ^~~~
                        ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.050
                        ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.

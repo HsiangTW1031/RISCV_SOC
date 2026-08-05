@@ -8,7 +8,7 @@ aes_core                 PASS         PASS: aes_core (FIPS-197 App.B + App.C.1, 
 aes_chain                PASS         PASS: aes_chain (CBC + CTR vs NIST SP 800-38A vectors, encrypt+decrypt) all green
 aes_axi_wrapper          PASS         PASS: aes AXI-Lite wrapper (FIPS-197 App.B + App.C.1 ECB encrypt/decrypt, NIST SP800-38A CBC via MODE/LOAD_IV/IV registers, KEY write-only, busy/no-queue) all green
 aes_diff                 PASS         PASS: aes differential test (500 random plaintext/key pairs, RTL vs from-scratch C++ reference model, encrypt match + decrypt round-trip) all green
-axi_lite_xbar            PASS         PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI/AES/DMA + SLVERR on miss) + 2-master arbitration (CPU-priority on contention) all green
+axi_lite_xbar            PASS         PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI/AES/DMA + DECERR on miss + diagnostic CSR/decerr_irq, v2.2.0) + 2-master arbitration (CPU-priority on contention) all green
 boot_rom                 PASS         PASS: boot_rom (load + read + write-rejected) all green
 dma_ram                  PASS         PASS: dma_ram (AXI4 INCR burst read/write, byte strobes, single-beat, back-to-back bursts) all green
 dma_engine               PASS         PASS: dma_engine (multi-block CBC encrypt/decrypt + CTR streamed through AXI4 bursts + aes_chain with zero per-block CPU involvement, matches NIST SP 800-38A vectors) all green

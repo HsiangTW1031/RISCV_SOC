@@ -2,9 +2,12 @@
 `include "addr_map.vh"
 
 // AXI4-Lite crossbar — 2 masters (s0 = CPU, s1 = the JTAG debug bridge) x
-// 9 slaves (ROM, RAM, Timer, Watchdog, UART, I2C, SPI, AES, and (Phase 6)
-// the DMA engine's control port -- DMA's own AXI4 burst master talks
-// directly to dma_ram.v, not through here). Hand-written (the project's
+// 9 real slaves (ROM, RAM, Timer, Watchdog, UART, I2C, SPI, AES, and
+// (Phase 6) the DMA engine's control port -- DMA's own AXI4 burst master
+// talks directly to dma_ram.v, not through here), plus (v2.2.0) a small
+// diagnostic CSR window (SLAVE_XBAR_CSR) answered directly by the
+// crossbar itself, same as the decode-miss path -- see the "diagnostic
+// CSR" section below and docs/memory_map.md. Hand-written (the project's
 // core differentiator); Verilog-2001 only.
 //
 // Arbitration: fixed priority, s0 (CPU) wins on simultaneous contention.
@@ -34,10 +37,31 @@
 // future master) that accepts AW and W on different cycles.
 //
 // Unmapped addresses never touch a real slave's valid signals: they're
-// answered directly with SLVERR by the crossbar itself.
+// answered directly with DECERR by the crossbar itself (v2.2.0 -- was
+// SLVERR before; see rtl/include/axi_lite.vh's header comment for why
+// DECERR is the spec-correct code for "the interconnect found no slave
+// here" as opposed to "a real slave reported its own error").
+//
+// v2.2.0 diagnostic CSR: PicoRV32 as configured in this project never
+// checks BRESP/RRESP (see docs/architecture.md's known-limitations
+// section), so a DECERR on the bus is otherwise invisible to firmware --
+// nothing catches it unless someone happens to be polling the exact
+// response of the exact transaction that missed. To make an unmapped
+// access observable after the fact (not just in the instant it happens),
+// the crossbar latches the offending address into one of two read-only
+// registers in its own small CSR window (0x4000_7000, see
+// docs/memory_map.md) and pulses `decerr_irq` for one cycle -- routed by
+// soc_top.v into the shared irq bus at bit 9. This is the same "CSR +
+// interrupt instead of polling" pattern real SoCs use for bus-fault
+// reporting (e.g. a Cortex-M's BusFault Status/Address Registers) --
+// adapted to a plain maskable interrupt line since PicoRV32 has no
+// dedicated fault-exception vector to hook into instead.
 module axi_lite_xbar (
     input  wire        clk,
     input  wire        resetn,
+    output wire        decerr_irq, // v2.2.0: one-cycle pulse whenever a
+                                    // new decode-miss address is latched
+                                    // (write or read side); see above
 
     // ---- upstream master 0: the CPU ----
     input  wire        s0_awvalid,
@@ -152,7 +176,7 @@ module axi_lite_xbar (
 );
 
   // slave-select width sized for the full addr_map.vh SLAVE_* numbering
-  // (up to SLAVE_ERR=8).
+  // (up to SLAVE_ERR=10).
   localparam SEL_W = 4;
 
   function [SEL_W-1:0] decode_addr;
@@ -176,10 +200,22 @@ module axi_lite_xbar (
         decode_addr = `SLAVE_AES;
       else if (addr[31:28] == `ADDR_REGION_PERIPH && addr[15:12] == `ADDR_PERIPH_DMA)
         decode_addr = `SLAVE_DMA;
+      else if (addr[31:28] == `ADDR_REGION_PERIPH && addr[15:12] == `ADDR_PERIPH_XBAR_CSR)
+        decode_addr = `SLAVE_XBAR_CSR;
       else
         decode_addr = `SLAVE_ERR;
     end
   endfunction
+
+  // ---- v2.2.0 diagnostic CSR state (see module header) ----
+  // Only addr[2] within the CSR window is decoded (word 0 -> last write
+  // miss, word 1 -> last read miss); every other offset in the 4KB
+  // window aliases to one of these two words rather than spending extra
+  // address-compare logic on a window this small -- a deliberate
+  // simplification, not an oversight.
+  reg [31:0] last_decerr_waddr, last_decerr_raddr;
+  reg        decerr_irq_w, decerr_irq_r;
+  assign decerr_irq = decerr_irq_w || decerr_irq_r;
 
   // =====================================================================
   // WRITE PATH
@@ -308,19 +344,26 @@ module axi_lite_xbar (
 
   always @(posedge clk) begin
     if (!resetn) begin
-      w_state    <= W_IDLE;
-      w_have_aw  <= 1'b0;
-      w_have_w   <= 1'b0;
-      s_bvalid   <= 1'b0;
-      w_grant    <= 1'b1;
+      w_state           <= W_IDLE;
+      w_have_aw         <= 1'b0;
+      w_have_w          <= 1'b0;
+      s_bvalid          <= 1'b0;
+      w_grant           <= 1'b1;
+      last_decerr_waddr <= 32'h0;
+      decerr_irq_w      <= 1'b0;
     end else begin
       if (w_open) w_grant <= w_arb_s0;
+      decerr_irq_w <= 1'b0;
 
       case (w_state)
         W_IDLE: begin
           if (aw_fire) begin
             w_addr_lat <= cur_awaddr;
             w_sel      <= decode_addr(cur_awaddr);
+            if (decode_addr(cur_awaddr) == `SLAVE_ERR) begin
+              last_decerr_waddr <= cur_awaddr;
+              decerr_irq_w       <= 1'b1;
+            end
           end
           if (w_fire) begin
             w_data_lat <= cur_wdata;
@@ -338,7 +381,7 @@ module axi_lite_xbar (
         end
 
         W_ISSUE: begin
-          if (w_sel == `SLAVE_ERR) begin
+          if (w_sel == `SLAVE_ERR || w_sel == `SLAVE_XBAR_CSR) begin
             w_state <= W_RESP;
           end else begin
             if (!w_issued_aw && w_slave_awready) w_issued_aw <= 1'b1;
@@ -356,7 +399,12 @@ module axi_lite_xbar (
         end
 
         W_RESP: begin
-          if (w_sel == `SLAVE_ERR && !s_bvalid) s_bresp <= `AXI_RESP_SLVERR;
+          // SLAVE_ERR: no slave exists here at all -> DECERR. SLAVE_XBAR_CSR:
+          // the address is real (it's this CSR window), the write itself is
+          // what's invalid (read-only, like boot_rom rejecting writes) ->
+          // SLVERR -- same distinction as rtl/include/axi_lite.vh's header.
+          if (w_sel == `SLAVE_ERR && !s_bvalid) s_bresp <= `AXI_RESP_DECERR;
+          else if (w_sel == `SLAVE_XBAR_CSR && !s_bvalid) s_bresp <= `AXI_RESP_SLVERR;
           s_bvalid <= 1'b1;
           if (s_bvalid && cur_bready) begin
             s_bvalid <= 1'b0;
@@ -469,11 +517,14 @@ module axi_lite_xbar (
 
   always @(posedge clk) begin
     if (!resetn) begin
-      r_state  <= R_IDLE;
-      s_rvalid <= 1'b0;
-      r_grant  <= 1'b1;
+      r_state           <= R_IDLE;
+      s_rvalid          <= 1'b0;
+      r_grant           <= 1'b1;
+      last_decerr_raddr <= 32'h0;
+      decerr_irq_r      <= 1'b0;
     end else begin
       if (r_open) r_grant <= r_arb_s0;
+      decerr_irq_r <= 1'b0;
 
       case (r_state)
         R_IDLE: begin
@@ -482,11 +533,15 @@ module axi_lite_xbar (
             r_sel       <= decode_addr(cur_araddr);
             r_issued_ar <= 1'b0;
             r_state     <= R_ISSUE;
+            if (decode_addr(cur_araddr) == `SLAVE_ERR) begin
+              last_decerr_raddr <= cur_araddr;
+              decerr_irq_r       <= 1'b1;
+            end
           end
         end
 
         R_ISSUE: begin
-          if (r_sel == `SLAVE_ERR) begin
+          if (r_sel == `SLAVE_ERR || r_sel == `SLAVE_XBAR_CSR) begin
             r_state <= R_RESP;
           end else begin
             if (!r_issued_ar && w_slave_arready_r) r_issued_ar <= 1'b1;
@@ -504,9 +559,16 @@ module axi_lite_xbar (
         end
 
         R_RESP: begin
+          // Same DECERR/SLVERR distinction as the write side above; the
+          // CSR window's read data selects last_decerr_waddr/raddr by
+          // r_addr_lat[2] (word 0 vs word 1 -- see the CSR comment near
+          // decode_addr()).
           if (r_sel == `SLAVE_ERR && !s_rvalid) begin
             s_rdata <= 32'h0;
-            s_rresp <= `AXI_RESP_SLVERR;
+            s_rresp <= `AXI_RESP_DECERR;
+          end else if (r_sel == `SLAVE_XBAR_CSR && !s_rvalid) begin
+            s_rdata <= r_addr_lat[2] ? last_decerr_raddr : last_decerr_waddr;
+            s_rresp <= `AXI_RESP_OKAY;
           end
           s_rvalid <= 1'b1;
           if (s_rvalid && cur_rready) begin

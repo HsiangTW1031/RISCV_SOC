@@ -408,7 +408,7 @@ flowchart TB
     JTAGPROBE(("external JTAG probe"))
     JTAGDTM["jtag_dtm + jtag_tap"]
     BRIDGE["jtag_axi_bridge<br/>(CDC owner)"]
-    XBAR["axi_lite_xbar<br/>hand-written, 2 master x 9 slave"]
+    XBAR["axi_lite_xbar<br/>hand-written, 2 master x 9 slave<br/>+ own diagnostic CSR (v2.2.0)"]
     ROM["boot_rom 64KB"]
     RAM["sram 128KB"]
     TIMER["timer"]

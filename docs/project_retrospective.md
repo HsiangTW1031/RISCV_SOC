@@ -429,3 +429,29 @@ Levi 看 RTL 時發現一個實務經驗上的落差:這個專案自己寫的周
 - 19 個 regression targets 全部 PASS、135 個 lint finding 不變。
 
 **這次的教訓,跟上一節「邏輯等價不等於時序不變」互為表裡**:這次反過來證明了「時序退化不代表已經無解」——遇到合成工具的技術對應對結構變動敏感這種問題,不是只能「誠實記錄、放棄治療」,先搞懂工具的合成腳本實際上在做什麼(這裡是「沒帶 `-constr` 就不會做 sizing」這個具體機制),往往能找到真正的槓桿點,而不是盲目調參數碰運氣。整個過程(包含中間被否決的 flatten 實驗)全部先在獨立 `git worktree` 裡驗證過,確認方向正確、跑過三個 corner 的 STA、跑過 LEC 交叉驗證之後,才實際套用到這個已經 commit 的版本上——過程中沒有任何一步是「先套用再看行不行」。
+
+### 再往下一層:crossbar 的 decode-miss response 從 SLVERR 修正成 DECERR,加一個診斷 CSR + 中斷(v2.2.0)
+
+這輪的起點不是效能或驗證問題,是 Levi 看 `docs/memory_map.md` 的周邊位址表時,注意到 `SLAVE_ERR`(decode miss 的 fallback)被排在「周邊」那張表裡,格式跟 Timer/UART 這些真正有 RTL 模組的周邊完全一樣——雖然 `axi_lite_xbar.v` 的原始碼裡它明明只是 `decode_addr()` function 的一個分支,不是獨立 block。這是純粹的文件排版誤導,不是 RTL 有問題,但也因此帶出了後面一整輪真正的功能討論。
+
+**討論過程(這次的順序值得記錄,因為每一步都是 Levi 主動追問把方向修正過來的)**:
+
+1. Levi 想順便「做 SLAVE_ERR 的功能」,原始想法是想記錄踩到哪個未映射位址——一開始我以為只是要加一個可讀的暫存器,提議用一個固定位址讓 CPU 直接讀。
+2. Levi 反問「這樣 CPU 就要一直 polling,很耗資源,這顆 CPU 沒有 interrupt 機制嗎」——PicoRV32 在這個專案裡本來就有完整的 32-bit `irq` bus(bit 3-8 已經用在 Timer/WDT/I2C/SPI/AES/DMA),bit 9 以上都還空著,順理成章改成「CSR 記錄位址 + interrupt 通知」,不用 polling。
+3. Levi 再問「這樣是業界會處理的方式嗎」——查證後發現大方向對(CSR + interrupt 通知、decode 邏輯放在 crossbar 內部,都是真實 AXI interconnect IP 的標準做法),但揪出一個真正的規格落差:這個專案從 Phase 1 開始,decode miss 一律回 `SLVERR`,嚴格照 AMBA/AXI4 規範應該回 `DECERR`(interconnect 自己找不到 slave,跟「slave 自己回報錯誤」是不同語意)。這個落差不是這次討論才產生的,是一直都在,只是沒人specifically去對照規範檢查過。
+4. Levi 決定兩個一起做,並且要求:圖上如果要標示 SLAVE_ERR 或新的 CSR,要清楚標成 CSR、不要讓人誤會那是一個 block。
+
+**實作前的盤點,抓到兩個沒預期到的連動**:
+1. 現有測試(`blocks/axi_lite_xbar/dv/sim_main.cpp`)剛好用 `0x4000_7000` 當「確認是未映射位址」的探測位址,跟新 CSR 選的位址直接撞在一起——不先盤點就直接動手的話,新 CSR 會讓這個既有測試的假設(「這裡應該是未映射」)失效卻不會馬上被發現。
+2. `docs/coverage_waiver_report.md` 有一條 waiver 理由寫「這個專案的 response 編碼只會用到 OKAY/SLVERR,bit[0] 永遠是 0,不用管」——DECERR 一旦真的用起來,這個理由對 crossbar 自己的 `s_bresp`/`s_rresp` 就不再成立了(即使 waiver 機制本身因為「只檢查還沒 covered 的 bit」而自動不受影響,這條理由的文字敘述已經跟事實不符,需要修正)。
+
+**最終實作**(細節見 `CHANGELOG.md` v2.2.0):
+- `rtl/include/axi_lite.vh` 新增 `AXI_RESP_DECERR`,`axi_lite_xbar.v` 的 decode-miss 路徑改回真正的 DECERR。
+- 新增兩個唯讀 CSR(`0x4000_7000`/`0x4000_7004`,寫入分開的暫存器而不是「一個暫存器+方向 bit」,單純是實作起來比較不用處理位元塞不下的問題),寫入這個 window 一律 SLVERR(位址有效,只是唯讀,跟 `boot_rom` 拒絕寫入同一套邏輯)。
+- 新增 `irq` bit 9,decode miss 發生的同一個 cycle 拉一個 pulse,接進 `soc_top.v` 的 `irq_bus`。
+- 測試把探測位址從 `0x4000_7000` 移到 `0x4000_8000`,新增 CSR 讀值正確性、IRQ 剛好 pulse 一次(讀 CSR 或寫 CSR window 都不該誤觸發)的測試。
+- `toggle_waivers.txt` 的 Rule 3 文字修正(regex 本身沒動,機制已經自動排除掉真正 covered 的 bit,細節見 `docs/coverage_waiver_report.md` 第 8 節)。
+
+**驗證結果**:19/19 regression 全過、135 個 lint finding 不變、typical/slow corner 關鍵路徑完全沒變(還是 AES chain,2.881ns/10.288ns,這個改動量體太小、也不在關鍵路徑上,不影響時序)、hold 依然乾淨。Chip area 因為新增的兩個 32-bit 暫存器+相關邏輯,略增 0.7%(135530.2→136510.1),deduped toggle coverage 從 92.0% 微降到 91.4%(分母變大、新邏輯還沒做窮盡的 toggle 測試,不是既有測試變差,仍遠高於 90% 目標)。
+
+**這次的教訓**:一個看似單純的「文件排版讓人誤會」的小發現(SLAVE_ERR 混在周邊表格裡),經過 Levi 一連串「這樣不會怎樣嗎」「業界是這樣做的嗎」的追問,最後牽出一個從 Phase 1 就存在、從沒被抓到的規格不精確(SLVERR/DECERR 混用)。**這類問題不會自己跳出來——沒有任何測試會因為「該回 DECERR 卻回了 SLVERR」而失敗,因為兩者都只是「非 OKAY」,只有真的去對照規格逐條檢查才會發現。** 另外,動手前先盤點「這個改動會撞到哪些既有的東西」(這次抓到位址衝突、waiver 理由過時兩個連動),比動手改完才發現測試莫名其妙開始失敗,省下來的除錯時間遠大於盤點本身花的時間。

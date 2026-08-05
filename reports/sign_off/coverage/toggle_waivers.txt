@@ -59,17 +59,32 @@
 ^w_slave_wready$	Crossbar's internal mux selecting among slave wready signals, all of which are hardwired 1.
 ^w_slave_arready_r$	Crossbar's internal mux selecting among slave arready signals, all of which are hardwired 1.
 
-# ---- Rule 3: AXI response bit[0] (this project's encoding never uses it) ----
-# This project's AXI_RESP encoding (rtl/include/axi_lite.vh) only ever
-# drives OKAY (2'b00) or SLVERR (2'b10) -- EXOKAY (2'b01) and DECERR
-# (2'b11) are never used anywhere in the design. Both used codes have
-# bit[0]=0, so bit[0] of every *resp signal in the project is a
-# structural constant, project-wide, independent of any single module.
-^s_bresp\[0\]$	This project's AXI_RESP encoding only ever drives OKAY (00) or SLVERR (10) -- both have bit[0]=0; EXOKAY/DECERR are never used anywhere in the design.
-^s_rresp\[0\]$	Same response-encoding convention, read channel.
-^.*_bresp\[0\]$	Same response-encoding convention, crossbar-side per-slave wire.
+# ---- Rule 3: AXI response bit[0] on PERIPHERAL and crossbar-internal
+# per-slave signals only (NOT the crossbar's own external s_bresp/s_rresp
+# -- see the v2.2.0 note below) ----
+# Every real peripheral (timer.v, boot_rom.v, aes.v, dma_engine.v, ...)
+# hardwires its own s_bresp/s_rresp to AXI_RESP_OKAY (2'b00) unconditionally
+# -- confirmed, no alternate branch anywhere. The crossbar-side per-slave
+# mux wires (rom_bresp, ram_bresp, w_slave_bresp, ...) only ever carry
+# values sourced from those same peripherals for a real slave select, so
+# bit[0] is a genuine structural constant there too.
+#
+# v2.2.0 correction: this reasoning does NOT extend to axi_lite_xbar.v's
+# OWN top-level s_bresp/s_rresp registers (the ones presented upstream to
+# s0/s1) -- those now also genuinely drive AXI_RESP_DECERR (2'b11,
+# bit[0]=1) on a decode miss, on top of OKAY/SLVERR, so bit[0] there is a
+# real, exercised signal, not a constant. It's deliberately NOT listed as
+# a waiver pattern below (regex is by bare signal name, not per-file --
+# see docs/project_retrospective.md's note on this mechanism's tradeoffs):
+# analyze_coverage.py only ever consults the waiver list for a bit that's
+# still uncovered, and axi_lite_xbar's s_bresp[0]/s_rresp[0] are now
+# covered outright (confirmed: they no longer appear in this rule's
+# waived-bit examples), so nothing here needs to name-exclude them.
+^s_bresp\[0\]$	Peripheral hardwires s_bresp to AXI_RESP_OKAY unconditionally -- bit[0] is a structural constant there (does NOT apply to axi_lite_xbar's own s_bresp, which genuinely drives DECERR since v2.2.0 and is separately covered, not waived).
+^s_rresp\[0\]$	Same response-encoding convention, read channel (same v2.2.0 exception for axi_lite_xbar's own s_rresp).
+^.*_bresp\[0\]$	Same response-encoding convention, crossbar-side per-slave wire (e.g. rom_bresp/ram_bresp) -- these only ever carry a real peripheral's OKAY-only response, unaffected by v2.2.0.
 ^.*_rresp\[0\]$	Same response-encoding convention, crossbar-side per-slave wire.
-^w_slave_bresp\[0\]$	Crossbar's internal muxed response, same encoding convention.
+^w_slave_bresp\[0\]$	Crossbar's internal muxed response across real peripheral selects only (SLAVE_ERR/SLAVE_XBAR_CSR bypass this wire entirely -- see axi_lite_xbar.v's W_ISSUE/W_RESP logic), same OKAY-only encoding convention.
 
 # ---- Rule 4: peripheral-level bresp/rresp entirely (never generate SLVERR) ----
 # Beyond just bit[0] (Rule 3): every individual peripheral hardwires its

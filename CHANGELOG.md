@@ -4,6 +4,66 @@ Maps each git tag to what changed and why. Commit messages have the "what";
 `docs/project_retrospective.md` has the full bug-by-bug story behind most of
 these — this file is the short index between the two.
 
+## [v2.2.0] - 2026-08-05
+
+Corrects a long-standing spec inaccuracy in `axi_lite_xbar`'s decode-miss
+response, and adds a diagnostic CSR + interrupt so an unmapped bus access
+is actually observable by firmware -- prompted by noticing that
+PicoRV32's own bus adapter never checks BRESP/RRESP at all, so a decode
+miss was previously invisible unless someone happened to be polling the
+exact response of the exact transaction that missed.
+
+### Fixed
+- `axi_lite_xbar`'s decode-miss path now genuinely drives `AXI_RESP_DECERR`
+  (`2'b11`) instead of `SLVERR` (`2'b10`) -- per AMBA/AXI4, DECERR is the
+  interconnect's own "no slave exists here" response, while SLVERR means a
+  real, mapped slave reported its own error (e.g. `boot_rom` rejecting a
+  write because it's read-only). This project conflated the two since
+  Phase 1; `SLVERR` on a genuinely mapped-but-invalid operation (like the
+  new CSR window below rejecting writes) is unchanged and still correct.
+
+### Added
+- Two new read-only diagnostic registers in `axi_lite_xbar`'s own address
+  space (`0x4000_7000` = `LAST_DECERR_WADDR`, `0x4000_7004` =
+  `LAST_DECERR_RADDR`) that latch the address of the most recent
+  write/read decode miss respectively -- answered directly by the
+  crossbar, not routed to any peripheral. Writes to this window return
+  `SLVERR` (real address, read-only).
+- New `irq` bit 9 (`decerr_irq`), a one-cycle pulse whenever a new
+  decode-miss address is latched -- the same "CSR + interrupt instead of
+  polling" pattern real SoCs use for bus-fault reporting (e.g. a
+  Cortex-M's BusFault Status/Address Registers), adapted to a plain
+  maskable interrupt line since PicoRV32 has no dedicated fault-exception
+  vector to hook into instead.
+- New regression coverage in `blocks/axi_lite_xbar/dv/sim_main.cpp`:
+  DECERR on both write and read miss, decerr_irq pulses exactly once per
+  miss (not on CSR reads, not on CSR-window writes), CSR readback holds
+  the correct address, writes to the CSR window are rejected with SLVERR
+  without corrupting the stored values.
+
+### Known effect (documented, not a defect)
+- Chip area +0.7% (135530.2 -> 136510.1) from the new CSR registers and
+  IRQ logic -- Fmax and critical path are unchanged (still the AES chain,
+  2.881ns typical / 10.288ns slow corner), since this addition doesn't
+  touch anything on that path.
+- Deduped toggle coverage after waivers 92.0% -> 91.4% -- the denominator
+  grew (new RTL), and the new logic hasn't had exhaustive toggle-diversity
+  vectors written for it yet (only the specific addresses/directions
+  needed to prove correctness); still well above the 90% target.
+- `docs/coverage_waiver_report.md`'s Rule 3 (AXI response bit[0] is a
+  structural constant) no longer applies to `axi_lite_xbar`'s own
+  external-facing `s_bresp`/`s_rresp` (which now genuinely drives DECERR)
+  -- corrected the waiver file's reasoning text; the regex patterns
+  themselves needed no change since the waiver mechanism only ever
+  consults still-uncovered bits, and axi_lite_xbar's bits are now
+  genuinely covered, not waived.
+
+19/19 regression, 135 lint findings, and multi-corner STA hold all
+unchanged. See `docs/project_retrospective.md` for the full story
+(including the CSR/interrupt design discussion) and
+`docs/memory_map.md`/`docs/architecture.md` for the updated address map
+and block diagram.
+
 ## [v2.1.0] - 2026-08-03
 
 Recovers (and exceeds) the Fmax regression documented as a "known effect"

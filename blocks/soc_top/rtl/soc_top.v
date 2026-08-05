@@ -23,17 +23,23 @@
 // it's for.
 //
 // Known limitation (unchanged from Phase 1): picorv32_axi's mem_axi_b*/r*
-// ports have no BRESP/RRESP pins at all — this adapter never checks for
-// SLVERR. An unmapped-address bug in firmware won't hang the bus, but it
-// also won't be caught by the CPU itself.
+// ports have no BRESP/RRESP pins at all — this adapter never checks the
+// response code at all, DECERR included. An unmapped-address bug in
+// firmware won't hang the bus, but it also won't be caught by the CPU
+// itself via the response channel — which is exactly why axi_lite_xbar's
+// v2.2.0 diagnostic CSR + irq[9] (below) exists: it's the only way this
+// SoC actually surfaces a decode-miss to firmware.
 //
 // IRQ map (matches docs/phase_plan.md): irq[3] = Timer EXPIRED,
 // irq[4] = Watchdog WARNING, irq[5] = I2C transfer done, irq[6] = SPI
-// transfer done, irq[7] = AES block done. irq[0]/irq[1] are PicoRV32's own
-// built-in bus-error/illegal-instruction traps; everything else is unused
-// this phase. wdog_reset_req is exposed at the top level for
-// observability but is NOT yet wired to actually reset the SoC — that's a
-// deliberate, documented scope cut (see docs/phase_plan.md risk notes).
+// transfer done, irq[7] = AES block done, irq[9] = axi_lite_xbar decode
+// miss (v2.2.0 — see that module's header comment and
+// docs/memory_map.md for the CSR that goes with it). irq[0]/irq[1] are
+// PicoRV32's own built-in bus-error/illegal-instruction traps; irq[8] is
+// dma_irq (see below); everything else is unused this phase.
+// wdog_reset_req is exposed at the top level for observability but is
+// NOT yet wired to actually reset the SoC — that's a deliberate,
+// documented scope cut (see docs/phase_plan.md risk notes).
 module soc_top #(
     parameter FIRMWARE_HEX = "firmware.hex"
 ) (
@@ -88,11 +94,13 @@ module soc_top #(
   wire [31:0] cpu_rdata;
 
   wire        timer_irq, wdt_irq, i2c_irq, spi_irq, aes_irq, dma_irq;
-  wire [31:0] irq_bus = {23'b0, dma_irq, aes_irq, spi_irq, i2c_irq, wdt_irq, timer_irq, 3'b0};
-  // bit8=dma_irq (Phase 6, whole multi-block DMA+AES operation done),
-  // bit7=aes_irq, bit6=spi_irq, bit5=i2c_irq, bit4=wdt_irq, bit3=timer_irq,
-  // bits[2:0] reserved for PicoRV32's own bus-error/illegal-instruction/
-  // (unused) traps.
+  wire        xbar_decerr_irq;
+  wire [31:0] irq_bus = {22'b0, xbar_decerr_irq, dma_irq, aes_irq, spi_irq, i2c_irq, wdt_irq, timer_irq, 3'b0};
+  // bit9=xbar_decerr_irq (v2.2.0, axi_lite_xbar decode-miss, see that
+  // module's header + docs/memory_map.md), bit8=dma_irq (Phase 6, whole
+  // multi-block DMA+AES operation done), bit7=aes_irq, bit6=spi_irq,
+  // bit5=i2c_irq, bit4=wdt_irq, bit3=timer_irq, bits[2:0] reserved for
+  // PicoRV32's own bus-error/illegal-instruction/(unused) traps.
 
   picorv32_axi #(
       .ENABLE_MUL(1),
@@ -199,6 +207,7 @@ module soc_top #(
 
   axi_lite_xbar u_xbar (
       .clk(clk), .resetn(resetn_clk_sync),
+      .decerr_irq(xbar_decerr_irq),
 
       .s0_awvalid(cpu_awvalid), .s0_awready(cpu_awready), .s0_awaddr(cpu_awaddr),
       .s0_wvalid(cpu_wvalid),   .s0_wready(cpu_wready),   .s0_wdata(cpu_wdata), .s0_wstrb(cpu_wstrb),

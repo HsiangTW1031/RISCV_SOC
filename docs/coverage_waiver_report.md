@@ -11,10 +11,12 @@ Dashboard 呈現:`reports/sign_off/dashboard.html` 的「Toggle Coverage Waivers
 | 統計方式 | Toggle coverage | 說明 |
 |---|---|---|
 | Raw aggregate(`verilator_coverage --report summary`) | **65.0%**(48252/74288) | 沿用至今的舊數字。同一個 source-level toggle point,只要被多個 hierarchy instance 引用(例如 `aes_core.v` 在合併後的測試套件中被 5 個不同路徑實例化),就會被重複計數,分母被灌水但沒有對應的多樣性增加。 |
-| Deduped per-bit,**waive 前** | **80.1%**(9132/11404 bits) | 直接 parse `merged.dat` 原始資料,以 (file, line, signal) 去重複,每個實際存在的 bit 只算一次(任一 instance 有覆蓋就算覆蓋)。比 raw aggregate 更誠實,單純修正重複計數的問題,還沒套用任何 waiver。 |
-| Deduped per-bit,**waive 後** | **92.0%**(9132/9924 bits) | 套用 36 條 waiver rule,排除 1480 個「結構上不可能 toggle」的 bit(從分子分母同時移除)之後的最終 sign-off 數字。 |
+| Deduped per-bit,**waive 前** | **79.7%**(9142/11472 bits) | 直接 parse `merged.dat` 原始資料,以 (file, line, signal) 去重複,每個實際存在的 bit 只算一次(任一 instance 有覆蓋就算覆蓋)。比 raw aggregate 更誠實,單純修正重複計數的問題,還沒套用任何 waiver。 |
+| Deduped per-bit,**waive 後** | **91.4%**(9142/9998 bits) | 套用 36 條 waiver rule,排除 1474 個「結構上不可能 toggle」的 bit(從分子分母同時移除)之後的最終 sign-off 數字。 |
 
-**waive 前後對照:80.1% → 92.0%,+11.9 個百分點,分母從 11404 bits 縮減到 9924 bits(移除 1480 bits)。**
+**waive 前後對照:79.7% → 91.4%,+11.7 個百分點,分母從 11472 bits 縮減到 9998 bits(移除 1474 bits)。**
+
+（v2.2.0 新增 axi_lite_xbar 的 DECERR/診斷 CSR 之後的數字,見第 8 節。分母比之前多了(新 RTL 引入新的 bit),但覆蓋率仍遠高於 90% 目標。)
 
 （這是加測試向量、把 residual gap 從 1966 bits 補到 772 bits 之後的數字——見第 5 節「加測試向量把 residual gap 從 80.1% 推到 92.2%」。covered bit 數在那一輪從 7926 上升到 9153;waiver 本身邏輯不變,waive 不會讓任何東西「變成 covered」,純粹是把「本來就不該被拿來衡量」的 bit 移出評分範圍——waived bit 數從 1513 降到 1480,是因為部分先前「未覆蓋但符合 waiver 規則」的 bit 現在被新測試直接覆蓋了,不再需要被 waive。
 
@@ -100,3 +102,16 @@ python3 scripts/build_dashboard.py      # 重新產生 reports/sign_off/dashboar
 ```
 
 新增/修改 waiver rule:直接編輯 `reports/sign_off/coverage/toggle_waivers.txt`(格式:`<signal-regex><TAB><理由>`,套用在 bit-indexed 名稱如 `s_bresp[0]` 跟去掉 index 的 base name 如 `s_bresp` 兩者上),重跑 `analyze_coverage.py` 即可。
+
+## 8. v2.2.0:DECERR + 診斷 CSR 讓 Rule 3 的其中一條理由過時
+
+`axi_lite_xbar.v` 新增了 decode-miss 的正確回應碼(`SLVERR`→`DECERR`)跟一個診斷用 CSR(細節見 `docs/project_retrospective.md`、`docs/memory_map.md`)之後,Rule 3(`^s_bresp\[0\]$`/`^s_rresp\[0\]$`,「這個專案的 response 編碼只會用到 OKAY/SLVERR,bit[0] 永遠是 0」)的理由**不再是 project-wide 成立的事實**——crossbar 自己對外的 `s_bresp`/`s_rresp`(呈現給 s0/s1 的那個)現在真的會在 decode miss 時驅動 `DECERR`(`2'b11`,bit[0]=1),不再是結構性常數。
+
+**但這不是一個需要修正的 bug,數字也沒有變差**——這個 waiver 機制是「先看這個 bit 有沒有真的被覆蓋,只有還沒覆蓋的才會去檢查 waiver rule」(見 `scripts/analyze_coverage.py` 的 `build_toggle_waiver_report()`),所以:
+
+- axi_lite_xbar 自己的 `s_bresp[0]`/`s_rresp[0]`,因為新增的 DECERR 測試(`blocks/axi_lite_xbar/dv/sim_main.cpp`)讓它們兩個方向都真的 toggle 過,**已經直接算作 covered,從來沒有被這條 waiver 規則接住過**——實際檢查過 dashboard 產生的 waived-bit 範例清單,這條規則現在只列出真正的周邊模組(`aes.v`、`boot_rom.v`、`dma_engine.v` 等),axi_lite_xbar 完全沒有出現在裡面,證實機制運作正常。
+- 其他所有周邊(Timer/Watchdog/UART/I2C/SPI/AES/DMA/boot_rom)自己的 `s_bresp`/`s_rresp`,以及 crossbar 內部連到這些周邊的 per-slave mux wire(`rom_bresp`/`ram_bresp`/`w_slave_bresp` 等),**這條 waiver 理由仍然完全成立**——這些周邊本身從來沒有機會生成 `DECERR`(那是 crossbar 自己的邏輯,不會透過周邊的 bresp/rresp 路徑),bit[0] 在這些地方依然是真正的結構性常數。
+
+實際做的修正:只更新 `toggle_waivers.txt` 裡這幾條規則的**理由文字**,把「project-wide 都不會用到 DECERR」改成「周邊層級跟 crossbar 內部 per-slave mux 才適用,crossbar 自己對外的 bresp/rresp 是 v2.2.0 之後的例外」,**regex pattern 本身完全沒動**(不需要動,機制已經自動排除掉真正覆蓋到的 bit)。這是「文件講的理由要跟實際行為保持誠實」的例子,不是修 bug。
+
+順便更新的整體數字(`docs/coverage_waiver_report.md` 第 1 節表格已同步):waive 前 79.7%(9142/11472)、waive 後 91.4%(9142/9998),1474 bits waived、36 條 rule 不變。分母比 v2.1.0 時期多了(新 RTL 引入新的暫存器/邏輯),百分比因此比 92.0% 略降到 91.4%,是新增邏輯測試向量還沒做到窮盡的正常現象,不是既有測試變差,仍然遠高於 90% 目標。

@@ -12,6 +12,7 @@
 
 static const uint8_t RESP_OKAY   = 0x0;
 static const uint8_t RESP_SLVERR = 0x2;
+static const uint8_t RESP_DECERR = 0x3;
 
 int main(int argc, char** argv) {
   VerilatedContext* ctx = new VerilatedContext;
@@ -27,7 +28,15 @@ int main(int argc, char** argv) {
 
   dut->clk = 0;
   dut->s1_awvalid = 0; dut->s1_wvalid = 0; dut->s1_bready = 0; dut->s1_arvalid = 0; dut->s1_rready = 0;
-  auto tick_half = [&]() { dut->clk = !dut->clk; dut->eval(); };
+  // decerr_irq is a one-cycle-pulse registered signal (stable for a full
+  // clock period once asserted), so sampling it once per rising edge --
+  // not once per half-cycle call -- counts each pulse exactly once.
+  int decerr_irq_pulses = 0;
+  auto tick_half = [&]() {
+    dut->clk = !dut->clk;
+    dut->eval();
+    if (dut->clk == 1 && dut->decerr_irq) decerr_irq_pulses++;
+  };
   AxiLiteBfm bfm(sig, tick_half);
 
   dut->resetn = 0;
@@ -107,20 +116,63 @@ int main(int argc, char** argv) {
   ok = bfm.read(0x00000000, &rd, &resp);
   check("ROM 0x0 unaffected by RAM/Timer/WDT/UART/I2C/SPI/AES/DMA writes", ok && rd == 0xAAAA0001);
 
-  // ---- 10. unmapped address -> SLVERR, no slave touched ----
+  // ---- 10. unmapped address -> DECERR, no slave touched (v2.2.0: this
+  // was SLVERR before -- see rtl/include/axi_lite.vh's header for why
+  // DECERR is the spec-correct code for "no slave exists here" as
+  // opposed to "a real slave reported its own error"). Each miss should
+  // also latch its address into the crossbar's diagnostic CSR and pulse
+  // decerr_irq exactly once (see axi_lite_xbar.v's header comment).
+  int irq0 = decerr_irq_pulses;
   ok = bfm.write(0x50000000, 0xDEADDEAD, 0xF, &resp);
   check("write unmapped completes (crossbar self-answers)", ok);
-  check("write unmapped resp SLVERR", resp == RESP_SLVERR);
+  check("write unmapped resp DECERR", resp == RESP_DECERR);
+  check("write unmapped pulses decerr_irq exactly once", decerr_irq_pulses - irq0 == 1);
 
+  irq0 = decerr_irq_pulses;
   ok = bfm.read(0x50000000, &rd, &resp);
   check("read unmapped completes", ok);
-  check("read unmapped resp SLVERR", resp == RESP_SLVERR);
+  check("read unmapped resp DECERR", resp == RESP_DECERR);
+  check("read unmapped pulses decerr_irq exactly once", decerr_irq_pulses - irq0 == 1);
+
+  // ---- 10b. diagnostic CSR readback (v2.2.0): confirm the two misses
+  // above each landed in the right register, before anything else
+  // overwrites them ----
+  ok = bfm.read(0x40007000, &rd, &resp);
+  check("read LAST_DECERR_WADDR completes", ok);
+  check("read LAST_DECERR_WADDR resp OKAY (this address IS mapped)", resp == RESP_OKAY);
+  check("LAST_DECERR_WADDR holds the write-miss address", rd == 0x50000000);
+
+  ok = bfm.read(0x40007004, &rd, &resp);
+  check("read LAST_DECERR_RADDR completes", ok);
+  check("read LAST_DECERR_RADDR resp OKAY", resp == RESP_OKAY);
+  check("LAST_DECERR_RADDR holds the read-miss address", rd == 0x50000000);
+  // reading the CSR window itself must not be mistaken for a fresh miss.
+  check("reading the CSR window doesn't itself pulse decerr_irq",
+        decerr_irq_pulses - irq0 == 1); // still just the read-miss above
+
+  // ---- 10c. writes to the CSR window are rejected (it's real, mapped,
+  // read-only address space -- SLVERR, not DECERR, same distinction as
+  // boot_rom rejecting writes) ----
+  irq0 = decerr_irq_pulses;
+  ok = bfm.write(0x40007000, 0xFFFFFFFF, 0xF, &resp);
+  check("write to CSR window completes", ok);
+  check("write to CSR window resp SLVERR (mapped, but read-only)", resp == RESP_SLVERR);
+  check("write to CSR window doesn't pulse decerr_irq (not a decode miss)",
+        decerr_irq_pulses - irq0 == 0);
+  ok = bfm.read(0x40007000, &rd, &resp);
+  check("CSR window write was rejected, not silently applied", ok && rd == 0x50000000);
 
   // a peripheral sub-address beyond DMA that's still genuinely unmapped —
-  // expected to SLVERR (all 9 defined peripheral slots are wired up now).
-  ok = bfm.read(0x40007000, &rd, &resp);
+  // expected to DECERR (all 9 real peripheral slots + the CSR window are
+  // wired up now; this probe deliberately avoids 0x4000_7xxx, which is
+  // the CSR window since v2.2.0, not unmapped anymore).
+  irq0 = decerr_irq_pulses;
+  ok = bfm.read(0x40008000, &rd, &resp);
   check("read genuinely-unmapped peripheral addr completes", ok);
-  check("read genuinely-unmapped peripheral addr resp SLVERR", resp == RESP_SLVERR);
+  check("read genuinely-unmapped peripheral addr resp DECERR", resp == RESP_DECERR);
+  check("that miss also pulses decerr_irq", decerr_irq_pulses - irq0 == 1);
+  ok = bfm.read(0x40007004, &rd, &resp);
+  check("LAST_DECERR_RADDR now reflects the newest read miss", ok && rd == 0x40008000);
 
   // confirm the unmapped accesses didn't corrupt real slave state.
   ok = bfm.read(0x10000000, &rd, &resp);
@@ -224,7 +276,7 @@ int main(int argc, char** argv) {
     printf("FAIL: %d check(s) failed\n", fail_count);
     return 1;
   }
-  printf("PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI/AES/DMA + SLVERR on miss) "
-         "+ 2-master arbitration (CPU-priority on contention) all green\n");
+  printf("PASS: axi_lite_xbar routing/decode (ROM/RAM/Timer/WDT/UART/I2C/SPI/AES/DMA + DECERR on miss "
+         "+ diagnostic CSR/decerr_irq, v2.2.0) + 2-master arbitration (CPU-priority on contention) all green\n");
   return 0;
 }

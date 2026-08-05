@@ -23,6 +23,16 @@
 `define AXI_STRB_WIDTH 4   // AXI_DATA_WIDTH/8
 
 // AxRESP / xRESP encoding actually used (AXI4 defines 4 values; this project
-// only ever drives OKAY or SLVERR — EXOKAY/DECERR are never generated).
+// never generates EXOKAY -- there's no exclusive-access support anywhere
+// in this design). SLVERR and DECERR are both real per spec, and mean
+// different things: SLVERR is a mapped slave itself reporting an error
+// (e.g. boot_rom rejecting a write because it's read-only -- the address
+// decoded fine, the *operation* is what's invalid), while DECERR is the
+// interconnect's own response when no slave exists at that address at
+// all (axi_lite_xbar's decode-miss path -- see docs/memory_map.md).
+// Conflating the two under a single SLVERR was this project's original
+// Phase 1 shortcut; v2.2.0 corrected the decode-miss path to genuinely
+// drive DECERR, matching the AMBA/AXI4 spec's actual distinction.
 `define AXI_RESP_OKAY   2'b00
 `define AXI_RESP_SLVERR 2'b10
+`define AXI_RESP_DECERR 2'b11

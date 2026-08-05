@@ -20,16 +20,27 @@
                                  // burst master talks directly to
                                  // dma_ram.v, entirely separate from this
                                  // Lite-only crossbar (see docs/specs/dma.md)
+`define ADDR_PERIPH_XBAR_CSR 4'h7 // 0x4000_7000 -- NOT a peripheral, the
+                                 // crossbar's own diagnostic CSR window
+                                 // (last decode-miss addresses, v2.2.0),
+                                 // answered directly by axi_lite_xbar
+                                 // itself like SLAVE_ERR below, not routed
+                                 // to any real slave module
 
 // ---- slave index numbering, used by axi_lite_xbar's internal mux ----
-`define SLAVE_ROM   0
-`define SLAVE_RAM   1
-`define SLAVE_TIMER 2
-`define SLAVE_WDT   3
-`define SLAVE_UART  4
-`define SLAVE_I2C   5
-`define SLAVE_SPI   6
-`define SLAVE_AES   7
-`define SLAVE_DMA   8
-`define SLAVE_ERR   9   // default/error slave: unmapped addresses -> SLVERR
-`define NUM_SLAVES  10
+`define SLAVE_ROM      0
+`define SLAVE_RAM      1
+`define SLAVE_TIMER    2
+`define SLAVE_WDT      3
+`define SLAVE_UART     4
+`define SLAVE_I2C      5
+`define SLAVE_SPI      6
+`define SLAVE_AES      7
+`define SLAVE_DMA      8
+`define SLAVE_XBAR_CSR 9   // 0x4000_7000 window -- crossbar's own
+                            // diagnostic registers, answered directly by
+                            // axi_lite_xbar, see docs/memory_map.md
+`define SLAVE_ERR      10  // default/error slave: unmapped addresses ->
+                            // DECERR (v2.2.0; was SLVERR before -- see
+                            // rtl/include/axi_lite.vh's header comment)
+`define NUM_SLAVES     11
