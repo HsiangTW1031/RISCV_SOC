@@ -86,7 +86,7 @@ onward. The v2.0.0 regression just exposed a pre-existing gap.
   that only use `@NANGATE45_LIB@` are unaffected)
 - `scripts/collect_soc_reports.sh`: synth/STA skip condition now also
   requires `NANGATE45_SLOW_LIB`
-- New committed report: `reports/sign_off/timing_mcmm.txt` (3-corner STA
+- New committed report: `reports/sign_off/timing/sta_mcmm.txt` (3-corner STA
   raw output)
 
 ### Known-good result (verified, not just re-tuned for one corner)

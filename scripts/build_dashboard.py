@@ -32,7 +32,7 @@ VENDORED_BLOCKS = set(cfg.VENDORED_FILES.values())
 data = json.loads((REPORTS / "dashboard_data.json").read_text())
 
 # ---- pull a few more numbers out of the existing sign-off text reports ----
-sim_text = (REPORTS / "simulation_regression.txt").read_text()
+sim_text = (REPORTS / "simulation/regression.txt").read_text()
 # Each regression row is "<target-name>  <PASS|FAIL|BUILD-FAIL>  <detail...>"
 # (see scripts/lib_verilator_targets.sh's print_regression_summary) -- the
 # result is the 2nd whitespace-separated column, not a line prefix (a line
@@ -48,7 +48,7 @@ for line in sim_text.splitlines():
 regression_pass = bool(re.search(r"ALL \d+ regression targets PASS", sim_text))
 regression_kpi_kind = "good" if regression_pass else "bad"
 
-synth_text = (REPORTS / "synthesis_area.txt").read_text()
+synth_text = (REPORTS / "synthesis/area.txt").read_text()
 # Yosys prints one "Chip area for module" line per submodule (this
 # project's non-flattened hierarchy), then the top-level's own *local*
 # area, and only then the real rolled-up "Chip area for top module"
@@ -70,7 +70,7 @@ for line in synth_text.splitlines():
         cell_count = int(m2.group(1))
         break
 
-sta_text = (REPORTS / "timing_sta.txt").read_text()
+sta_text = (REPORTS / "timing/sta.txt").read_text()
 m = re.search(r"([\d.]+)\s+data arrival time", sta_text)
 crit_path_ns = float(m.group(1)) if m else None
 fmax_mhz = round(1000.0 / crit_path_ns, 1) if crit_path_ns else None

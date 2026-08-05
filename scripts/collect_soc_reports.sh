@@ -18,7 +18,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT/scripts/project_config.sh"
 export PROJECT_NAME PROJECT_REPO_URL PROJECT_TAGLINE
 OUT="$ROOT/reports/sign_off"
-mkdir -p "$OUT"
+# Sub-directories are grouped by function (matches coverage/, which already
+# existed this way), not by which tool produced them -- so
+# docs/verification_summary.md and docs/performance.md can point at
+# "reports/sign_off/timing/..." instead of a flat pile of same-prefix files.
+mkdir -p "$OUT" "$OUT/simulation" "$OUT/lint" "$OUT/synthesis" "$OUT/timing" "$OUT/coverage"
 
 # Synthesis + STA need Nangate45 liberty files, which can't be vendored
 # into this repo (licensing) -- see TOOLCHAIN.md. Without them set, skip
@@ -38,23 +42,23 @@ else
 fi
 
 echo "=== 1/6: full regression (scripts/run_regression.sh) ==="
-"$ROOT/scripts/run_regression.sh" > "$OUT/simulation_regression.txt" 2>&1
+"$ROOT/scripts/run_regression.sh" > "$OUT/simulation/regression.txt" 2>&1
 regr_rc=$?
-tail -25 "$OUT/simulation_regression.txt"
+tail -25 "$OUT/simulation/regression.txt"
 # Each row is "<target-name>  <PASS|FAIL|BUILD-FAIL>  <detail...>" (see
 # scripts/lib_verilator_targets.sh) -- the result is the 2nd
 # whitespace-separated column, not a line prefix.
-n_targets=$(awk '$2 == "PASS" || $2 == "FAIL" || $2 == "BUILD-FAIL"' "$OUT/simulation_regression.txt" | wc -l | tr -d ' ')
+n_targets=$(awk '$2 == "PASS" || $2 == "FAIL" || $2 == "BUILD-FAIL"' "$OUT/simulation/regression.txt" | wc -l | tr -d ' ')
 
 echo
 echo "=== 2/6: lint (scripts/run_lint.sh) ==="
-"$ROOT/scripts/run_lint.sh" > "$OUT/lint_summary.txt" 2>&1
+"$ROOT/scripts/run_lint.sh" > "$OUT/lint/summary.txt" 2>&1
 lint_rc=$?
 # lintlist.sh entries use absolute paths (needed so multi-directory file
 # lists resolve regardless of cwd) -- strip the machine-local prefix
 # before this lands in a committed report.
-sed "s#$ROOT/##g" "$ROOT/blocks/$TOP_BLOCK/lint/lint_report.txt" > "$OUT/${TOP_BLOCK}_lint_full.txt"
-tail -20 "$OUT/lint_summary.txt"
+sed "s#$ROOT/##g" "$ROOT/blocks/$TOP_BLOCK/lint/lint_report.txt" > "$OUT/lint/${TOP_BLOCK}_full.txt"
+tail -20 "$OUT/lint/summary.txt"
 
 echo
 echo "=== 3/6: synthesis (blocks/$TOP_BLOCK/syn/synth.ys) ==="
@@ -72,12 +76,12 @@ if [ "$HAVE_PDK" -eq 1 ]; then
     echo "# blocks/$TOP_BLOCK/syn/synth_log.txt -- not committed (tens of MB)."
     echo
     tail -80 "$SYNTH_FULL_LOG"
-  } > "$OUT/synthesis_area.txt"
+  } > "$OUT/synthesis/area.txt"
 else
   synth_rc=2
-  echo "SKIPPED (no NANGATE45_LIB)" > "$OUT/synthesis_area.txt"
+  echo "SKIPPED (no NANGATE45_LIB)" > "$OUT/synthesis/area.txt"
 fi
-tail -15 "$OUT/synthesis_area.txt"
+tail -15 "$OUT/synthesis/area.txt"
 
 # OpenSTA's simplified Verilog reader can't parse a few things Yosys's
 # write_verilog emits (a `signed` keyword on post-synthesis nets, `(* ... *)`
@@ -104,19 +108,19 @@ fi
 echo
 echo "=== 4/6: STA (blocks/$TOP_BLOCK/sta/sta.tcl) ==="
 if [ "$HAVE_PDK" -eq 1 ]; then
-  ( cd "$ROOT/blocks/$TOP_BLOCK/sta" && sta sta.tcl > "$OUT/timing_sta.txt" 2>&1 )
+  ( cd "$ROOT/blocks/$TOP_BLOCK/sta" && sta sta.tcl > "$OUT/timing/sta.txt" 2>&1 )
   sta_rc=$?
 else
   sta_rc=2
-  echo "SKIPPED (no NANGATE45_LIB)" > "$OUT/timing_sta.txt"
+  echo "SKIPPED (no NANGATE45_LIB)" > "$OUT/timing/sta.txt"
 fi
-tail -20 "$OUT/timing_sta.txt"
+tail -20 "$OUT/timing/sta.txt"
 
 echo
 echo "=== 5/6: coverage (scripts/run_coverage.sh + analyze_coverage.py) ==="
-"$ROOT/scripts/run_coverage.sh" > "$OUT/coverage_run.txt" 2>&1
+"$ROOT/scripts/run_coverage.sh" > "$OUT/coverage/run.txt" 2>&1
 cov_rc=$?
-tail -15 "$OUT/coverage_run.txt"
+tail -15 "$OUT/coverage/run.txt"
 python3 "$ROOT/scripts/analyze_coverage.py"
 analyze_rc=$?
 
@@ -132,10 +136,10 @@ dashboard_rc=$?
   echo
   echo "| Check | Result | File |"
   echo "|---|---|---|"
-  echo "| Simulation regression ($n_targets targets) | $([ $regr_rc -eq 0 ] && echo PASS || echo FAIL) | \`simulation_regression.txt\` |"
-  echo "| Lint (per-block, lint-only) | $([ $lint_rc -eq 0 ] && echo CLEAN || echo "warnings present") | \`lint_summary.txt\`, \`${TOP_BLOCK}_lint_full.txt\` |"
-  echo "| Synthesis (Yosys, Nangate45) | $([ $synth_rc -eq 0 ] && echo OK || ([ $synth_rc -eq 2 ] && echo "SKIPPED (no PDK)" || echo FAIL)) | \`synthesis_area.txt\` |"
-  echo "| STA (OpenSTA) | $([ $sta_rc -eq 0 ] && echo OK || ([ $sta_rc -eq 2 ] && echo "SKIPPED (no PDK)" || echo FAIL)) | \`timing_sta.txt\` |"
+  echo "| Simulation regression ($n_targets targets) | $([ $regr_rc -eq 0 ] && echo PASS || echo FAIL) | \`simulation/regression.txt\` |"
+  echo "| Lint (per-block, lint-only) | $([ $lint_rc -eq 0 ] && echo CLEAN || echo "warnings present") | \`lint/summary.txt\`, \`lint/${TOP_BLOCK}_full.txt\` |"
+  echo "| Synthesis (Yosys, Nangate45) | $([ $synth_rc -eq 0 ] && echo OK || ([ $synth_rc -eq 2 ] && echo "SKIPPED (no PDK)" || echo FAIL)) | \`synthesis/area.txt\` |"
+  echo "| STA (OpenSTA) | $([ $sta_rc -eq 0 ] && echo OK || ([ $sta_rc -eq 2 ] && echo "SKIPPED (no PDK)" || echo FAIL)) | \`timing/sta.txt\` (+ \`timing/sta_mcmm.txt\` for multi-corner, run separately) |"
   echo "| Coverage (line/toggle/branch/FSM) | $([ $cov_rc -eq 0 ] && echo OK || echo FAIL) | \`coverage/merged.dat\`, \`dashboard_data.json\` |"
   echo "| HTML dashboard | $([ $dashboard_rc -eq 0 ] && echo OK || echo FAIL) | \`dashboard.html\` (open directly in a browser) |"
   echo

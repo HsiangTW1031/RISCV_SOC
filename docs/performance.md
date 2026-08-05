@@ -90,7 +90,7 @@
 | **soc_top** | 關鍵路徑 10.288ns(`u_aes/u_chain` 內部)→ **slow corner Fmax ≈ 97.2MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
 | **aes_core**(獨立合成,這次的 sizing 改動只動了 `blocks/soc_top/syn/synth.ys`,不影響這裡) | 關鍵路徑 38.399ns → **slow corner Fmax ≈ 26.0MHz** | 全設計 0 個 hold 違規(TNS = 0.00) |
 
-Setup 用的 SDC 時脈週期(2.0ns/500MHz)本來就是刻意設定得比實際能達到的頻率更緊(見 `constraints/*.sdc` 註解)——目的是讓 `report_checks` 直接印出關鍵路徑的真實 data arrival time,再自己算 Fmax,不是為了衝一個特定頻率,所以 setup 報告顯示大量違規是預期中的,不代表真的有時序問題;唯一有意義的數字是 data arrival time 換算出來的 slow-corner Fmax,這才是兩個 corner 一起看才拿得到的、比第 1 節保守的真實數字。Hold 完全乾淨(fast corner 下 TNS 剛好 0.00,沒有任何一個 endpoint 違規)——加上第 1 節的 sizing 改動之後重新確認過,hold 依然完全沒有被 sizing 拖垮,原始報告存在 `reports/sign_off/timing_mcmm.txt`。
+Setup 用的 SDC 時脈週期(2.0ns/500MHz)本來就是刻意設定得比實際能達到的頻率更緊(見 `constraints/*.sdc` 註解)——目的是讓 `report_checks` 直接印出關鍵路徑的真實 data arrival time,再自己算 Fmax,不是為了衝一個特定頻率,所以 setup 報告顯示大量違規是預期中的,不代表真的有時序問題;唯一有意義的數字是 data arrival time 換算出來的 slow-corner Fmax,這才是兩個 corner 一起看才拿得到的、比第 1 節保守的真實數字。Hold 完全乾淨(fast corner 下 TNS 剛好 0.00,沒有任何一個 endpoint 違規)——加上第 1 節的 sizing 改動之後重新確認過,hold 依然完全沒有被 sizing 拖垮,原始報告存在 `reports/sign_off/timing/sta_mcmm.txt`。
 
 **`soc_top` 這次的 slow corner Fmax(97.2MHz)比 retrofit 前(43.128ns/≈23.2MHz)、retrofit 剛完成時(51.837ns/19.3MHz)都好很多**——第 1 節提到的 sizing 改動(`abc -constr` + slow corner library)在三個 corner 上都是全面改善,不是只針對 typical corner 調參數湊出來的數字。`aes_core` 獨立合成的數字完全沒變,因為這次的改動範圍刻意只限縮在 `blocks/soc_top/syn/synth.ys`。
 
