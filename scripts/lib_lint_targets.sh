@@ -27,21 +27,35 @@ lint_target() {
 
   verilator $VFLAGS --lint-only --top-module "$top" "${files[@]}" > "$scratch" 2>&1
 
-  local warn_count
+  local warn_count error_count
   warn_count=$(grep -c "^%Warning" "$scratch" || true)
+  # A genuine parse/elaboration failure (syntax error, missing module,
+  # etc.) prints "%Error: <message>" lines distinct from Verilator's own
+  # closing tally line -- which is ALSO prefixed "%Error:" even when the
+  # run's only problem was warnings ("%Error: Exiting due to N
+  # warning(s)", since lint-only mode treats warnings as fatal by
+  # default). Only counting "^%Warning" and ignoring "^%Error" entirely
+  # means a real syntax error -- which produces zero %Warning lines --
+  # silently reports CLEAN: Verilator never got far enough to lint
+  # anything, but nothing here noticed. Exclude just the closing tally
+  # line so a warnings-only run still reports its warning count as
+  # before, while any *other* %Error line marks the target as failed.
+  error_count=$(grep "^%Error" "$scratch" | grep -vc "Exiting due to" || true)
 
   {
     echo "=== verilator --lint-only --top-module $top ==="
     echo "Files: ${files[*]}"
     echo
     cat "$scratch"
-    if [ "$warn_count" -eq 0 ]; then echo "(clean)"; fi
+    if [ "$warn_count" -eq 0 ] && [ "$error_count" -eq 0 ]; then echo "(clean)"; fi
   } >> "$report.tmp"
   rm -f "$scratch"
 
   NAMES+=("$block/$report_name")
   COUNTS+=("$warn_count")
-  if [ "$warn_count" -eq 0 ]; then
+  if [ "$error_count" -gt 0 ]; then
+    RESULTS+=("$error_count error(s)")
+  elif [ "$warn_count" -eq 0 ]; then
     RESULTS+=("CLEAN")
   else
     RESULTS+=("$warn_count warning(s)")
