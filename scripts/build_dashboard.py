@@ -49,8 +49,19 @@ regression_pass = bool(re.search(r"ALL \d+ regression targets PASS", sim_text))
 regression_kpi_kind = "good" if regression_pass else "bad"
 
 synth_text = (REPORTS / "synthesis_area.txt").read_text()
-m = re.search(r"Chip area for top module '\\?\w+': ([\d.]+)", synth_text)
-chip_area = float(m.group(1)) if m else None
+# Yosys prints one "Chip area for module" line per submodule (this
+# project's non-flattened hierarchy), then the top-level's own *local*
+# area, and only then the real rolled-up "Chip area for top module"
+# total. re.search only returns the first match, which would be wrong if
+# the top-level wrapper ever has little/no logic of its own (its own
+# local area printing before the real total) -- take the last match
+# instead, since the rolled-up total is always printed last. Currently
+# harmless for soc_top specifically (it has real logic of its own: the
+# reset synchronizers), but this matches the fix applied to the
+# ic-verification-signoff-scaffold skill's copy after it caused a real
+# "N/A" misreport there on a thin CPU wrapper -- keeping both in sync.
+matches = re.findall(r"Chip area for (?:top )?module '\\?\w+': ([\d.]+)", synth_text)
+chip_area = float(matches[-1]) if matches else None
 m = re.search(r"cells\n\s*(\d+)", synth_text)
 cell_count = None
 for line in synth_text.splitlines():
