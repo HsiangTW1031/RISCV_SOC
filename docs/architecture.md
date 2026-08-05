@@ -1,6 +1,6 @@
 # Architecture
 
-整個 SoC 的模組組成、匯流排拓樸、中斷路由。個別模組的暫存器介面/驗證細節見 `docs/specs/*.md`；位址配置見 `docs/memory_map.md`；效能數據見 `docs/performance.md`。
+整個 SoC 的模組組成、匯流排拓樸、中斷路由。個別模組的暫存器介面/驗證細節見 `docs/specs/*.md`；位址配置見 `docs/memory_map.md`；效能數據見 `docs/verification/performance.md`。
 
 ## 1. 頂層組成
 
@@ -91,7 +91,7 @@ Vendored,原封不動（見 `rtl/core/VENDORED_SOURCE.md`)。設定：`ENABLE_MU
 | 8 | DMA | **整個**多 block 操作完成（不是每個 block)|
 | 9 | axi_lite_xbar(v2.2.0) | decode miss(讀或寫任一方向踩到未映射位址),搭配 `0x4000_7000` 的診斷 CSR 一起用,見 `docs/memory_map.md` §2.1 |
 
-每個周邊的 `irq` 輸出都是**單一 cycle 的 pulse**,不是 level-sensitive——這是 Phase 2 一開始犯的錯誤又修正過來的教訓（若是 level-sensitive,PicoRV32 沒有真的邊緣觸發鎖存機制配合的話,同一個中斷可能被重複觸發或漏接),詳見 `docs/project_retrospective.md`。實際測得的中斷延遲(Timer IRQ 訊號拉起到 PicoRV32 真正進到 ISR)是 3-14 cycles,平均 8.6 cycles,見 `docs/performance.md`。
+每個周邊的 `irq` 輸出都是**單一 cycle 的 pulse**,不是 level-sensitive——這是 Phase 2 一開始犯的錯誤又修正過來的教訓（若是 level-sensitive,PicoRV32 沒有真的邊緣觸發鎖存機制配合的話,同一個中斷可能被重複觸發或漏接),詳見 `docs/project_retrospective.md`。實際測得的中斷延遲(Timer IRQ 訊號拉起到 PicoRV32 真正進到 ISR)是 3-14 cycles,平均 8.6 cycles,見 `docs/verification/performance.md`。
 
 ## 5. 除錯路徑：JTAG
 

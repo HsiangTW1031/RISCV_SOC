@@ -23,7 +23,7 @@
    - **實際生效的做法**:保留 per-module hierarchy,新增 `blocks/soc_top/syn/constr.txt`(`set_driving_cell BUF_X1` + `set_load 10.0`,標準的假設值,重點是「有 -constr」而不是這兩個數字本身)並加上 `-D 10000`,啟用 abc 的 sizing pass。
    - **用 slow corner library 而非 typical 做 sizing 判斷**:`dfflibmap`/`abc` 這兩行改成吃 `$NANGATE45_SLOW_LIB` 而不是 `$NANGATE45_LIB`——因為 Yosys/abc 沒有真正的 MMMC(Multi-Mode Multi-Corner)最佳化能力,只能在單一 corner 的時序模型下做 sizing 決策;用 slow corner(worst-case setup)當作 sizing 依據,決策會偏保守,比用 typical corner sizing 更接近真實 signoff flow「對 setup 最壞情況做最佳化」的做法。（最終報告面積/typical Fmax 時仍然用 `$NANGATE45_LIB` 算,因為 cell 面積本身不隨 corner 改變,只有 sizing 決策的依據不同。）
 
-結果:典型 corner 關鍵路徑從 14.821ns 降到 2.881ns,關鍵路徑位置也從 PicoRV32 換回 AES chain,而且比 retrofit 之前的 AES 瓶頸(10.966ns)還快很多——**不只補回 retrofit 掉的頻率,還比原本(未 retrofit)的版本更好**,代價是 chip area 多了 4.76%。用 best-effort LEC(`equiv_simple`)驗證過沒有引入新的邏輯偏差(見 `docs/lec_methodology.md`),19 個 regression target 全過、135 個 lint finding 不變。
+結果:典型 corner 關鍵路徑從 14.821ns 降到 2.881ns,關鍵路徑位置也從 PicoRV32 換回 AES chain,而且比 retrofit 之前的 AES 瓶頸(10.966ns)還快很多——**不只補回 retrofit 掉的頻率,還比原本(未 retrofit)的版本更好**,代價是 chip area 多了 4.76%。用 best-effort LEC(`equiv_simple`)驗證過沒有引入新的邏輯偏差(見 `docs/verification/lec_methodology.md`),19 個 regression target 全過、135 個 lint finding 不變。
 
 ## 2. AES 加密吞吐量
 

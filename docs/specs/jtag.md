@@ -53,7 +53,7 @@ flowchart LR
 | `clk` | in | 1 | - | system clock (bridge only) |
 | `m_*` (AXI4-Lite master) | - | - | clk | the bridge's AXI4-Lite master port, wired to the crossbar's `s1_*` |
 
-在這個 block 自己的獨立測試(`jtag_chain_testtop.v`)裡,`resetn`/`tck_resetn` 是兩條各自獨立、由 testbench 直接驅動的訊號,沒有內建的 CDC (clock-domain crossing) 同步邏輯——這是刻意的簡化,因為 block-level 測試只需要模擬 power-on reset,不需要驗證跨時脈域的 reset 同步。真正需要嚴謹處理的 reset domain crossing(異步輸入、雙 flop 同步器)是在 `soc_top.v` 整合層級做的:`resetn_clk_sync`/`resetn_tck_sync` 各自是 clk 域跟 tck 域獨立的同步版本,詳見 `docs/cdc_methodology.md` 的 RDC (Reset Domain Crossing) 章節。
+在這個 block 自己的獨立測試(`jtag_chain_testtop.v`)裡,`resetn`/`tck_resetn` 是兩條各自獨立、由 testbench 直接驅動的訊號,沒有內建的 CDC (clock-domain crossing) 同步邏輯——這是刻意的簡化,因為 block-level 測試只需要模擬 power-on reset,不需要驗證跨時脈域的 reset 同步。真正需要嚴謹處理的 reset domain crossing(異步輸入、雙 flop 同步器)是在 `soc_top.v` 整合層級做的:`resetn_clk_sync`/`resetn_tck_sync` 各自是 clk 域跟 tck 域獨立的同步版本,詳見 `docs/verification/cdc_methodology.md` 的 RDC (Reset Domain Crossing) 章節。
 
 ## 4. Register Map (JTAG DR content, selected via IR)
 

@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
   sig.rvalid  = &dut->s_rvalid;  sig.rready  = &dut->s_rready;  sig.rdata  = &dut->s_rdata;  sig.rresp = &dut->s_rresp;
 
   dut->clk = 0;
-  long long tick_count = 0; // for performance reporting (docs/performance.md) -- counts every half-cycle across both the raw ram_* burst helpers and the AxiLiteBfm's own internal clocking, so cycles_now() below is accurate regardless of which path drove the clock
+  long long tick_count = 0; // for performance reporting (docs/verification/performance.md) -- counts every half-cycle across both the raw ram_* burst helpers and the AxiLiteBfm's own internal clocking, so cycles_now() below is accurate regardless of which path drove the clock
   auto tick_half = [&]() { dut->clk = !dut->clk; dut->eval(); tick_count++; };
   AxiLiteBfm bfm(sig, tick_half);
   auto clock = [&]() { tick_half(); tick_half(); };
@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  // ---- extra key/IV/length/address coverage (see docs/coverage_waivers.md
+  // ---- extra key/IV/length/address coverage (see docs/verification/coverage_waivers.md
   // section 5) ----
   // Every test above shares the same NIST SP800-38A key and a length of 4
   // blocks -- key_reg/iv_reg/len_reg only ever see that one key's bit

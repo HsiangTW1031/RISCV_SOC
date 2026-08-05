@@ -3,7 +3,7 @@
 # ../syn/mem_blackboxes.v) have no internal cells, so paths terminate at
 # their input ports and originate at their output ports -- consistent
 # with treating them as hardened SRAM macros outside this logic-only
-# timing view (see docs/performance.md for the rationale).
+# timing view (see docs/verification/performance.md for the rationale).
 #
 # Requires NANGATE45_LIB set (see TOOLCHAIN.md) -- OpenSTA's Tcl
 # interpreter can read env vars natively, no templating needed.

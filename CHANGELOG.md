@@ -50,7 +50,7 @@ exact response of the exact transaction that missed.
   grew (new RTL), and the new logic hasn't had exhaustive toggle-diversity
   vectors written for it yet (only the specific addresses/directions
   needed to prove correctness); still well above the 90% target.
-- `docs/coverage_waivers.md`'s Rule 3 (AXI response bit[0] is a
+- `docs/verification/coverage_waivers.md`'s Rule 3 (AXI response bit[0] is a
   structural constant) no longer applies to `axi_lite_xbar`'s own
   external-facing `s_bresp`/`s_rresp` (which now genuinely drives DECERR)
   -- corrected the waiver file's reasoning text; the regex patterns
@@ -151,7 +151,7 @@ needs updating -- this is why it's a major version bump, not a patch.
   `aes_core`'s standalone synthesis numbers are essentially unchanged and
   PicoRV32 is byte-for-byte unmodified, so this is attributed to Yosys/abc
   technology-mapping sensitivity to netlist-wide structural changes, not a
-  real logic or timing defect -- see `docs/performance.md` §1/7.
+  real logic or timing defect -- see `docs/verification/performance.md` §1/7.
 - Toggle coverage shifted slightly (92.2% -> 92.0%) since the JTAG
   reset-release timing fix changes exactly which bits toggle during boot
   -- still well above the 90% target.
@@ -185,8 +185,8 @@ adding test vectors to existing testbenches -- no RTL changes.
   points from `axi_lite_xbar.v`'s own mirrors despite sharing a name)
 
 ### Fixed
-- (documentation) `docs/coverage_waivers.md` and
-  `docs/verification_summary.md` updated with the new numbers; the old
+- (documentation) `docs/verification/coverage_waivers.md` and
+  `docs/verification/summary.md` updated with the new numbers; the old
   1966-bit residual gap breakdown is now 772 bits
 
 Caught the same bug three times while doing this — a naive "value +

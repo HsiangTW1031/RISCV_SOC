@@ -20,7 +20,7 @@ export PROJECT_NAME PROJECT_REPO_URL PROJECT_TAGLINE
 OUT="$ROOT/reports/sign_off"
 # Sub-directories are grouped by function (matches coverage/, which already
 # existed this way), not by which tool produced them -- so
-# docs/verification_summary.md and docs/performance.md can point at
+# docs/verification/summary.md and docs/verification/performance.md can point at
 # "reports/sign_off/timing/..." instead of a flat pile of same-prefix files.
 mkdir -p "$OUT" "$OUT/simulation" "$OUT/lint" "$OUT/synthesis" "$OUT/timing" "$OUT/coverage"
 
@@ -30,7 +30,7 @@ mkdir -p "$OUT" "$OUT/simulation" "$OUT/lint" "$OUT/synthesis" "$OUT/timing" "$O
 # regression/lint/coverage/dashboard don't need a PDK at all.
 # NANGATE45_SLOW_LIB is required here too (not just for sta_mcmm.tcl) --
 # blocks/soc_top/syn/synth.ys's abc -constr gate-sizing pass maps against
-# the slow corner (see docs/performance.md section 7).
+# the slow corner (see docs/verification/performance.md section 7).
 if [ -n "${NANGATE45_LIB:-}" ] && [ -f "${NANGATE45_LIB}" ] \
    && [ -n "${NANGATE45_SLOW_LIB:-}" ] && [ -f "${NANGATE45_SLOW_LIB}" ]; then
   HAVE_PDK=1
@@ -87,7 +87,7 @@ tail -15 "$OUT/synthesis/area.txt"
 # write_verilog emits (a `signed` keyword on post-synthesis nets, `(* ... *)`
 # attribute lines, and a string parameter override on the boot_rom
 # instance) -- none of it affects the netlist's actual function, so strip
-# it before STA reads the file. See docs/performance.md's methodology note.
+# it before STA reads the file. See docs/verification/performance.md's methodology note.
 NETLIST="$ROOT/blocks/$TOP_BLOCK/syn/${TOP_BLOCK}_out.v"
 if [ -f "$NETLIST" ]; then
   sed -i.bak 's/wire signed/wire/g' "$NETLIST"
@@ -143,7 +143,7 @@ dashboard_rc=$?
   echo "| Coverage (line/toggle/branch/FSM) | $([ $cov_rc -eq 0 ] && echo OK || echo FAIL) | \`coverage/merged.dat\`, \`dashboard_data.json\` |"
   echo "| HTML dashboard | $([ $dashboard_rc -eq 0 ] && echo OK || echo FAIL) | \`dashboard.html\` (open directly in a browser) |"
   echo
-  echo "See \`docs/performance.md\` and \`docs/verification_summary.md\` for the narrative writeup of these numbers."
+  echo "See \`docs/verification/performance.md\` and \`docs/verification/summary.md\` for the narrative writeup of these numbers."
 } > "$OUT/README.md"
 
 echo

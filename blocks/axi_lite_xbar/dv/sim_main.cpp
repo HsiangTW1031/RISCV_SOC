@@ -217,7 +217,7 @@ int main(int argc, char** argv) {
   check("post-arbitration: RAM holds s1's contended write", ok && rd == 0xBBBB2222);
 
   // ---- extra data-value diversity for per-slave wdata/rdata mirrors
-  // (see docs/coverage_waivers.md section 5) ----
+  // (see docs/verification/coverage_waivers.md section 5) ----
   // Every slave above only ever saw ONE specific 32-bit value, so any bit
   // that happened to be 0 (or 1) in that one value never toggled the
   // other way in the crossbar's own per-slave rdata mirror registers (or

@@ -15,7 +15,7 @@
 | 7 | `spi` | 全部 4 種 CPOL/CPHA 模式、byte-accurate、busy/done、忙碌中 START 被忽略 | 導向測試,對一個假 SPI slave（`fake_spi_slave.v`) | PASS |
 | 8 | `jtag_tap` | IEEE 1149.1 16-state FSM 完全比對參考模型,任意狀態下 TMS reset 安全性質 | Property-based + 參考模型比對 | PASS |
 | 9 | `jtag_chain` | TAP+DTM+bridge 整條鏈,tck↔clk CDC(tck 慢於 clk 的方向)、IDCODE、BYPASS、透過真正 AXI4-Lite slave 讀寫 | 端到端整合測試 | PASS |
-| 9b | `jtag_chain_fast_tck` | 同上,但 tck 反過來比 clk 快——CDC ratio 的另一個極端方向 | 端到端整合測試(CDC 壓力測試,見 `docs/cdc_methodology.md`) | PASS |
+| 9b | `jtag_chain_fast_tck` | 同上,但 tck 反過來比 clk 快——CDC ratio 的另一個極端方向 | 端到端整合測試(CDC 壓力測試,見 `docs/verification/cdc_methodology.md`) | PASS |
 | 10 | `aes_key_expand` | 11 組 round key | FIPS-197 Appendix A.1 官方向量 | PASS |
 | 11 | `aes_core` | 單一 block encrypt/decrypt | FIPS-197 Appendix B + C.1 官方向量 | PASS |
 | 12 | `aes_chain` | CBC/CTR mode chaining,兩個方向 | NIST SP 800-38A Appendix F.2/F.5 官方向量 | PASS |
@@ -42,11 +42,11 @@
 | Line coverage(這個專案自己寫的 RTL,不含 vendored PicoRV32) | **96.8%** |
 | Toggle coverage,raw aggregate(`verilator_coverage --report summary`) | 64.8%(48332/74560 points)——這個數字把同一個 source-level toggle point 依 hierarchy instance 重複計數(例如 `aes_core.v` 被 5 個不同路徑實例化),分母被灌水,詳見下方 |
 | Toggle coverage,deduped per-bit,**waive 前** | **79.7%**(9142/11472 bits) |
-| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1474 個結構上不可能 toggle 的 bit) | **91.4%**(9142/9998 bits,v2.2.0 新增 CSR 相關暫存器/邏輯讓分母變大,見 `docs/coverage_waivers.md`) |
+| Toggle coverage,deduped per-bit,**waive 後**(36 條 waiver rule,waive 掉 1474 個結構上不可能 toggle 的 bit) | **91.4%**(9142/9998 bits,v2.2.0 新增 CSR 相關暫存器/邏輯讓分母變大,見 `docs/verification/coverage_waivers.md`) |
 | Branch coverage(全專案合併) | 79.8%(1561/1956 points) |
 | **FSM state coverage**（11 個 FSM:spi_master、i2c_master、uart、jtag_tap、aes_core、aes_chain、axi_lite_xbar 讀/寫、dma_ram 讀/寫、dma_engine) | **100%**(全部狀態都至少被進入過一次) |
 
-Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、waive 前後每個 block 的量化對照、以及刻意不 waive 的 residual gap 清單:`docs/coverage_waivers.md`。
+Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、waive 前後每個 block 的量化對照、以及刻意不 waive 的 residual gap 清單:`docs/verification/coverage_waivers.md`。
 
 圖像化的 sign-off dashboard(coverage bar chart、toggle waiver 摘要、每個 FSM 的狀態 checklist、135 筆 lint 發現分類後的 summary、架構圖)：`reports/sign_off/dashboard.html`,可以直接用瀏覽器打開,不需要額外工具。
 
@@ -54,10 +54,10 @@ Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、wai
 
 範圍限定在 `aes` + `soc_top`(跟現有 per-block synthesis/STA 的既有範圍一致):
 
-- **Multi-corner STA**(`blocks/{aes,soc_top}/sta/sta_mcmm.tcl`):第 1 節、`docs/performance.md` 引用的 Fmax 是單一 typical corner 的數字,這裡補上 setup(slow corner)+ hold(fast corner)。soc_top 在 slow corner 下真實關鍵路徑 51.837ns(**slow-corner Fmax ≈ 19.3MHz**),fast corner 下 hold 完全乾淨(0 個違規)。完整數字見 `docs/performance.md` 第 7 節(含 active-low reset retrofit 之後 critical path 從 AES 換到 PicoRV32 內部的說明)。
-- **Formal equivalence check(LEC)**(`blocks/{aes,soc_top}/syn/lec.ys`):用 Yosys 的 `equiv_make`/`equiv_simple`/`equiv_induct` 形式化證明「synthesis 出來的 gate-level netlist」邏輯上等價於 RTL。aes_core 完整跑完,97.7% 證明完成;soc_top 因為含整顆 CPU、規模差兩個數量級,刻意只跑不含 sequential induction 的部分驗證(60.1%),改用下面的 gate-level simulation 補足整顆 SoC 的驗證——完整理由跟數字見 `docs/lec_methodology.md`。
+- **Multi-corner STA**(`blocks/{aes,soc_top}/sta/sta_mcmm.tcl`):第 1 節、`docs/verification/performance.md` 引用的 Fmax 是單一 typical corner 的數字,這裡補上 setup(slow corner)+ hold(fast corner)。soc_top 在 slow corner 下真實關鍵路徑 51.837ns(**slow-corner Fmax ≈ 19.3MHz**),fast corner 下 hold 完全乾淨(0 個違規)。完整數字見 `docs/verification/performance.md` 第 7 節(含 active-low reset retrofit 之後 critical path 從 AES 換到 PicoRV32 內部的說明)。
+- **Formal equivalence check(LEC)**(`blocks/{aes,soc_top}/syn/lec.ys`):用 Yosys 的 `equiv_make`/`equiv_simple`/`equiv_induct` 形式化證明「synthesis 出來的 gate-level netlist」邏輯上等價於 RTL。aes_core 完整跑完,97.7% 證明完成;soc_top 因為含整顆 CPU、規模差兩個數量級,刻意只跑不含 sequential induction 的部分驗證(60.1%),改用下面的 gate-level simulation 補足整顆 SoC 的驗證——完整理由跟數字見 `docs/verification/lec_methodology.md`。
 - **Gate-level simulation**(`scripts/run_gatelevel_sim.sh`):拿現有的 regression testbench,直接對 Yosys 合成後的 netlist(而非 RTL)跑一次,驗證 synthesis 本身沒有改變行為。aes_core、soc_top(含真實開機、5 次 Timer 中斷、UART 輸出、JTAG 讀寫 RAM、DMA 控制埠)兩個都 **PASS**。
-- **Signoff 範圍界限**:這個專案的 signoff 停在「gate-level netlist,邏輯跟時序都驗證過」——不含 place & route、DRC/LVS、DFT、power signoff,理由見 `docs/performance.md` 第 8 節(刻意的取捨,不是漏掉)。
+- **Signoff 範圍界限**:這個專案的 signoff 停在「gate-level netlist,邏輯跟時序都驗證過」——不含 place & route、DRC/LVS、DFT、power signoff,理由見 `docs/verification/performance.md` 第 8 節(刻意的取捨,不是漏掉)。
 
 ## 5. CDC(Clock Domain Crossing)驗證
 
@@ -67,7 +67,7 @@ Toggle coverage 完整的 waiver 方法論、每一條 rule 的 RTL 實證、wai
 2. **結構性 review**:對照 RTL 逐條確認每個跨 domain 訊號的 synchronizer 級數(全部 ≥2 級)、第一級是否直接取樣來源暫存器(無組合邏輯夾雜)。
 3. **模擬層級的 ratio 壓力測試**:`jtag_chain`(tck 慢於 clk)+ 新增的 `jtag_chain_fast_tck`(tck 快於 clk)兩個方向都測過,驗證 RTL 宣稱的「任意時脈比例都成立」不是空話。
 
-完整方法論、逐條訊號的 review 結果、以及明確標注的範圍界限(數位模擬無法重現真實 metastability,這部分需要 timing library MTBF 計算,不在這個專案範圍內):`docs/cdc_methodology.md`。
+完整方法論、逐條訊號的 review 結果、以及明確標注的範圍界限(數位模擬無法重現真實 metastability,這部分需要 timing library MTBF 計算,不在這個專案範圍內):`docs/verification/cdc_methodology.md`。
 
 同一份報告的第 6 節另外補上 **RDC(Reset Domain Crossing)**:`resetn` 原本未經同步直接餵給 `clk`/`tck` 兩個 domain,已在 `soc_top.v` 加上兩個「非同步 assert、同步 de-assert」的 2-flop reset synchronizer(每個 domain 一個),改完全部 19 個 regression 測試仍然全線 PASS。
 

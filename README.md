@@ -124,7 +124,7 @@ version (matching this palette) lives in
 - Verified end-to-end against NIST SP 800-38A vectors (CBC encrypt, CTR, CBC
   decrypt) — 15/15 checks green; measured 39.0 cycles/block average
   (burst read + AES + burst write + FSM overhead), see
-  [`docs/performance.md`](docs/performance.md)
+  [`docs/verification/performance.md`](docs/verification/performance.md)
 
 ### Crypto
 - `aes_core`: AES-128 encrypt/decrypt built from FIPS-197 first principles
@@ -137,7 +137,7 @@ version (matching this palette) lives in
   differential test against an independent from-scratch C++ reference model
 - `KEY` registers are deliberately write-only — no key readback, unlike
   every other R/W register in this project
-- Explicit non-goals documented in [`docs/aes_notes.md`](docs/aes_notes.md):
+- Explicit non-goals documented in [`docs/specs/aes_notes.md`](docs/specs/aes_notes.md):
   no side-channel hardening, not production-secure
 
 ### Debug & Trace
@@ -227,9 +227,9 @@ All numbers below are measured (synthesis/STA/coverage runs), not estimated.
 | Fmax, typical corner | 347.1 MHz |
 | Fmax, slow corner (multi-corner STA) | 19.3 MHz |
 
-Full methodology: [`docs/verification_summary.md`](docs/verification_summary.md)
+Full methodology: [`docs/verification/summary.md`](docs/verification/summary.md)
 (tests + coverage + CDC + formal LEC) and
-[`docs/performance.md`](docs/performance.md) (timing/throughput).
+[`docs/verification/performance.md`](docs/verification/performance.md) (timing/throughput).
 
 ## Tool Support
 
@@ -280,7 +280,7 @@ MIT — see [`LICENSE`](LICENSE). The vendored `picorv32.v` keeps its own
 - [`CHANGELOG.md`](CHANGELOG.md) — what changed in each tagged release, and why
 - [`docs/project_retrospective.md`](docs/project_retrospective.md) — every
   real bug found across the project, root cause and fix, phase by phase
-- [`docs/verification_summary.md`](docs/verification_summary.md) — the full
+- [`docs/verification/summary.md`](docs/verification/summary.md) — the full
   test list plus coverage/CDC/formal-LEC methodology
-- [`docs/performance.md`](docs/performance.md) — Fmax, throughput, and
+- [`docs/verification/performance.md`](docs/verification/performance.md) — Fmax, throughput, and
   interrupt-latency measurement methodology

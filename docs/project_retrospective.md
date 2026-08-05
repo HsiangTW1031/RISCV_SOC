@@ -24,7 +24,7 @@
 
 ### 錯誤模式 C：用「原值 + bitwise complement」兩個值想補滿 toggle coverage,結果只補到一半
 
-在把 toggle coverage 從 80.1% 推到 90%+ 的過程中(見 `docs/coverage_waivers.md` 第 5 節),同一個邏輯錯誤連續踩了三次,分別在 DMA 的 `key_reg`/`iv_reg`、`axi_lite_xbar` 每個 slave port 自己的 rdata mirror、以及透過 JTAG poke `soc_top.v` 的 top-level mirror wire。
+在把 toggle coverage 從 80.1% 推到 90%+ 的過程中(見 `docs/verification/coverage_waivers.md` 第 5 節),同一個邏輯錯誤連續踩了三次,分別在 DMA 的 `key_reg`/`iv_reg`、`axi_lite_xbar` 每個 slave port 自己的 rdata mirror、以及透過 JTAG poke `soc_top.v` 的 top-level mirror wire。
 
 三次都是同一個想法:「這個暫存器原本只寫過一個固定值 V1,要讓每個 bit 都雙向 toggle 過,寫一次 `~V1`(bitwise complement)應該就夠了」。實際推演發現不對:假設暫存器 reset 值是 0,依序寫入 V1 再寫入 `~V1`——**V1 裡是 1 的 bit** 會經歷 `0→1(寫V1)→0(寫~V1)`,兩個方向都覆蓋到;但 **V1 裡是 0 的 bit** 只會經歷 `0→0(寫V1,沒變化)→1(寫~V1)`,只有單一方向,序列在這裡就結束,永遠補不到「1→0」。如果 V1 剛好 1-bit 很少(例如 `axi_lite_xbar` 測試裡 Timer 用的 `0x11110004`,32 bit 裡只有 5 個 1),兩值法實際上只補得到不到 1/6 的 bit,遠低於預期。
 
@@ -124,7 +124,7 @@ Nangate45 合成+STA(僅 `aes_core`,不含 AXI wrapper):Fmax ≈ 98.5MHz,關鍵�
 
 ## Phase 7：文件與 Sign-off
 
-`docs/architecture.md`、`docs/memory_map.md`、`docs/verification_summary.md`、`docs/performance.md`;整顆 SoC 的 Yosys 合成 + OpenSTA timing(`blocks/soc_top/syn/`、`blocks/soc_top/sta/`);`scripts/run_regression.sh` 一次跑完全部 18 個測試 binary。
+`docs/architecture.md`、`docs/memory_map.md`、`docs/verification/summary.md`、`docs/verification/performance.md`;整顆 SoC 的 Yosys 合成 + OpenSTA timing(`blocks/soc_top/syn/`、`blocks/soc_top/sta/`);`scripts/run_regression.sh` 一次跑完全部 18 個測試 binary。
 
 ### 真實 bug：`scripts/run_regression.sh` 第一次跑,就抓到一個潛伏的 watchdog 測試 bug
 
@@ -134,7 +134,7 @@ Nangate45 合成+STA(僅 `aes_core`,不含 AXI wrapper):Fmax ≈ 98.5MHz,關鍵�
 
 ### 效能數據的驗證方法論註記
 
-Phase 7 的效能數據(`docs/performance.md`)全部來自**真正跑起來的量測**,不是估算:
+Phase 7 的效能數據(`docs/verification/performance.md`)全部來自**真正跑起來的量測**,不是估算:
 - Fmax 來自對整顆 SoC(記憶體陣列以 blackbox 處理)做真正的 Yosys 合成 + OpenSTA timing analysis,不是只合成單一模組後外推。
 - DMA 的 cycles/block 數字來自在 C++ testbench 裡對 `tick_half` 呼叫次數做精確計數,不是理論值。
 - 中斷延遲(3-14 cycles,平均 8.6)是直接寫一支 scope-aware 的 VCD parser,對 `blocks/soc_top/dv/wave.vcd` 這份已經存在的完整波形做後處理量出來的——過程中也踩到一個小坑:一開始猜測需要透過 Verilator 的內部 hierarchy signal 存取 PicoRV32 深層的 `irq_active` 暫存器,但 Verilator 預設不會把這類內部訊號暴露成可以直接存取的 C++ member,與其冒險用 `--public` 之類的旗標重新編譯、或用不穩定的內部命名去猜 C++ member 名稱,不如**直接解析既有的 VCD 波形檔**——`soc_top_sim` 本來就已經用 `--trace` 深度 99 產生完整波形,VCD 格式本身很單純(`$scope`/`$var`/`$upscope` 定義 hierarchy,後面是逐拍的訊號變化),不需要額外的 Python 套件也能寫出一支可靠的最小化 parser。
@@ -244,8 +244,8 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 
 - Toggle coverage:raw aggregate 58.1% → deduped per-bit(waive 前)69.5% → deduped per-bit(waive 後,36 條 rule、1513 bits 被排除)**80.1%**
 - 每一條 waiver rule 都附上對應的 RTL 行號實證(不是憑感覺套 pattern),寫在 `reports/sign_off/coverage/toggle_waivers.txt`
-- 1965 bits 刻意不 waive、留作 residual gap(主要是 `dma_engine.v` 的 `key_reg`/`iv_reg` 只測過一組固定金鑰、`divider_reg` 只測過偏小的除頻值、部分 `s_rdata`/`m_rdata` 高位元、以及 `soc_top` 自己還沒有端到端測過 SPI/I2C)——這些留在 `docs/coverage_waivers.md`,不是消失掉,是明確標記成「之後可以加測試補的項目」
-- 完整量化的 waive 前後對照(含每個 block 的細分)獨立寫在 `docs/coverage_waivers.md`,`reports/sign_off/dashboard.html` 也新增對應的區塊呈現同一份數據。
+- 1965 bits 刻意不 waive、留作 residual gap(主要是 `dma_engine.v` 的 `key_reg`/`iv_reg` 只測過一組固定金鑰、`divider_reg` 只測過偏小的除頻值、部分 `s_rdata`/`m_rdata` 高位元、以及 `soc_top` 自己還沒有端到端測過 SPI/I2C)——這些留在 `docs/verification/coverage_waivers.md`,不是消失掉,是明確標記成「之後可以加測試補的項目」
+- 完整量化的 waive 前後對照(含每個 block 的細分)獨立寫在 `docs/verification/coverage_waivers.md`,`reports/sign_off/dashboard.html` 也新增對應的區塊呈現同一份數據。
 
 ### 再往下一層:gate-level 的驗證(multi-corner STA、formal LEC、gate-level simulation)
 
@@ -271,14 +271,14 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 
 `aes_core` 完整跑完 `equiv_simple` + `equiv_induct`(預設 4 步歸納)後,還剩 904 個未證明,分組後全部集中在 `u_key_expand.rk[0]`——把歸納深度加到 `-seq 12` 後降到 520 個,分組後發現這 520 個沿著同一條訊號鏈(`rnum` round counter → `sub_shift_enc`/`sub_shift_dec` → `data_reg` → `data_out`,加上幾個控制訊號),跟 AES core 本身「10 拍 key expansion + 11 輪」的真實時序深度吻合——判斷這是歸納步數還沒完全覆蓋到這個深度造成的,不是真的邏輯不等價,而且同一份 netlist 已經被 `run_gatelevel_sim.sh` 用真實 FIPS-197 測試向量獨立驗證過行為正確,兩種方法互相印證,沒有繼續往上加大 `-seq`(每加深一次,SAT 求解時間就大幅增加,報酬遞減)——**97.7%(22126/22646)是誠實記錄下來的最終結果,不是硬做出來的 100%**。
 
-`soc_top` 含整顆 PicoRV32、cell count 是 aes_core 的兩個數量級以上,對這種規模跑跟 aes_core 一樣完整的 sequential induction 不切實際(aes_core 一個 block 光是 `equiv_induct` 就要跑十幾分鐘還沒完全收斂了),而且「含嵌入式 CPU 的整顆晶片做 full-chip formal equivalence」即使在真正的商用 EDA 工具上也是出了名的難題,業界標準做法本來就是「block-level formal + full-chip simulation」——所以 `blocks/soc_top/syn/lec.ys` 刻意只跑 `equiv_simple`(不做 induction),當作 best-effort 的部分驗證,跑出 60.2%(36036/59864,純組合邏輯層級的等價性),明確標注這不是「signoff 通過」的數字,整顆 SoC 真正的驗證由前面的 gate-level simulation 補上。這個範圍縮小是刻意做的判斷,不是省事——寫進 `docs/lec_methodology.md` 時特別把理由講清楚。
+`soc_top` 含整顆 PicoRV32、cell count 是 aes_core 的兩個數量級以上,對這種規模跑跟 aes_core 一樣完整的 sequential induction 不切實際(aes_core 一個 block 光是 `equiv_induct` 就要跑十幾分鐘還沒完全收斂了),而且「含嵌入式 CPU 的整顆晶片做 full-chip formal equivalence」即使在真正的商用 EDA 工具上也是出了名的難題,業界標準做法本來就是「block-level formal + full-chip simulation」——所以 `blocks/soc_top/syn/lec.ys` 刻意只跑 `equiv_simple`(不做 induction),當作 best-effort 的部分驗證,跑出 60.2%(36036/59864,純組合邏輯層級的等價性),明確標注這不是「signoff 通過」的數字,整顆 SoC 真正的驗證由前面的 gate-level simulation 補上。這個範圍縮小是刻意做的判斷,不是省事——寫進 `docs/verification/lec_methodology.md` 時特別把理由講清楚。
 
 #### 最後的結果
 
-- Multi-corner STA:soc_top slow-corner Fmax ≈ 23.2MHz(比之前只看 typical corner 的 91.2MHz 保守很多),兩個 block 在 fast corner 下 hold 都完全乾淨(0 個違規)——完整數字見 `docs/performance.md` 第 7 節。
+- Multi-corner STA:soc_top slow-corner Fmax ≈ 23.2MHz(比之前只看 typical corner 的 91.2MHz 保守很多),兩個 block 在 fast corner 下 hold 都完全乾淨(0 個違規)——完整數字見 `docs/verification/performance.md` 第 7 節。
 - Gate-level simulation:aes_core、soc_top(含真實開機、中斷、UART、JTAG、DMA)在 Yosys 合成後的 netlist 上都 PASS。
-- Formal LEC:aes_core 97.7% 完整證明,soc_top 刻意縮小範圍的 60.2% 部分驗證——完整理由跟數字見 `docs/lec_methodology.md`。
-- `docs/performance.md` 新增第 8 節,明確記錄這個專案的 signoff 範圍界限(停在 gate-level netlist,不含 place & route/DRC/LVS/DFT/power signoff),講清楚是刻意的取捨,不是漏掉。
+- Formal LEC:aes_core 97.7% 完整證明,soc_top 刻意縮小範圍的 60.2% 部分驗證——完整理由跟數字見 `docs/verification/lec_methodology.md`。
+- `docs/verification/performance.md` 新增第 8 節,明確記錄這個專案的 signoff 範圍界限(停在 gate-level netlist,不含 place & route/DRC/LVS/DFT/power signoff),講清楚是刻意的取捨,不是漏掉。
 
 ### 再往下一層:CDC(Clock Domain Crossing)驗證
 
@@ -301,7 +301,7 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 - `blocks/soc_top/constraints/soc_top.sdc` 新增 tck clock 宣告 + `set_clock_groups -asynchronous`,`sta.tcl`/`sta_mcmm.tcl` 重跑確認 Path Group 正確分開。
 - `blocks/jtag/rtl/jtag_axi_bridge.v` 的每一條跨 domain 訊號(START/DONE toggle、BUSY 比較、RESP_OK/RDATA 的 2-flop 同步)逐條對照 RTL review 過,確認同步器級數跟拓樸(第一級直接取樣來源暫存器,無組合邏輯夾雜)。
 - 新增 `jtag_chain_fast_tck` regression target,補上原本沒測過的「tck 比 clk 快」方向,跟原有的 `jtag_chain` 一起涵蓋兩個時脈比例的極端。
-- 完整報告、每條訊號的 review 結果、以及明確標注的範圍界限(數位模擬無法重現真實 metastability)寫在 `docs/cdc_methodology.md`。
+- 完整報告、每條訊號的 review 結果、以及明確標注的範圍界限(數位模擬無法重現真實 metastability)寫在 `docs/verification/cdc_methodology.md`。
 
 ### 再往下一層:RDC(Reset Domain Crossing)——reset 訊號本身也需要同步
 
@@ -311,7 +311,7 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 
 改完之後重跑 regression,一開始又看到 14/19 測試 BUILD-FAIL——查了發現又是同一類跟這次改動完全無關的舊問題:`obj_dir_*` 建置快取目錄裡再次出現帶空格的殘留檔案(這次連 `timer`/`watchdog` 這種我完全沒碰過的 block 也一起中獎,直接證實不是這次 RTL 改動造成的)。這是這個 session 第二次遇到同一種快取損毀——原因還沒查清楚(可能是背景某個系統程序,例如 Time Machine 或 Spotlight,在建置期間對這些目錄做了什麼),但修法一樣:整批刪掉 `obj_dir_*` 重建。清乾淨之後 19 個測試全部 PASS,包含唯一真的會受這次改動影響的 `soc_top`(多了 2-cycle 的 reset 釋放延遲,沒有讓任何 cycle-accurate 檢查失敗)。
 
-**這個改動只動了 `soc_top.v`**,單一 block 的獨立測試都是直接 instantiate 各自 RTL、自己驅動 `rst`,不經過這層同步器,完全不受影響——這也是為什麼可以只在整合層級加,不用動到每個周邊自己的 RTL。完整說明寫在 `docs/cdc_methodology.md` 第 6 節。
+**這個改動只動了 `soc_top.v`**,單一 block 的獨立測試都是直接 instantiate 各自 RTL、自己驅動 `rst`,不經過這層同步器,完全不受影響——這也是為什麼可以只在整合層級加,不用動到每個周邊自己的 RTL。完整說明寫在 `docs/verification/cdc_methodology.md` 第 6 節。
 
 ### 把 reset synchronizer 改動連帶的過時快照重新跑過一輪
 
@@ -340,12 +340,12 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 - `blocks/soc_top/syn/synth.ys` 維持原本的 `clean`(沒有引入新的清理步驟),改用既有的 `scripts/collect_soc_reports.sh` 重新產生全部報告。
 - Chip area 129847.1(cell count 78649),比改動前的 130337.1(79128)略降,關鍵路徑 10.966ns(Fmax 91.2MHz)完全沒變——reset 邏輯跟 AES key expansion 這條臨界路徑無關。
 - Multi-corner STA 補上 `set_false_path -from [get_ports rst]` 之後,hold 恢復乾淨。
-- LEC(`docs/lec_methodology.md`)soc_top 數字更新為 60.1%,並補上 `async2sync` pass。
-- Coverage/dashboard 數字微幅變動(多了 4 個新增正反器對應的 toggle 檢查點),`docs/coverage_waivers.md`、`docs/verification_summary.md` 都同步更新成新數字。
+- LEC(`docs/verification/lec_methodology.md`)soc_top 數字更新為 60.1%,並補上 `async2sync` pass。
+- Coverage/dashboard 數字微幅變動(多了 4 個新增正反器對應的 toggle 檢查點),`docs/verification/coverage_waivers.md`、`docs/verification/summary.md` 都同步更新成新數字。
 
 ### 再往下一層:把 deduped toggle coverage 從 80.1% 推到 92.2%
 
-`docs/coverage_waivers.md` 第 5 節的 residual gap(1966 bits)列出來之後,一直是「已知、刻意留著」的狀態。這次回頭挑幾項低成本的補起來,目標抓 90%。
+`docs/verification/coverage_waivers.md` 第 5 節的 residual gap(1966 bits)列出來之後,一直是「已知、刻意留著」的狀態。這次回頭挑幾項低成本的補起來,目標抓 90%。
 
 #### 起手:先做兩項低成本的,結果只到 81.9%
 
@@ -364,7 +364,7 @@ review 完把訊號分成幾大類(位址匯流排高位元、always-ready 寫�
 - Deduped toggle coverage(waive 後):80.1%(7926/9892)→ **92.2%**(9153/9925),residual gap 從 1966 bits 降到 772 bits。
 - 過程中沒有修改任何 RTL——全部是在既有 testbench 裡加測試向量(i2c/spi divider、DMA 第二組 key/IV + 窮舉暫存器覆蓋、`axi_lite_xbar`/JTAG bridge 的第三組資料值、`soc_top` 透過 JTAG 對其餘周邊的窮舉 poke)。
 - 19 個 regression targets、135 個 lint finding、chip area(129847.1)、Fmax(91.2MHz)全部沒變——純粹是驗證廣度的提升,不影響任何功能或時序數字。
-- 還剩的 772 bits 主要是 DMA 內部的搬移進度計數器(`cur_src`/`cur_dst`/`blocks_left`,需要真的跑一次不同長度/位址的搬移才能補)跟 `soc_top` 層級的 SPI/I2C 整合測試(原本規劃的第四項,42 bits,優先度較低沒動),詳見 `docs/coverage_waivers.md` 第 5 節。
+- 還剩的 772 bits 主要是 DMA 內部的搬移進度計數器(`cur_src`/`cur_dst`/`blocks_left`,需要真的跑一次不同長度/位址的搬移才能補)跟 `soc_top` 層級的 SPI/I2C 整合測試(原本規劃的第四項,42 bits,優先度較低沒動),詳見 `docs/verification/coverage_waivers.md` 第 5 節。
 
 ### 再往下一層:全專案 reset 極性從 active-high 改成 active-low(resetn)
 
@@ -378,7 +378,7 @@ Levi 看 RTL 時發現一個實務經驗上的落差:這個專案自己寫的周
 
 #### `soc_top.v` 的 reset synchronizer 是唯一需要真的重新設計的地方
 
-其餘所有周邊都是機械式的 `if (rst)` → `if (!resetn)` 反相,邏輯完全等價。但 `soc_top.v` 自己的 RDC reset synchronizer(見 `docs/cdc_methodology.md` 第 6 節)是這個專案唯一真正的 async reset 邏輯,不能只做字面反相——原本是 `posedge rst` 觸發、async SET;改成鏡像等價的 `negedge resetn` 觸發、async CLEAR。
+其餘所有周邊都是機械式的 `if (rst)` → `if (!resetn)` 反相,邏輯完全等價。但 `soc_top.v` 自己的 RDC reset synchronizer(見 `docs/verification/cdc_methodology.md` 第 6 節)是這個專案唯一真正的 async reset 邏輯,不能只做字面反相——原本是 `posedge rst` 觸發、async SET;改成鏡像等價的 `negedge resetn` 觸發、async CLEAR。
 
 #### 抓到的第一個真問題:`mem_blackboxes.v` 忘記改
 
@@ -400,7 +400,7 @@ Levi 看 RTL 時發現一個實務經驗上的落差:這個專案自己寫的周
 - PicoRV32 是完全沒改過一行的 vendored 檔案,餵給它的 `resetn` 訊號邏輯行為跟改之前完全等價。
 - Chip area 反而略降(129847.1→129373.6,少了一顆反相器),不是邏輯變多了。
 
-跟 Levi 確認後,結論是**誠實記錄現狀,不再深挖**:這很可能是 Yosys/abc 的技術對應(technology mapping)演算法對 netlist 結構變動的敏感度造成的——全專案大量訊號改名、少一顆反相器,這類結構性變動會改變 abc 內部啟發式優化的決策順序,連帶影響到邏輯上完全無關模組的合成結果,是已知但很難精準預測的合成工具行為。完整數字跟推論寫在 `docs/performance.md` 第 1、7 節。**這是這次 retrofit 最重要的教訓**:就算改動本身邏輯上完全等價、經過完整 regression + LEC 驗證,合成後的時序數字仍然可能因為工具的非局部優化行為而改變——「邏輯等價」不等於「時序不變」,兩者要分開驗證,不能只看 regression 綠燈就假設 Fmax 這類數字也不受影響。
+跟 Levi 確認後,結論是**誠實記錄現狀,不再深挖**:這很可能是 Yosys/abc 的技術對應(technology mapping)演算法對 netlist 結構變動的敏感度造成的——全專案大量訊號改名、少一顆反相器,這類結構性變動會改變 abc 內部啟發式優化的決策順序,連帶影響到邏輯上完全無關模組的合成結果,是已知但很難精準預測的合成工具行為。完整數字跟推論寫在 `docs/verification/performance.md` 第 1、7 節。**這是這次 retrofit 最重要的教訓**:就算改動本身邏輯上完全等價、經過完整 regression + LEC 驗證,合成後的時序數字仍然可能因為工具的非局部優化行為而改變——「邏輯等價」不等於「時序不變」,兩者要分開驗證,不能只看 regression 綠燈就假設 Fmax 這類數字也不受影響。
 
 #### 最後的結果
 
@@ -420,7 +420,7 @@ Levi 看 RTL 時發現一個實務經驗上的落差:這個專案自己寫的周
 
 真正生效的做法:保留原本的 per-module hierarchy,新增 `blocks/soc_top/syn/constr.txt` 並加上 `-D`,啟用 abc 的 sizing pass。Levi 追問「有 3 個 corner 嗎」以及「這裡跟業界不太一樣的地方」,點出一個更根本的問題:sizing 決策當時只用 typical corner library 算,不是真正業界 MMMC(Multi-Mode Multi-Corner)流程——真正的 signoff 工具會用 worst-case corner 或多 corner 同時感知去做 sizing,而不是先在 typical 上調完、再事後拿別的 corner 去驗證有沒有中獎。這個落差其實從專案一開始就存在(Yosys/abc 本身不支援 MMMC,是開源工具鏈的天花板),只是一直沒有做 sizing 的時候是「潛在」的,一旦真的開始 sizing,就變成「有可能影響決策」的。改成 `dfflibmap`/`abc` 都吃 `$NANGATE45_SLOW_LIB`(而非 typical)之後重新跑三個 corner,確認 setup 在 typical/slow 兩個 corner 都大幅改善、hold 在 fast corner 依然完全乾淨——這次剛好三個 corner 都變好,但這是驗證出來的結果,不是方法論本身保證的,值得記住「先合成後驗證」跟「合成時就對多 corner 負責」是兩種不同嚴謹程度的做法。
 
-**最終結果**(細節見 `docs/performance.md` §1、§7):
+**最終結果**(細節見 `docs/verification/performance.md` §1、§7):
 - Typical corner critical path 14.821ns→2.881ns,Fmax 67.5MHz→**347.1MHz**,關鍵路徑從 PicoRV32 換回 AES chain——不只補回 retrofit 掉的頻率,還比 retrofit 之前(91.2MHz)更好。
 - Slow corner critical path 51.837ns→10.288ns,Fmax 19.3MHz→**97.2MHz**,同樣比 retrofit 前(≈23.2MHz)更好。
 - Fast corner hold 全程維持 0 違規。
@@ -443,14 +443,14 @@ Levi 看 RTL 時發現一個實務經驗上的落差:這個專案自己寫的周
 
 **實作前的盤點,抓到兩個沒預期到的連動**:
 1. 現有測試(`blocks/axi_lite_xbar/dv/sim_main.cpp`)剛好用 `0x4000_7000` 當「確認是未映射位址」的探測位址,跟新 CSR 選的位址直接撞在一起——不先盤點就直接動手的話,新 CSR 會讓這個既有測試的假設(「這裡應該是未映射」)失效卻不會馬上被發現。
-2. `docs/coverage_waivers.md` 有一條 waiver 理由寫「這個專案的 response 編碼只會用到 OKAY/SLVERR,bit[0] 永遠是 0,不用管」——DECERR 一旦真的用起來,這個理由對 crossbar 自己的 `s_bresp`/`s_rresp` 就不再成立了(即使 waiver 機制本身因為「只檢查還沒 covered 的 bit」而自動不受影響,這條理由的文字敘述已經跟事實不符,需要修正)。
+2. `docs/verification/coverage_waivers.md` 有一條 waiver 理由寫「這個專案的 response 編碼只會用到 OKAY/SLVERR,bit[0] 永遠是 0,不用管」——DECERR 一旦真的用起來,這個理由對 crossbar 自己的 `s_bresp`/`s_rresp` 就不再成立了(即使 waiver 機制本身因為「只檢查還沒 covered 的 bit」而自動不受影響,這條理由的文字敘述已經跟事實不符,需要修正)。
 
 **最終實作**(細節見 `CHANGELOG.md` v2.2.0):
 - `rtl/include/axi_lite.vh` 新增 `AXI_RESP_DECERR`,`axi_lite_xbar.v` 的 decode-miss 路徑改回真正的 DECERR。
 - 新增兩個唯讀 CSR(`0x4000_7000`/`0x4000_7004`,寫入分開的暫存器而不是「一個暫存器+方向 bit」,單純是實作起來比較不用處理位元塞不下的問題),寫入這個 window 一律 SLVERR(位址有效,只是唯讀,跟 `boot_rom` 拒絕寫入同一套邏輯)。
 - 新增 `irq` bit 9,decode miss 發生的同一個 cycle 拉一個 pulse,接進 `soc_top.v` 的 `irq_bus`。
 - 測試把探測位址從 `0x4000_7000` 移到 `0x4000_8000`,新增 CSR 讀值正確性、IRQ 剛好 pulse 一次(讀 CSR 或寫 CSR window 都不該誤觸發)的測試。
-- `toggle_waivers.txt` 的 Rule 3 文字修正(regex 本身沒動,機制已經自動排除掉真正 covered 的 bit,細節見 `docs/coverage_waivers.md` 第 8 節)。
+- `toggle_waivers.txt` 的 Rule 3 文字修正(regex 本身沒動,機制已經自動排除掉真正 covered 的 bit,細節見 `docs/verification/coverage_waivers.md` 第 8 節)。
 
 **驗證結果**:19/19 regression 全過、135 個 lint finding 不變、typical/slow corner 關鍵路徑完全沒變(還是 AES chain,2.881ns/10.288ns,這個改動量體太小、也不在關鍵路徑上,不影響時序)、hold 依然乾淨。Chip area 因為新增的兩個 32-bit 暫存器+相關邏輯,略增 0.7%(135530.2→136510.1),deduped toggle coverage 從 92.0% 微降到 91.4%(分母變大、新邏輯還沒做窮盡的 toggle 測試,不是既有測試變差,仍遠高於 90% 目標)。
 

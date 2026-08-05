@@ -67,7 +67,7 @@ environment variables (no hardcoded paths in this repo — see below):
 | Env var | Used by | What it needs to point at |
 |---|---|---|
 | `NANGATE45_LIB` | `run_synth.sh`, `run_lec.sh`, `sta.tcl` (all blocks) | `NangateOpenCellLibrary_typical.lib` |
-| `NANGATE45_SLOW_LIB` | `sta_mcmm.tcl` (multi-corner STA, all blocks) + `blocks/soc_top/syn/synth.ys`'s `abc -constr` gate-sizing pass (see `docs/performance.md` section 7) | `Nangate45_slow.lib` |
+| `NANGATE45_SLOW_LIB` | `sta_mcmm.tcl` (multi-corner STA, all blocks) + `blocks/soc_top/syn/synth.ys`'s `abc -constr` gate-sizing pass (see `docs/verification/performance.md` section 7) | `Nangate45_slow.lib` |
 | `NANGATE45_FAST_LIB` | `sta_mcmm.tcl` (multi-corner STA only) | `Nangate45_fast.lib` |
 
 **`NANGATE45_LIB`** — the easiest source is the `flow/platforms/nangate45/lib/`
@@ -118,7 +118,7 @@ and can still be run as plain `sta sta.tcl`.
 ## Formal LEC timing note
 
 `blocks/aes/syn/run_lec.sh`'s `equiv_induct -seq 12` step takes 10+ minutes
-and still only reaches ~97.7% proven (see `docs/lec_methodology.md`) — it's
+and still only reaches ~97.7% proven (see `docs/verification/lec_methodology.md`) — it's
 deliberately **not** part of `collect_soc_reports.sh`/`reproduce_all.sh`'s
 automated path. Run it manually only when you specifically want to redo the
 formal equivalence check.

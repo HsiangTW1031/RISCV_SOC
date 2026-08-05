@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
              rd_val == DMA_TEST_VAL);
 
   // ---- extra data-value diversity via JTAG pokes to the remaining
-  // peripherals (see docs/coverage_waivers.md section 5): closes
+  // peripherals (see docs/verification/coverage_waivers.md section 5): closes
   // soc_top's own top-level *_wdata mirror wires connecting each
   // peripheral to the crossbar, which otherwise only ever see whatever
   // narrow set of values firmware happened to use. Only checks that the

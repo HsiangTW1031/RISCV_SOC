@@ -10,7 +10,7 @@
 # Everything else -- PicoRV32, the hand-written crossbar, every
 # peripheral's control/datapath logic, the AES core + CBC/CTR chaining,
 # and the DMA engine -- is synthesized for real. This is what makes the
-# Fmax number in docs/performance.md a genuine logic-critical-path result,
+# Fmax number in docs/verification/performance.md a genuine logic-critical-path result,
 # not a memory-dominated one.
 #
 # This is a template: @NANGATE45_LIB@/@NANGATE45_SLOW_LIB@ get substituted
@@ -47,14 +47,14 @@ synth -top soc_top
 # `abc -liberty ...` alone only did area-focused technology mapping and
 # never adjusted drive strength for high-fanout nets. That's why the
 # active-low reset retrofit's Fmax regression (91.2->67.5MHz typical
-# corner, docs/performance.md section 1) went unnoticed by re-running abc
+# corner, docs/verification/performance.md section 1) went unnoticed by re-running abc
 # with different `-D` delay targets alone: `-D` without `-constr` is a
 # no-op in this design (confirmed empirically -- identical netlist with
 # or without it). Adding -constr (constr.txt: an assumed BUF_X1 driving
 # cell / 10fF load, standard placeholder values -- what matters is that a
 # -constr file is present at all, not these specific numbers) recovered
 # the lost timing and then some (critical path 14.821ns->2.881ns typical
-# corner). See docs/performance.md sections 1 and 7 for the full story.
+# corner). See docs/verification/performance.md sections 1 and 7 for the full story.
 #
 # Also tried and REJECTED: flattening the hierarchy first (`synth -top
 # soc_top -flatten`) so abc would see one global netlist instead of

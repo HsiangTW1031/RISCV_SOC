@@ -134,7 +134,7 @@ a { color: var(--accent); }
 
 <header class="top">
   <h1>RISCV_SOC &mdash; Sign-off Dashboard</h1>
-  <div class="sub">Generated 2026-08-05 21:55 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
+  <div class="sub">Generated 2026-08-05 22:03 by scripts/build_dashboard.py &middot; from-scratch RISC-V SoC (PicoRV32 + hand-written AXI4-Lite crossbar + AES-128/CBC/CTR + AXI4 burst DMA)</div>
 </header>
 
 <main>
@@ -226,7 +226,7 @@ flowchart TB
 <div class="metric"><div class="name">Before waivers (deduped per-bit)</div><div class="bar"><div class="bar-fill warn" style="width:79.7%"></div><span class="bar-label">79.7%</span></div><div class="cov-frac">9142/11472 bits</div></div>
 <div class="metric"><div class="name">After 36 waiver rules (1474 bits waived)</div><div class="bar"><div class="bar-fill good" style="width:91.4%"></div><span class="bar-label">91.4%</span></div><div class="cov-frac">9142/9998 bits</div></div>
 </div>
-<p style="color:var(--text-dim);font-size:0.85rem">"Deduped per-bit" parses <code>merged.dat</code> directly and counts each source-level toggle bit once, regardless of how many hierarchy instances share the same underlying module (unlike the raw aggregate above, which counts a shared sub-module once per instantiation). A waived bit is removed from both the numerator and the denominator; it is not counted as covered. Rules + rationale: <code>reports/sign_off/coverage/toggle_waivers.txt</code>. Full report: <code>docs/coverage_waivers.md</code>.</p>
+<p style="color:var(--text-dim);font-size:0.85rem">"Deduped per-bit" parses <code>merged.dat</code> directly and counts each source-level toggle bit once, regardless of how many hierarchy instances share the same underlying module (unlike the raw aggregate above, which counts a shared sub-module once per instantiation). A waived bit is removed from both the numerator and the denominator; it is not counted as covered. Rules + rationale: <code>reports/sign_off/coverage/toggle_waivers.txt</code>. Full report: <code>docs/verification/coverage_waivers.md</code>.</p>
 <details class="cat"><summary>Waiver rules applied <span class="count">26 reasons, 1474 bits</span></summary>
 <table class="mini"><thead><tr><th>Bits waived</th><th>Reason</th><th>Example</th></tr></thead><tbody>
 <tr><td>895</td><td>Crossbar-side per-slave address wire mirroring the same slave-side narrow decode.</td><td class="mono">blocks/axi_lite_xbar/rtl/axi_lite_xbar.v:105 s1_araddr[0]</td></tr>
@@ -257,7 +257,7 @@ flowchart TB
 <tr><td>1</td><td>Same documented scope cut, dma_ram.v&#x27;s slave side (only ever receives the one supported burst-type encoding).</td><td class="mono">blocks/dma/rtl/dma_ram.v:30 s_awburst[1]</td></tr>
 </tbody></table></details>
 <details class="cat"><summary>Residual gaps (not waived, still open) <span class="count">856 bits across 186 signals</span></summary>
-<p class="note">Not structurally impossible &mdash; each reflects limited test-vector diversity (e.g. one fixed AES key, a handful of probed addresses, small divider values) rather than hardware that cannot toggle. Left open deliberately rather than waived away; see docs/coverage_waivers.md for the reasoning per group.</p>
+<p class="note">Not structurally impossible &mdash; each reflects limited test-vector diversity (e.g. one fixed AES key, a handful of probed addresses, small divider values) rather than hardware that cannot toggle. Left open deliberately rather than waived away; see docs/verification/coverage_waivers.md for the reasoning per group.</p>
 <table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Signal</th><th>Bits uncovered</th></tr></thead><tbody>
 <tr><td>axi_lite_xbar</td><td class="mono">blocks/axi_lite_xbar/rtl/axi_lite_xbar.v</td><td>216</td><td class="mono">last_decerr_waddr</td><td>32</td></tr>
 <tr><td>soc_top</td><td class="mono">blocks/soc_top/rtl/soc_top.v</td><td>163</td><td class="mono">uartx_rdata</td><td>32</td></tr>

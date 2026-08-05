@@ -6,7 +6,7 @@
 
 A from-scratch AES-128 encrypt/decrypt accelerator (FIPS-197), iterative datapath — one round per clock cycle, ~21 cycles per 128-bit block (10 cycles key expansion + 1 initial AddRoundKey + 9 middle rounds + 1 final round). Single in-flight block per operation, same "no queue" convention as every other peripheral in this project.
 
-For the algorithm background (why AES/Rijndael, its FIPS-197 standardization, and why it's considered secure), see `docs/aes_notes.md` — this document only covers the RTL interface.
+For the algorithm background (why AES/Rijndael, its FIPS-197 standardization, and why it's considered secure), see `docs/specs/aes_notes.md` — this document only covers the RTL interface.
 
 **Base address**：`0x4000_5000`（`ADDR_PERIPH_AES`，見 `rtl/include/addr_map.vh`）
 
@@ -62,4 +62,4 @@ Byte order：DATA0/RESULT0/KEY0 放 128-bit block 最高位的 4 個 bytes（FIP
 3. **AXI-Lite 介面測試**（`sim_main.cpp`）——同樣兩組官方向量,但這次透過真正的 AXI4-Lite 暫存器讀寫,額外驗證 KEY 暫存器唯讀、busy/no-queue 行為。
 4. **Differential test**（`diff_sim_main.cpp`）——500 組隨機明文/金鑰,同時跑過 RTL（透過 Verilator）和一個獨立、從零寫的 C++ AES-128 軟體參考模型（S-box/Rcon table 用另一套完全獨立的程式碼路徑,在程式啟動時現算,不是抄同一份表),比對兩邊的密文是否一致,並確認 decrypt(encrypt(pt)) == pt。這個軟體模型自己也先過了 FIPS-197 官方向量才會被信任當作 oracle。
 
-合成/timing：`blocks/aes/syn/`、`blocks/aes/sta/` 有針對 `aes_core`（不含 AXI wrapper）在 Nangate45 下的獨立合成 + STA 結果,詳見 `docs/aes_notes.md`。
+合成/timing：`blocks/aes/syn/`、`blocks/aes/sta/` 有針對 `aes_core`（不含 AXI wrapper）在 Nangate45 下的獨立合成 + STA 結果,詳見 `docs/specs/aes_notes.md`。

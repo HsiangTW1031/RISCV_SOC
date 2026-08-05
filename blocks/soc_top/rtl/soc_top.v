@@ -12,7 +12,7 @@
 // reset button would be) -- feeding it directly into either domain's
 // synchronous logic risks a metastable release edge, the reset-domain
 // equivalent of the CDC problem `jtag_axi_bridge.v` already handles for
-// data (see docs/cdc_methodology.md). `resetn_clk_sync`/`resetn_tck_sync`
+// data (see docs/verification/cdc_methodology.md). `resetn_clk_sync`/`resetn_tck_sync`
 // below are each domain's own "asynchronous assert, synchronous
 // de-assert" 2-flop reset synchronizer -- every clk-domain instance uses
 // resetn_clk_sync, every tck-domain one (jtag_tap/jtag_dtm, and

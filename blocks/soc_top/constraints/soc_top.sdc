@@ -45,7 +45,7 @@ set_output_delay 0.0 -clock tck [get_ports tdo]
 # Declaring the two clock groups asynchronous is what correctly exempts
 # every path crossing this boundary from setup/hold checking -- this does
 # NOT verify the synchronizers themselves are structurally sound (STA
-# can't do that); see docs/cdc_methodology.md for the structural review that
+# can't do that); see docs/verification/cdc_methodology.md for the structural review that
 # actually checks synchronizer depth and topology.
 set_clock_groups -asynchronous -group {clk} -group {tck}
 

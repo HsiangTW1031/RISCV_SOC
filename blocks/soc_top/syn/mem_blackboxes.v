@@ -12,7 +12,7 @@
 // which just needs the port list to link the synthesized netlist, not a
 // re-synthesis) can each parse this file directly. Not a synthesizable
 // deliverable -- lives in syn/, used only for the whole-SoC logic-only
-// synthesis/STA run described in docs/performance.md.
+// synthesis/STA run described in docs/verification/performance.md.
 
 module boot_rom (
     clk, resetn,

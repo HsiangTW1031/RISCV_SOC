@@ -2,11 +2,11 @@
 #
 # sta.tcl (existing, unchanged by this script) reports max-delay/setup
 # timing at the single typical-corner library used for synthesis -- that
-# is the number cited as Fmax in docs/performance.md. This script re-times
+# is the number cited as Fmax in docs/verification/performance.md. This script re-times
 # the SAME netlist across the Nangate45 slow/fast process corners to add
 # what a real signoff always checks and the typical-only run above cannot:
 # worst-case setup (slow corner, max delay) and worst-case hold (fast
-# corner, min delay). See docs/coverage_waivers.md's sibling doc
+# corner, min delay). See docs/verification/coverage_waivers.md's sibling doc
 # docs/project_retrospective.md for why this was added.
 #
 # Corner libs: OpenSTA's own bundled Nangate45 fast/slow corner libraries.

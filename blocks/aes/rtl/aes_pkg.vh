@@ -14,7 +14,7 @@
 // values (S-box[0x00]=0x63, S-box[0x53]=0xed, etc.) and against a full
 // from-scratch AES-128 encrypt/decrypt run against the FIPS-197 Appendix B
 // and Appendix C.1 known-answer vectors, before being pasted in here. See
-// docs/aes_notes.md for the derivation and the vectors used.
+// docs/specs/aes_notes.md for the derivation and the vectors used.
 
 // ---- forward S-box (SubBytes / SubWord) ----
 function [7:0] aes_sbox_fwd;

@@ -10,7 +10,7 @@
 // ~21 cycles/block total. This is deliberately not pipelined or unrolled
 // across rounds or overlapped with key expansion -- the point of this
 // core is a small, auditable, single-round-datapath-reused-every-cycle
-// design; see docs/aes_notes.md for the area/latency tradeoff writeup.
+// design; see docs/specs/aes_notes.md for the area/latency tradeoff writeup.
 //
 // State byte order: bit [127:120] of a 128-bit word is byte 0, down to
 // bit [7:0] as byte 15, in FIPS-197's column-major layout (byte i sits at
@@ -99,7 +99,7 @@ module aes_core (
   endfunction
 
   // ShiftRows: out_byte[i] = in_byte[fwd[i]], fwd derived from
-  // s'(r,c) = s(r, (c+r) mod 4) -- see docs/aes_notes.md for the
+  // s'(r,c) = s(r, (c+r) mod 4) -- see docs/specs/aes_notes.md for the
   // derivation script; not hand-computed from the (c+r) mod 4 formula
   // directly to avoid an off-by-one slipping in.
   function [127:0] aes_shift_rows;
