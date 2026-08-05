@@ -1,0 +1,400 @@
+<title>RISCV_SOC — Architecture</title>
+<style>
+  :root {
+    --bg: #0a1b2c;
+    --bg-grid: #10293a;
+    --card: #0e2235;
+    --card-border: #2d5365;
+    --box-fill: #22394d;
+    --text: #dfeaef;
+    --text-dim: #7b93a6;
+    --text-faint: #52697c;
+    --cyan: #5fd0e3;
+    --cyan-dim: #3c7086;
+    --orange: #e08a3c;
+    --orange-text: #241206;
+    --vendor-fill: #3a3563;
+    --vendor-border: #8a7ce0;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/32px 32px,
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/32px 32px,
+      var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    padding: 48px 24px 64px;
+  }
+  .page { max-width: 1160px; margin: 0 auto; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--cyan);
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .sub {
+    color: var(--text-dim);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 680px;
+    margin: 0 0 36px;
+  }
+  .sub code { font-family: var(--mono); color: var(--text); font-size: 13.5px; }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--card-border);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .kpi { background: var(--card); padding: 16px 18px; }
+  .kpi .label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+  }
+  .kpi .value { font-size: 15px; font-weight: 600; }
+
+  .diagram {
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    background: var(--card);
+    padding: 32px 28px 24px;
+    margin-bottom: 28px;
+  }
+
+  .top-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 4px;
+  }
+  .jtag-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+  .block {
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    background: var(--box-fill);
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 190px;
+  }
+  .block.vendor { background: var(--vendor-fill); border: 1px solid var(--vendor-border); }
+  .block .name { font-weight: 600; font-size: 14px; }
+  .block .desc { font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); margin-top: 4px; }
+  .block .tag {
+    display: inline-block;
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--cyan);
+    border: 1px solid var(--cyan-dim);
+    border-radius: 3px;
+    padding: 1px 6px;
+  }
+
+  .drop {
+    width: 1px;
+    height: 26px;
+    background: var(--cyan-dim);
+    margin: 0 auto;
+  }
+
+  .xbar {
+    border: 1px solid var(--orange);
+    border-radius: 6px;
+    background: var(--card);
+    padding: 16px 22px;
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .xbar .name { font-weight: 700; font-size: 15px; }
+  .xbar .desc { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 6px; line-height: 1.6; }
+  .xbar .csr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--cyan);
+    border: 1px dashed var(--cyan-dim);
+    border-radius: 4px;
+    padding: 3px 9px;
+  }
+
+  .bus-label {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    margin: 22px 0 6px;
+    position: relative;
+  }
+  .bus-line {
+    height: 1px;
+    background: var(--cyan-dim);
+    margin: 0 0 18px;
+  }
+
+  .periph-row {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 10px;
+  }
+  .periph {
+    border: 1px solid var(--card-border);
+    border-radius: 5px;
+    background: var(--box-fill);
+    padding: 10px 6px;
+    text-align: center;
+    position: relative;
+  }
+  .periph.headline { background: var(--orange); border-color: var(--orange); }
+  .periph .drop-up {
+    width: 1px;
+    height: 12px;
+    background: var(--cyan-dim);
+    margin: 0 auto 8px;
+  }
+  .periph .name { font-weight: 600; font-size: 12px; }
+  .periph .desc { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 3px; }
+  .periph.headline .name, .periph.headline .desc { color: var(--orange-text); }
+
+  .irq-note {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-faint);
+    margin-top: 16px;
+  }
+  .irq-note .hot { color: var(--cyan); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--card-border);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-dim);
+  }
+  .legend .swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: -1px;
+  }
+  .sw-vendor { background: var(--vendor-fill); border: 1px solid var(--vendor-border); }
+  .sw-custom { background: var(--box-fill); border: 1px solid var(--card-border); }
+  .sw-headline { background: var(--orange); border: 1px solid var(--orange); }
+  .sw-csr { background: transparent; border: 1px dashed var(--cyan-dim); }
+
+  .lower {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .panel {
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    background: var(--card);
+    padding: 22px 24px;
+  }
+  .panel h2 {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.1em;
+    color: var(--cyan);
+    margin: 0 0 16px;
+    font-weight: 600;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    font-weight: 500;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bg-grid);
+    font-variant-numeric: tabular-nums;
+  }
+  td.mono, .addr { font-family: var(--mono); color: var(--text-dim); font-size: 12px; }
+  tr.csr-row td { color: var(--cyan); }
+  tr.err-row td { color: var(--text-faint); font-style: italic; }
+  tr:last-child td { border-bottom: none; }
+
+  ul.notes { margin: 0; padding: 0; list-style: none; }
+  ul.notes li {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--bg-grid);
+  }
+  ul.notes li:last-child { border-bottom: none; padding-bottom: 0; }
+  ul.notes li:first-child { padding-top: 0; }
+  ul.notes b { color: var(--cyan); font-weight: 600; }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--card-border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+
+  @media (max-width: 860px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .periph-row { grid-template-columns: repeat(3, 1fr); }
+    .lower { grid-template-columns: 1fr; }
+    .top-row { flex-direction: column; gap: 14px; }
+  }
+</style>
+
+<div class="page">
+  <div class="eyebrow">RISCV_SOC · ARCHITECTURE · v2.2.0</div>
+  <h1>A RISC-V SoC, built from a vendored core outward</h1>
+  <p class="sub">
+    PicoRV32 supplies the CPU; everything downstream of it — the AXI4-Lite crossbar,
+    the AES-128 accelerator, the DMA engine, and the peripheral set — is hand-written RTL,
+    verified in simulation. <code>v2.2.0</code> corrected the crossbar's decode-miss response
+    from <code>SLVERR</code> to spec-correct <code>DECERR</code>, and added a diagnostic CSR + IRQ
+    so firmware can observe it without polling.
+  </p>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="label">CORE</div><div class="value">PicoRV32 · RV32IMC</div></div>
+    <div class="kpi"><div class="label">INTERCONNECT</div><div class="value">AXI4-Lite · 2M×9S</div></div>
+    <div class="kpi"><div class="label">RTL</div><div class="value">Verilog-2001</div></div>
+    <div class="kpi"><div class="label">SIGN-OFF</div><div class="value">Verilator + Yosys/Nangate45 + OpenSTA</div></div>
+  </div>
+
+  <div class="diagram">
+    <div class="top-row">
+      <div class="block vendor">
+        <div class="name">picorv32_axi</div>
+        <div class="desc">CPU · s0, fixed-priority master</div>
+      </div>
+      <div class="jtag-label">JTAG-to-AXI bridge ···→</div>
+      <div class="block">
+        <div class="name">jtag_dtm + jtag_tap</div>
+        <div class="desc">IEEE 1149.1 + SBA bridge</div>
+        <div class="tag">PHASE 5 · built</div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:center; gap:40px;">
+      <div class="drop" style="margin-left: -2px;"></div>
+      <div class="drop" style="margin-right: 40px;"></div>
+    </div>
+
+    <div class="xbar">
+      <div class="name">axi_lite_xbar</div>
+      <div class="desc">hand-written · 2 master (s0=CPU priority, s1=JTAG) × 9 slave<br/>addr-decode + AW/W/B &amp; AR/R channel mux · DECERR on miss (v2.2.0, was SLVERR)</div>
+      <div class="csr-badge">◆ own diagnostic CSR · 0x4000_7000 · not a peripheral slave</div>
+    </div>
+
+    <div class="bus-line" style="margin-top:22px;"></div>
+    <div class="bus-label" style="margin-top:-32px; background:var(--card); display:inline-block; padding:0 10px; left:50%; transform:translateX(-50%); position:relative;">AXI4-LITE BUS</div>
+
+    <div class="periph-row">
+      <div class="periph"><div class="drop-up"></div><div class="name">ROM</div><div class="desc">64 KB</div></div>
+      <div class="periph"><div class="drop-up"></div><div class="name">RAM</div><div class="desc">128 KB</div></div>
+      <div class="periph"><div class="drop-up"></div><div class="name">Timer</div><div class="desc">compare</div></div>
+      <div class="periph"><div class="drop-up"></div><div class="name">WDT</div><div class="desc">kick/reset</div></div>
+      <div class="periph"><div class="drop-up"></div><div class="name">UART</div><div class="desc">TX-only FIFO</div></div>
+      <div class="periph"><div class="drop-up"></div><div class="name">I2C</div><div class="desc">master</div></div>
+      <div class="periph"><div class="drop-up"></div><div class="name">SPI</div><div class="desc">master</div></div>
+      <div class="periph headline"><div class="drop-up"></div><div class="name">AES-128</div><div class="desc">ECB/CBC/CTR</div></div>
+      <div class="periph headline"><div class="drop-up"></div><div class="name">DMA</div><div class="desc">ctrl port (AXI4-Lite)</div></div>
+    </div>
+
+    <div class="irq-note">
+      irq[3..8] ← Timer/WDT/I2C/SPI/AES/DMA · <span class="hot">irq[9] ← xbar decode-miss (v2.2.0)</span> · DMA burst path bypasses this bus entirely → private <code style="font-family:inherit">dma_ram</code>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch sw-vendor"></span>vendored third-party (PicoRV32)</span>
+      <span><span class="swatch sw-custom"></span>custom RTL, this project</span>
+      <span><span class="swatch sw-headline"></span>custom RTL — headline deliverable</span>
+      <span><span class="swatch sw-csr"></span>crossbar-internal, not a slave</span>
+    </div>
+  </div>
+
+  <div class="lower">
+    <div class="panel">
+      <h2>MEMORY MAP</h2>
+      <table>
+        <tr><th>REGION</th><th>BASE</th><th>SIZE</th></tr>
+        <tr><td>Boot ROM</td><td class="mono">0x0000_0000</td><td>64 KB</td></tr>
+        <tr><td>RAM</td><td class="mono">0x1000_0000</td><td>128 KB</td></tr>
+        <tr><td>Peripheral region</td><td class="mono">0x4000_0000</td><td>4 KB windows</td></tr>
+        <tr><td style="padding-left:14px;">Timer</td><td class="mono">0x4000_0000</td><td>4 KB</td></tr>
+        <tr><td style="padding-left:14px;">Watchdog</td><td class="mono">0x4000_1000</td><td>4 KB</td></tr>
+        <tr><td style="padding-left:14px;">UART</td><td class="mono">0x4000_2000</td><td>4 KB</td></tr>
+        <tr><td style="padding-left:14px;">I2C</td><td class="mono">0x4000_3000</td><td>4 KB</td></tr>
+        <tr><td style="padding-left:14px;">SPI</td><td class="mono">0x4000_4000</td><td>4 KB</td></tr>
+        <tr><td style="padding-left:14px;">AES-128</td><td class="mono">0x4000_5000</td><td>4 KB</td></tr>
+        <tr><td style="padding-left:14px;">DMA (ctrl)</td><td class="mono">0x4000_6000</td><td>4 KB</td></tr>
+        <tr class="csr-row"><td style="padding-left:14px;">xbar CSR (not a periph)</td><td class="mono">0x4000_7000</td><td>2 regs, addr[2]-aliased</td></tr>
+        <tr class="err-row"><td>(unmapped)</td><td class="mono">—</td><td>→ DECERR (v2.2.0, was SLVERR)</td></tr>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>DESIGN NOTES</h2>
+      <ul class="notes">
+        <li><b>DECERR vs SLVERR (v2.2.0).</b> Decode-miss now returns spec-correct <code style="font-family:inherit">DECERR</code>; writes to the xbar's own read-only CSR window still return <code style="font-family:inherit">SLVERR</code> — the address is valid, the operation isn't.</li>
+        <li><b>Why a CSR + IRQ at all.</b> <code style="font-family:inherit">picorv32_axi</code> never checks BRESP/RRESP, so a bus error is otherwise invisible to firmware. The CSR latches the faulting address; irq bit 9 means "go read it" instead of polling.</li>
+        <li><b>One clock domain.</b> JTAG's TCK is the only CDC boundary — double-flopped at the TAP.</li>
+        <li><b>Static decode.</b> addr[31:28] selects region, addr[15:12] selects peripheral; the CSR window only decodes addr[2].</li>
+        <li><b>Non-standard IRQ.</b> PicoRV32 uses custom getq/setq/retirq opcodes, not RISC-V CSR interrupts.</li>
+        <li><b>Why PicoRV32.</b> YosysHQ's own core — synthesizes cleanly with zero SystemVerilog risk, leaving the AXI fabric as the differentiator.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>RISCV_SOC · v2.2.0 — DECERR + diagnostic CSR</span>
+    <span>docs/architecture.md</span>
+  </div>
+</div>
