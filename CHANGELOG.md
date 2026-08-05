@@ -50,7 +50,7 @@ exact response of the exact transaction that missed.
   grew (new RTL), and the new logic hasn't had exhaustive toggle-diversity
   vectors written for it yet (only the specific addresses/directions
   needed to prove correctness); still well above the 90% target.
-- `docs/coverage_waiver_report.md`'s Rule 3 (AXI response bit[0] is a
+- `docs/coverage_waivers.md`'s Rule 3 (AXI response bit[0] is a
   structural constant) no longer applies to `axi_lite_xbar`'s own
   external-facing `s_bresp`/`s_rresp` (which now genuinely drives DECERR)
   -- corrected the waiver file's reasoning text; the regex patterns
@@ -185,7 +185,7 @@ adding test vectors to existing testbenches -- no RTL changes.
   points from `axi_lite_xbar.v`'s own mirrors despite sharing a name)
 
 ### Fixed
-- (documentation) `docs/coverage_waiver_report.md` and
+- (documentation) `docs/coverage_waivers.md` and
   `docs/verification_summary.md` updated with the new numbers; the old
   1966-bit residual gap breakdown is now 772 bits
 

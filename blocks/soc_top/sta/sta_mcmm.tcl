@@ -6,7 +6,7 @@
 # the SAME netlist across the Nangate45 slow/fast process corners to add
 # what a real signoff always checks and the typical-only run above cannot:
 # worst-case setup (slow corner, max delay) and worst-case hold (fast
-# corner, min delay). See docs/coverage_waiver_report.md's sibling doc
+# corner, min delay). See docs/coverage_waivers.md's sibling doc
 # docs/project_retrospective.md for why this was added.
 #
 # Corner libs: OpenSTA's own bundled Nangate45 fast/slow corner libraries.

@@ -22,7 +22,7 @@
 //   0x1C KEY3   (WO)  — key bytes [12:15] (LSB word)  } project, reads
 //                       back as 0 -- a real secure core should never let
 //                       software (or a debugger) read the key back out of
-//                       a register. See docs/aes_report.md.
+//                       a register. See docs/aes_notes.md.
 //   0x20 DATA0  (r/w) — plaintext/ciphertext-in bytes [0:3]  (MSB word)
 //   0x24 DATA1  (r/w) — bytes [4:7]
 //   0x28 DATA2  (r/w) — bytes [8:11]

@@ -3,7 +3,7 @@
 #
 # aes_core alone (465 local cells, 22646 $equiv checkpoints) needed several
 # minutes of SAT-based k-induction to reach 97.7% proven, and even then
-# didn't fully converge (see docs/lec_report.md). soc_top has ~79000
+# didn't fully converge (see docs/lec_methodology.md). soc_top has ~79000
 # standard cells (docs/performance.md) including a full RISC-V CPU --
 # running the same sequential equiv_induct here is not practical in a
 # reasonable amount of time, and isn't standard practice even in real
@@ -19,7 +19,7 @@
 # real numbers instead of erroring out on an incomplete proof).
 #
 # `async2sync` is required since soc_top.v's reset synchronizers
-# (docs/cdc_report.md's RDC section) are this design's only genuinely
+# (docs/cdc_methodology.md's RDC section) are this design's only genuinely
 # asynchronous-reset flip-flops -- equiv_simple has no direct SAT model
 # for an async FF cell (confirmed: "No SAT model available for async FF
 # cell ... Consider running `async2sync`"), so both gold and gate get

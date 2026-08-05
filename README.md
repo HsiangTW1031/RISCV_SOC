@@ -137,7 +137,7 @@ version (matching this palette) lives in
   differential test against an independent from-scratch C++ reference model
 - `KEY` registers are deliberately write-only — no key readback, unlike
   every other R/W register in this project
-- Explicit non-goals documented in [`docs/aes_report.md`](docs/aes_report.md):
+- Explicit non-goals documented in [`docs/aes_notes.md`](docs/aes_notes.md):
   no side-channel hardening, not production-secure
 
 ### Debug & Trace

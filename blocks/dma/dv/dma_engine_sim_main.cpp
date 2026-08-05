@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  // ---- extra key/IV/length/address coverage (see docs/coverage_waiver_report.md
+  // ---- extra key/IV/length/address coverage (see docs/coverage_waivers.md
   // section 5) ----
   // Every test above shares the same NIST SP800-38A key and a length of 4
   // blocks -- key_reg/iv_reg/len_reg only ever see that one key's bit

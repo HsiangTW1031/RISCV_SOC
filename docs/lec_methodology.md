@@ -37,7 +37,7 @@ soc_top 含完整的 PicoRV32 CPU,`docs/performance.md` 記錄的 cell count 是
 
 `blocks/soc_top/syn/lec.ys` 因此刻意縮小範圍,只跑 `equiv_simple`(單次 SAT call,不做多步歸納)當作 best-effort 的部分驗證——60.2% 是「純組合邏輯」的證明覆蓋率,凡是需要跨 cycle 才能證明的暫存器等價性(也就是整個 CPU pipeline、周邊的狀態機)都沒有被這個部分證明涵蓋到。**這 60.2% 不是「signoff 通過」的數字,是誠實標注這一步做到哪裡的部分結果**,真正驗證 soc_top 整體行為正確性的是上面提到的 gate-level simulation。
 
-加入 `docs/cdc_report.md` 的 reset synchronizer 之後,`equiv_simple` 一開始直接報錯:「No SAT model available for async FF cell ... Consider running `async2sync`」——這個設計唯一真正非同步 reset 的正反器就是新加的 reset synchronizer 本身,SAT 沒有現成模型處理。在 gold/gate 兩邊的 `prep -flatten` 之後都加上 Yosys 內建的 `async2sync` pass(把非同步 FF 輸入轉換成行為等價的同步電路)解決,加完之後數字幾乎不變,確認這個 reset 相關的新增邏輯本身沒有引入新的等價性問題。之後 `blocks/soc_top/syn/synth.ys` 加上 gate-sizing(`docs/performance.md` §1)重跑一次,證明的 checkpoint 數量原封不動,同樣的道理:sizing 不改邏輯,不該也沒有影響證明覆蓋率。
+加入 `docs/cdc_methodology.md` 的 reset synchronizer 之後,`equiv_simple` 一開始直接報錯:「No SAT model available for async FF cell ... Consider running `async2sync`」——這個設計唯一真正非同步 reset 的正反器就是新加的 reset synchronizer 本身,SAT 沒有現成模型處理。在 gold/gate 兩邊的 `prep -flatten` 之後都加上 Yosys 內建的 `async2sync` pass(把非同步 FF 輸入轉換成行為等價的同步電路)解決,加完之後數字幾乎不變,確認這個 reset 相關的新增邏輯本身沒有引入新的等價性問題。之後 `blocks/soc_top/syn/synth.ys` 加上 gate-sizing(`docs/performance.md` §1)重跑一次,證明的 checkpoint 數量原封不動,同樣的道理:sizing 不改邏輯,不該也沒有影響證明覆蓋率。
 
 ## 4. 如何重跑
 

@@ -22,7 +22,7 @@ Dashboard 呈現:`reports/sign_off/dashboard.html` 的「Toggle Coverage Waivers
 
 **這裡的數字比第 5 節記錄的 92.2%/9153 又略降到 92.0%/9132**——active-low reset retrofit(見 `docs/project_retrospective.md`)改變了 `soc_top` testbench 裡 JTAG tck domain reset 釋放的確切時序(修掉了一個先前從沒被注意到的模擬層級問題,見 retrospective),連帶讓 JTAG 相關電路在開機階段實際經歷的 toggle 序列跟之前不完全一樣,covered bit 數從 9153 變成 9132。這不是測試向量變少或變差,是同一組測試在時序修正後,實際命中的 bit 組合略有不同——仍然遠高於 90% 的目標,沒有進一步處理。）
 
-（這幾個數字比最初版本多了 4 個 bit，是後來在 `soc_top.v` 加了 reset synchronizer 新增的 4 個正反器，見 `docs/cdc_report.md`——多出來的 bit 全部落在 soc_top 自己的分類裡，不影響任何一條 waiver rule 或其他 block 的數字。）
+（這幾個數字比最初版本多了 4 個 bit，是後來在 `soc_top.v` 加了 reset synchronizer 新增的 4 個正反器，見 `docs/cdc_methodology.md`——多出來的 bit 全部落在 soc_top 自己的分類裡，不影響任何一條 waiver rule 或其他 block 的數字。）
 
 ## 2. 為什麼採用「deduped per-bit」而不是直接在 raw aggregate 上套 waiver
 
@@ -114,4 +114,4 @@ python3 scripts/build_dashboard.py      # 重新產生 reports/sign_off/dashboar
 
 實際做的修正:只更新 `toggle_waivers.txt` 裡這幾條規則的**理由文字**,把「project-wide 都不會用到 DECERR」改成「周邊層級跟 crossbar 內部 per-slave mux 才適用,crossbar 自己對外的 bresp/rresp 是 v2.2.0 之後的例外」,**regex pattern 本身完全沒動**(不需要動,機制已經自動排除掉真正覆蓋到的 bit)。這是「文件講的理由要跟實際行為保持誠實」的例子,不是修 bug。
 
-順便更新的整體數字(`docs/coverage_waiver_report.md` 第 1 節表格已同步):waive 前 79.7%(9142/11472)、waive 後 91.4%(9142/9998),1474 bits waived、36 條 rule 不變。分母比 v2.1.0 時期多了(新 RTL 引入新的暫存器/邏輯),百分比因此比 92.0% 略降到 91.4%,是新增邏輯測試向量還沒做到窮盡的正常現象,不是既有測試變差,仍然遠高於 90% 目標。
+順便更新的整體數字(`docs/coverage_waivers.md` 第 1 節表格已同步):waive 前 79.7%(9142/11472)、waive 後 91.4%(9142/9998),1474 bits waived、36 條 rule 不變。分母比 v2.1.0 時期多了(新 RTL 引入新的暫存器/邏輯),百分比因此比 92.0% 略降到 91.4%,是新增邏輯測試向量還沒做到窮盡的正常現象,不是既有測試變差,仍然遠高於 90% 目標。

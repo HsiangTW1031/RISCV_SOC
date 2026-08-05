@@ -200,7 +200,7 @@ def render_toggle_waiver_section():
                 'instantiation). A waived bit is removed from both the numerator and the '
                 'denominator; it is not counted as covered. Rules + rationale: '
                 '<code>reports/sign_off/coverage/toggle_waivers.txt</code>. Full report: '
-                '<code>docs/coverage_waiver_report.md</code>.</p>')
+                '<code>docs/coverage_waivers.md</code>.</p>')
 
     out.append('<details class="cat"><summary>Waiver rules applied '
                 f'<span class="count">{len(twr["by_reason"])} reasons, {twr["waived_bit_count"]} bits</span></summary>')
@@ -224,7 +224,7 @@ def render_toggle_waiver_section():
     out.append('<p class="note">Not structurally impossible &mdash; each reflects limited test-vector '
                 'diversity (e.g. one fixed AES key, a handful of probed addresses, small divider '
                 'values) rather than hardware that cannot toggle. Left open deliberately rather '
-                'than waived away; see docs/coverage_waiver_report.md for the reasoning per group.</p>')
+                'than waived away; see docs/coverage_waivers.md for the reasoning per group.</p>')
     out.append('<table class="mini"><thead><tr><th>Block</th><th>File</th><th>Line</th><th>Signal</th><th>Bits uncovered</th></tr></thead><tbody>')
     for (block, file, base), v in sorted(residual_grouped.items(), key=lambda kv: -kv[1]["count"]):
         out.append(f'<tr><td>{esc(block)}</td><td class="mono">{esc(file)}</td><td>{v["line"]}</td>'

@@ -14,7 +14,7 @@
 # this generic netlist still answers the real question gate-level sim is
 # for -- did logic synthesis/optimization change behavior -- just without
 # also covering the technology-mapping step (that step is instead checked
-# formally, see docs/lec_report.md).
+# formally, see docs/lec_methodology.md).
 #
 # Same blackbox treatment for boot_rom/sram/dma_ram as synth.ys, for the
 # same reason (a 32K-word array synthesized into flip-flops is slow and

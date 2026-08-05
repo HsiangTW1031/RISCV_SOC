@@ -1,7 +1,7 @@
 // Unit test for aes_key_expand.v against the FIPS-197 Appendix A.1 AES-128
 // key expansion example (independently re-derived and cross-checked in a
 // throwaway Python script before this test was written -- see
-// docs/aes_report.md). Drives the module directly (no AXI-Lite here; this
+// docs/aes_notes.md). Drives the module directly (no AXI-Lite here; this
 // is an internal building block, not a CPU-visible peripheral).
 #include "Vaes_key_expand.h"
 #include "verilated.h"

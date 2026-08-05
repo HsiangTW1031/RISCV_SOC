@@ -118,7 +118,7 @@ and can still be run as plain `sta sta.tcl`.
 ## Formal LEC timing note
 
 `blocks/aes/syn/run_lec.sh`'s `equiv_induct -seq 12` step takes 10+ minutes
-and still only reaches ~97.7% proven (see `docs/lec_report.md`) — it's
+and still only reaches ~97.7% proven (see `docs/lec_methodology.md`) — it's
 deliberately **not** part of `collect_soc_reports.sh`/`reproduce_all.sh`'s
 automated path. Run it manually only when you specifically want to redo the
 formal equivalence check.

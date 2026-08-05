@@ -4,7 +4,7 @@
 # that Yosys's logic synthesis/optimization pass didn't change behavior
 # (a real synthesis-correctness question RTL-only regression can't answer).
 # Complements the formal RTL-vs-netlist equivalence check (see
-# docs/lec_report.md); this one is simulation-based, that one is proof-based.
+# docs/lec_methodology.md); this one is simulation-based, that one is proof-based.
 #
 # Scope: aes_core + soc_top only, matching this project's existing
 # per-block synthesis/STA scope (see docs/performance.md) -- most blocks

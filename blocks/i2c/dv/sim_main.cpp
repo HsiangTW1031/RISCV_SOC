@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
   check("slave received the ORIGINAL byte (0x11), not the mid-flight one (0x99)",
         dut->slave_rx_byte == 0x11);
 
-  // ---- divider register: extra bit coverage (see docs/coverage_waiver_report.md
+  // ---- divider register: extra bit coverage (see docs/coverage_waivers.md
   // section 5) ----
   // divider_reg is a directly-written register, so writing all-ones then a
   // small value again toggles every one of its bits both directions cheaply

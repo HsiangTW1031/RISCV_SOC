@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 
   // ---- extra address/data diversity for the bridge's rdata/addr CDC
   // pipeline registers (rdata_reg/rdata_tck/rdata_sync1/rdata_sync2,
-  // addr_reg/addr_tck -- see docs/coverage_waiver_report.md section 5):
+  // addr_reg/addr_tck -- see docs/coverage_waivers.md section 5):
   // the two words above leave some bits of these registers never
   // toggling the other way. A third word at the opposite end of the
   // address range fake_axi_lite_slave decodes (addr[5:2], 16 words),

@@ -7,7 +7,7 @@ run_target jtag_chain "$ROOT/blocks/jtag/dv" jtag_chain_testtop chain_sim obj_di
   "$ROOT/blocks/jtag/dv/jtag_chain_testtop.v" jtag_chain_sim_main.cpp
 
 # CDC stress test at the opposite ratio corner (tck faster than clk, see
-# docs/cdc_report.md) -- same scan sequence/checks, only the clock
+# docs/cdc_methodology.md) -- same scan sequence/checks, only the clock
 # relationship differs. Regression-only (not part of coverage collection).
 if [ -z "${COVERAGE_MODE:-}" ]; then
   run_target jtag_chain_fast_tck "$ROOT/blocks/jtag/dv" jtag_chain_testtop fast_tck_sim obj_dir_fast_tck \
