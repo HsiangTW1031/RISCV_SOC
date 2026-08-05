@@ -8,67 +8,12 @@ or ASIC tape-out target.
 
 ## Architecture
 
-```mermaid
-flowchart TB
-    CPU["PicoRV32 (picorv32_axi)<br/>vendored, unmodified<br/>ENABLE_MUL/DIV/COMPRESSED/IRQ"]
-    JTAGPROBE(("外部 JTAG probe"))
-    JTAGDTM["jtag_dtm + jtag_tap<br/>(tck/tms/tdi/tdo 獨立 clock domain)"]
-    BRIDGE["jtag_axi_bridge<br/>(CDC owner)"]
-
-    XBAR["axi_lite_xbar<br/>手刻 AXI4-Lite crossbar<br/>2 master (s0=CPU 優先, s1=JTAG) x 9 slave<br/>+ 自己的診斷 CSR(0x4000_7000,非周邊,v2.2.0)"]
-
-    ROM["boot_rom<br/>64KB"]
-    RAM["sram<br/>128KB"]
-    TIMER["timer"]
-    WDT["watchdog"]
-    UART["uart (TX-only)"]
-    I2C["i2c_master"]
-    SPI["spi_master"]
-    AES["aes<br/>(AXI-Lite wrapper)"]
-    DMACTRL["dma_engine<br/>控制埠 (AXI4-Lite)"]
-
-    DMABURST["dma_engine<br/>burst master (AXI4)"]
-    DMARAM["dma_ram<br/>8KB, 私有,不接 crossbar"]
-
-    JTAGPROBE <-->|JTAG| JTAGDTM
-    JTAGDTM <--> BRIDGE
-    BRIDGE -->|s1| XBAR
-    CPU -->|s0| XBAR
-
-    XBAR --> ROM
-    XBAR --> RAM
-    XBAR --> TIMER
-    XBAR --> WDT
-    XBAR --> UART
-    XBAR --> I2C
-    XBAR --> SPI
-    XBAR --> AES
-    XBAR --> DMACTRL
-
-    DMACTRL -.同一模組內部直連,不經 crossbar.-> DMABURST
-    DMABURST <-->|AXI4 INCR burst| DMARAM
-
-    TIMER -.irq bit3.-> CPU
-    WDT -.irq bit4.-> CPU
-    I2C -.irq bit5.-> CPU
-    SPI -.irq bit6.-> CPU
-    AES -.irq bit7.-> CPU
-    DMACTRL -.irq bit8.-> CPU
-    XBAR -.irq bit9 decode miss.-> CPU
-
-    classDef vendor fill:#3a3563,stroke:#8a7ce0,stroke-width:2px,color:#e8edf2;
-    classDef headline fill:#e08a3c,stroke:#e08a3c,color:#241206;
-
-    class CPU vendor
-    class AES,DMACTRL,DMABURST,DMARAM headline
-```
+![RISCV_SOC architecture](images/architecture.png)
 
 Purple = vendored third-party IP (only `picorv32_axi` — everything else on
 this diagram is this project's own RTL). Orange = the two headline
 deliverables (AES + DMA). Full rationale for every design choice on this
-diagram: [`docs/architecture.md`](docs/architecture.md). A styled standalone
-version (matching this palette) lives in
-[`images/architecture_versions/`](images/architecture_versions/).
+diagram, plus the equivalent mermaid source: [`docs/architecture.md`](docs/architecture.md).
 
 ## Features
 
